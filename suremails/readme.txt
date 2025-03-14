@@ -1,4 +1,4 @@
-=== SureMail – WordPress SMTP and Email Logs Plugin ===
+=== SureMail – SMTP and Email Logs Plugin with Auto-Retry Mechanism ===
 Contributors: brainstormforce
 Donate link: https://www.paypal.me/BrainstormForce
 Tags: smtp, email, gmail smtp, outlook, email logs
@@ -9,7 +9,7 @@ Stable tag: 1.3.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-SureMail – WordPress SMTP Plugin with Multiple SMTP Providers and Email Logs
+SureMail – SMTP Plugin with Multiple SMTP Providers, Email Logs, and Auto-Retry
 
 == Description ==
 
