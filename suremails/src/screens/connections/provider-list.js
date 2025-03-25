@@ -1,5 +1,5 @@
 import { useState, useRef } from '@wordpress/element';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { RadioButton, toast } from '@bsf/force-ui'; // Import toast for notifications
 
 const ProviderList = ( { onSelectProvider, providers } ) => {
@@ -21,8 +21,27 @@ const ProviderList = ( { onSelectProvider, providers } ) => {
 		if ( selectedOption && selectedOption.badge ) {
 			// Prevent multiple toasts by checking the ref
 			if ( ! toastRef.current ) {
+				const prerequisiteMessage = selectedOption.prerequisite ? (
+					selectedOption.prerequisite
+				) : (
+					<span
+						dangerouslySetInnerHTML={ {
+							__html: sprintf(
+								// translators: %1$s is anchor oneping tag and %2$s is the anchor closing tag.
+								__(
+									"This provider isn't compatible. For help, contact us %1$shere%2$s.",
+									'suremails'
+								),
+								'<a href="' + suremails.supportURL + '">',
+								'</a>'
+							),
+						} }
+					></span>
+				);
 				toast.info(
-					__( 'This provider is coming soon!', 'suremails' )
+					selectedOption.provider_type === 'not_compatible'
+						? prerequisiteMessage
+						: __( 'This provider is coming soon!', 'suremails' )
 				);
 				toastRef.current = true;
 				setTimeout( () => {

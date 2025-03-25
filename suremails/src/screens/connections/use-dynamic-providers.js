@@ -173,7 +173,23 @@ const prepareProviderData = ( [ key, value ] ) => {
 
 	if ( value?.provider_type === 'soon' ) {
 		providerData.badge = (
-			<Badge label="Planned" size="xxs" type="pill" variant="green" />
+			<Badge
+				label={ __( 'Planned', 'suremails' ) }
+				size="xxs"
+				type="pill"
+				variant="green"
+			/>
+		);
+	}
+
+	if ( value?.provider_type === 'not_compatible' ) {
+		providerData.badge = (
+			<Badge
+				label={ __( 'Not Compatible', 'suremails' ) }
+				size="xxs"
+				type="pill"
+				variant="yellow"
+			/>
 		);
 	}
 

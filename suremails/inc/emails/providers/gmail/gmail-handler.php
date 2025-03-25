@@ -197,7 +197,7 @@ class GmailHandler implements ConnectionHandler {
 			'fields'            => self::get_specific_fields(),
 			'icon'              => 'GmailIcon',
 			'display_name'      => __( 'Google Workspace / Gmail', 'suremails' ),
-			'provider_type'     => 'free',
+			'provider_type'     => PHP_VERSION_ID >= 80100 ? 'free' : 'not_compatible',
 			'field_sequence'    => [
 				'connection_title',
 				'client_id',
@@ -213,6 +213,7 @@ class GmailHandler implements ConnectionHandler {
 				'auth_code',
 			],
 			'provider_sequence' => 27,
+			'prerequisite'      => __( 'This provider does not work with your version of PHP. Please upgrade to PHP 8.1 or higher to use this provider.', 'suremails' ),
 		];
 	}
 

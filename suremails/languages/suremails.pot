@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: SureMail 1.4.0\n"
+"Project-Id-Version: SureMail 1.4.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/suremails\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-03-25T05:23:38+00:00\n"
+"POT-Creation-Date: 2025-03-25T13:59:25+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: suremails\n"
@@ -41,7 +41,7 @@ msgstr ""
 msgid "SureMail Settings"
 msgstr ""
 
-#: inc/admin/plugin.php:264
+#: inc/admin/plugin.php:265
 msgid "Settings"
 msgstr ""
 
@@ -247,13 +247,13 @@ msgid "The Return Path is where bounce messages (failed delivery notices) are se
 msgstr ""
 
 #: inc/emails/providers/aws/aws-handler.php:213
-#: inc/emails/providers/gmail/gmail-handler.php:286
+#: inc/emails/providers/gmail/gmail-handler.php:287
 #: inc/emails/providers/smtp/smtp-handler.php:218
 msgid "Return Path"
 msgstr ""
 
 #: inc/emails/providers/aws/aws-handler.php:215
-#: inc/emails/providers/gmail/gmail-handler.php:288
+#: inc/emails/providers/gmail/gmail-handler.php:289
 msgid "Enter Return Path"
 msgstr ""
 
@@ -450,86 +450,90 @@ msgstr ""
 msgid "Google Workspace / Gmail"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:231
+#: inc/emails/providers/gmail/gmail-handler.php:216
+msgid "This provider does not work with your version of PHP. Please upgrade to PHP 8.1 or higher to use this provider."
+msgstr ""
+
+#: inc/emails/providers/gmail/gmail-handler.php:232
 #: inc/emails/providers/outlook/outlook-handler.php:104
 msgid "Client ID"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:233
+#: inc/emails/providers/gmail/gmail-handler.php:234
 msgid "Enter your Gmail Client ID"
 msgstr ""
 
 #. translators: %s:  URL.
-#: inc/emails/providers/gmail/gmail-handler.php:235
+#: inc/emails/providers/gmail/gmail-handler.php:236
 msgid "Get Client ID and Secret ID from Google Cloud Platform. Follow the Gmail %s"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:236
+#: inc/emails/providers/gmail/gmail-handler.php:237
 msgid "documentation."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:242
+#: inc/emails/providers/gmail/gmail-handler.php:243
 #: inc/emails/providers/outlook/outlook-handler.php:112
 msgid "Client Secret"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:244
+#: inc/emails/providers/gmail/gmail-handler.php:245
 msgid "Enter your Gmail Client Secret"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:252
+#: inc/emails/providers/gmail/gmail-handler.php:253
 msgid "Paste the authorization code or refresh token here."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:259
+#: inc/emails/providers/gmail/gmail-handler.php:260
 #: inc/emails/providers/outlook/outlook-handler.php:120
 msgid "Redirect URI"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:263
+#: inc/emails/providers/gmail/gmail-handler.php:264
 msgid "Copy the above URL and add it to the \"Authorized Redirect URIs\" section in your Google Cloud Project. Ensure the URL matches exactly."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:270
+#: inc/emails/providers/gmail/gmail-handler.php:271
 msgid "Authenticate with Google"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:271
+#: inc/emails/providers/gmail/gmail-handler.php:272
 msgid "Click here to re-authenticate"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:285
+#: inc/emails/providers/gmail/gmail-handler.php:286
 msgid "The Return Path is where bounce messages (failed delivery notices) are sent. Enable this to receive bounce notifications at the \"From Email\" address if delivery fails."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:327
+#: inc/emails/providers/gmail/gmail-handler.php:328
 msgid "Failed to encode body to JSON."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:347
+#: inc/emails/providers/gmail/gmail-handler.php:348
 msgid "Unknow error from Gmail API."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:369
+#: inc/emails/providers/gmail/gmail-handler.php:370
 msgid "Failed to get new token from Gmail API"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:378
+#: inc/emails/providers/gmail/gmail-handler.php:379
 msgid "Failed to authenticate"
 msgstr ""
 
 #. translators: %s: Error description.
-#: inc/emails/providers/gmail/gmail-handler.php:380
-#: inc/emails/providers/gmail/gmail-handler.php:424
+#: inc/emails/providers/gmail/gmail-handler.php:381
+#: inc/emails/providers/gmail/gmail-handler.php:425
 msgid "Failed to get new token from Gmail API: %s"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:403
+#: inc/emails/providers/gmail/gmail-handler.php:404
 msgid "Successfully added new tokens."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:417
-#: inc/emails/providers/gmail/gmail-handler.php:422
+#: inc/emails/providers/gmail/gmail-handler.php:418
+#: inc/emails/providers/gmail/gmail-handler.php:423
 msgid "Failed to get new token from Gmail API."
 msgstr ""
 
@@ -1184,6 +1188,10 @@ msgid "Unknown"
 msgstr ""
 
 #: build/main.js:2
+msgid "This provider isn't compatible. For help, contact us %1$shere%2$s."
+msgstr ""
+
+#: build/main.js:2
 msgid "This provider is coming soon!"
 msgstr ""
 
@@ -1409,6 +1417,14 @@ msgstr ""
 
 #: build/main.js:2
 msgid "Please enter a valid email address"
+msgstr ""
+
+#: build/main.js:2
+msgid "Planned"
+msgstr ""
+
+#: build/main.js:2
+msgid "Not Compatible"
 msgstr ""
 
 #: build/main.js:2
