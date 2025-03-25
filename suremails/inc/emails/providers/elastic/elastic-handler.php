@@ -475,7 +475,7 @@ class ElasticHandler implements ConnectionHandler {
 				'datatype'    => 'string',
 				'help_text'   => sprintf(       // translators: %s: www.mailgun.com/about/regions/ URL.
 					__( 'Select the type of email you will be sending using this connection. Choose Transactional Email for emails like password resets, order confirmations, etc. Select Marketing Email for sending bulk emails like newsletters, broadcasts, etc. %1$sLearn more%2$s', 'suremails' ),
-					'<a href="' . esc_url( 'https://suremails.com/docs/elastic-email/' ) . '" target="_blank">',
+					'<a href="' . esc_url( 'https://suremails.com/docs/elastic-email?utm_campaign=suremails&utm_medium=suremails-dashboard' ) . '" target="_blank">',
 					'</a>'
 				),
 				'label'       => __( 'Email Type', 'suremails' ),

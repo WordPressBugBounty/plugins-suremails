@@ -55,82 +55,11 @@ class MailgunHandler implements ConnectionHandler {
 	 * @throws \Exception If the API key, domain, or from email is missing, or if the domain is not active.
 	 */
 	public function authenticate() {
-		$result = [
-			'success'    => false,
-			'message'    => '',
+		return [
+			'success'    => true,
+			'message'    => __( 'Mailgun connection saved successfully.', 'suremails' ),
 			'error_code' => 200,
 		];
-		try {
-			$api_key    = sanitize_text_field( $this->connection_data['api_key'] ?? '' );
-			$domain     = sanitize_text_field( $this->connection_data['domain'] ?? '' );
-			$from_email = sanitize_email( $this->connection_data['from_email'] ?? '' );
-
-			if ( empty( $api_key ) || empty( $domain ) || empty( $from_email ) ) {
-				throw new \Exception( __( 'API key, domain, or from email is missing in the connection data.', 'suremails' ), 400 );
-			}
-
-			if ( ! filter_var( $from_email, FILTER_VALIDATE_EMAIL ) ) {
-				throw new \Exception( __( 'The "From Email" is not a valid email address.', 'suremails' ), 400 );
-			}
-
-			$region   = ! empty( $this->connection_data['region'] ) ? sanitize_text_field( $this->connection_data['region'] ) : 'US';
-			$api_base = 'EU' === strtoupper( $region ) ? self::API_BASE_EU_V4 : self::API_BASE_US_V4;
-			$api_url  = $api_base . 'domains';
-
-			$response = wp_remote_get(
-				$api_url,
-				[
-					'headers' => [
-						'Authorization' => 'Basic ' . base64_encode( 'api:' . $api_key ),
-					],
-				]
-			);
-
-			if ( is_wp_error( $response ) ) {
-				throw new \Exception( __( 'Failed to fetch domains: ', 'suremails' ) . $response->get_error_message(), (int) $response->get_error_code() );
-			}
-
-			$response_code = wp_remote_retrieve_response_code( $response );
-			if ( $response_code !== 200 ) {
-				throw new \Exception( __( 'Failed to validate API key or retrieve domains. Please check your API key.', 'suremails' ), (int) $response_code );
-			}
-
-			$response_body = wp_remote_retrieve_body( $response );
-			$domains       = json_decode( $response_body, true );
-
-			if ( ! isset( $domains['items'] ) || ! is_array( $domains['items'] ) ) {
-				throw new \Exception( __( 'Invalid response received from Mailgun API.', 'suremails' ), 500 );
-			}
-
-			$domain_found = array_filter(
-				$domains['items'],
-				static function ( $domain_item ) use ( $domain ) {
-					return isset( $domain_item['name'], $domain_item['state'] ) &&
-					strtolower( $domain_item['name'] ) === strtolower( $domain ) &&
-					$domain_item['state'] === 'active';
-				}
-			);
-
-			if ( ! $domain_found ) {
-				throw new \Exception( __( 'Domain is not active or does not exist in your Mailgun account.', 'suremails' ), 404 );
-			}
-
-			$email_parts  = explode( '@', $from_email );
-			$email_domain = strtolower( trim( $email_parts[1] ) );
-
-			if ( $email_domain !== strtolower( $domain ) ) {
-				throw new \Exception( __( 'The domain of the "From Email" does not match the connection domain.', 'suremails' ), 400 );
-			}
-
-			$result['success'] = true;
-			$result['message'] = __( 'Mailgun connection authenticated successfully.', 'suremails' );
-
-		} catch ( \Exception $e ) {
-			$result['message']    = $e->getMessage();
-			$result['error_code'] = $e->getCode();
-		}
-
-		return $result;
 	}
 
 	/**

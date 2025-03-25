@@ -58,11 +58,12 @@ class SparkpostHandler implements ConnectionHandler {
 
 		$api_key    = sanitize_text_field( $this->connection_data['api_key'] ?? '' );
 		$from_email = sanitize_email( $this->connection_data['from_email'] ?? '' );
+		$region     = sanitize_text_field( $this->connection_data['region'] ?? '' );
 
-		if ( empty( $api_key ) || empty( $from_email ) ) {
+		if ( empty( $api_key ) || empty( $from_email ) || empty( $region ) ) {
 			return [
 				'success' => false,
-				'message' => __( 'Authentication key is missing.', 'suremails' ),
+				'message' => __( 'Required fields are missing.', 'suremails' ),
 			];
 		}
 
@@ -70,34 +71,6 @@ class SparkpostHandler implements ConnectionHandler {
 			return [
 				'success' => false,
 				'message' => __( 'The "From Email" is not a valid email address.', 'suremails' ),
-			];
-		}
-
-		$region  = ! empty( $this->connection_data['region'] ) ? sanitize_text_field( $this->connection_data['region'] ) : 'US';
-		$api_url = 'EU' === strtoupper( $region ) ? self::API_BASE_EU : self::API_BASE_US;
-
-		$response = wp_remote_get(
-			$api_url . 'account',
-			[
-				'headers' => [
-					'Authorization' => $api_key,
-				],
-				'timeout' => 15,
-			]
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return [
-				'success' => false,
-				'message' => __( 'Failed to validate API key.', 'suremails' ),
-			];
-		}
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-		if ( $response_code !== 200 ) {
-			return [
-				'success' => false,
-				'message' => __( 'Failed to validate API key. Please check your API key.', 'suremails' ),
 			];
 		}
 

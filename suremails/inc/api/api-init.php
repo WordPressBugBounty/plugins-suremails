@@ -53,6 +53,7 @@ class Api_Init {
 			'SureMails\Inc\API\RecommendedPlugin',
 			'SureMails\Inc\API\ContentGuard',
 			'SureMails\Inc\API\Provider',
+			'SureMails\Inc\API\Auth',
 		];
 
 		foreach ( $controllers as $controller_class ) {

@@ -5,6 +5,7 @@ import { Shield, Sparkles, Check } from 'lucide-react';
 import { activateContentGuard, saveUserDetails } from '@api/settings';
 import { z } from 'zod';
 import { cn } from '@utils/utils';
+import Title from '@components/title/title';
 
 // Constants moved to top level
 const INITIAL_FORM_STATE = {
@@ -66,12 +67,13 @@ const ContentGuardHeader = () => (
 	<div className="space-y-1.5">
 		<Shield className="w-6 h-6 text-icon-primary" strokeWidth="1.25" />
 		<div className="space-y-1">
-			<h5 className="inline-block">
-				{ __(
+			<Title
+				tag="h2"
+				title={ __(
 					'Safeguard Your Email with Reputation Shield',
 					'suremails'
 				) }
-			</h5>
+			/>
 			{ window?.suremails?.contentGuardPopupStatus && (
 				<>
 					<p>

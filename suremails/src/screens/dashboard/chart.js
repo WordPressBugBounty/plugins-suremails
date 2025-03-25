@@ -225,7 +225,7 @@ export const Chart = ( {
 			className="w-full h-full p-4 rounded-xl bg-background-primary border-border-subtle border-0.5"
 		>
 			<Container.Item className="flex items-center justify-between w-full p-1">
-				<Title title={ __( 'Overview', 'suremails' ) } tag="h5" />
+				<Title title={ __( 'Overview', 'suremails' ) } tag="h3" />
 
 				<div className="flex items-center gap-2">
 					{ selectedDates.from || selectedDates.to ? (

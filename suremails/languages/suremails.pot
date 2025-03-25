@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: SureMail 1.3.0\n"
+"Project-Id-Version: SureMail 1.4.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/suremails\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-02-27T05:34:30+00:00\n"
+"POT-Creation-Date: 2025-03-25T05:23:38+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.10.0\n"
 "X-Domain: suremails\n"
@@ -17,7 +17,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: suremails.php
-#: inc/admin/plugin.php:168
+#: inc/admin/plugin.php:171
 #: inc/nps-notice.php:87
 msgid "SureMail"
 msgstr ""
@@ -37,11 +37,11 @@ msgstr ""
 msgid "https://suremails.com/"
 msgstr ""
 
-#: inc/admin/plugin.php:167
+#: inc/admin/plugin.php:170
 msgid "SureMail Settings"
 msgstr ""
 
-#: inc/admin/plugin.php:257
+#: inc/admin/plugin.php:264
 msgid "Settings"
 msgstr ""
 
@@ -124,19 +124,19 @@ msgstr ""
 msgid "Failed to authenticate."
 msgstr ""
 
-#: inc/api/save-test-connection.php:143
+#: inc/api/save-test-connection.php:144
 msgid "Connection authenticated and settings saved."
 msgstr ""
 
-#: inc/api/save-test-connection.php:152
+#: inc/api/save-test-connection.php:153
 msgid "An error occurred: "
 msgstr ""
 
-#: inc/api/save-test-connection.php:171
+#: inc/api/save-test-connection.php:172
 msgid "Invalid connection type."
 msgstr ""
 
-#: inc/api/save-test-connection.php:260
+#: inc/api/save-test-connection.php:297
 msgid "Missing required field."
 msgstr ""
 
@@ -177,91 +177,94 @@ msgstr ""
 msgid "An error occurred while validating the content."
 msgstr ""
 
-#: inc/controller/content-guard.php:312
+#: inc/controller/content-guard.php:308
 msgid "Email content is flagged."
 msgstr ""
 
 #: inc/emails/handler/mail-handler.php:145
 #: inc/emails/handler/mail-handler.php:456
-#: inc/emails/providers/aws/aws-handler.php:124
+#: inc/emails/providers/aws/aws-handler.php:133
 #: inc/emails/providers/brevo/brevo-handler.php:225
-#: inc/emails/providers/mailgun/mailgun-handler.php:168
+#: inc/emails/providers/mailgun/mailgun-handler.php:97
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:183
 #: inc/emails/providers/smtp/smtp-handler.php:126
 msgid "WordPress"
 msgstr ""
 
 #: inc/emails/providers/aws/aws-handler.php:83
-#: inc/emails/providers/aws/aws-handler.php:93
+#: inc/emails/providers/aws/aws-handler.php:102
 msgid "AWS SES authentication successful."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:95
+#: inc/emails/providers/aws/aws-handler.php:104
 msgid "AWS SES authentication failed: The from_email or its domain is not a verified identity."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:98
+#: inc/emails/providers/aws/aws-handler.php:107
 msgid "AWS SES authentication failed: "
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:144
+#: inc/emails/providers/aws/aws-handler.php:153
 msgid "Email sent successfully via AWS SES."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:151
+#: inc/emails/providers/aws/aws-handler.php:160
 msgid "Email sending failed via AWS SES: "
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:163
+#: inc/emails/providers/aws/aws-handler.php:172
 msgid "AWS Connection"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:164
+#: inc/emails/providers/aws/aws-handler.php:173
 msgid "Amazon SES"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:165
+#: inc/emails/providers/aws/aws-handler.php:174
 msgid "Enter the details below to connect with your Amazon SES account."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:185
+#: inc/emails/providers/aws/aws-handler.php:194
 msgid "Access Key"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:187
+#: inc/emails/providers/aws/aws-handler.php:196
 msgid "Enter your AWS access key"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:194
+#: inc/emails/providers/aws/aws-handler.php:203
 #: inc/emails/providers/mailjet/mailjet-handler.php:268
 msgid "Secret Key"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:196
+#: inc/emails/providers/aws/aws-handler.php:205
 msgid "Enter your AWS secret key"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:203
+#: inc/emails/providers/aws/aws-handler.php:212
 #: inc/emails/providers/smtp/smtp-handler.php:217
 msgid "The Return Path is where bounce messages (failed delivery notices) are sent. If it’s off, you might not get these messages. Turn it on to receive bounce notifications at the \"From Email\" address if delivery fails."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:204
+#: inc/emails/providers/aws/aws-handler.php:213
+#: inc/emails/providers/gmail/gmail-handler.php:286
 #: inc/emails/providers/smtp/smtp-handler.php:218
 msgid "Return Path"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:206
+#: inc/emails/providers/aws/aws-handler.php:215
+#: inc/emails/providers/gmail/gmail-handler.php:288
 msgid "Enter Return Path"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:217
-#: inc/emails/providers/mailgun/mailgun-handler.php:300
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:317
+#: inc/emails/providers/aws/aws-handler.php:226
+#: inc/emails/providers/mailgun/mailgun-handler.php:229
+#: inc/emails/providers/netcore/netcore-handler.php:225
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:290
 msgid "Region"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:219
+#: inc/emails/providers/aws/aws-handler.php:228
 msgid "Select Region"
 msgstr ""
 
@@ -300,7 +303,7 @@ msgstr ""
 #: inc/emails/providers/mailjet/mailjet-handler.php:185
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:266
 #: inc/emails/providers/smtp2go/smtp2go-handler.php:204
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:179
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:152
 msgid "Failed to encode email payload to JSON."
 msgstr ""
 
@@ -315,7 +318,7 @@ msgid "Email sent successfully via Brevo."
 msgstr ""
 
 #: inc/emails/providers/brevo/brevo-handler.php:329
-#: inc/emails/providers/mailgun/mailgun-handler.php:249
+#: inc/emails/providers/mailgun/mailgun-handler.php:178
 #: inc/emails/providers/postmark/postmark-handler.php:168
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:291
 msgid "Unknown error."
@@ -335,12 +338,12 @@ msgstr ""
 
 #: inc/emails/providers/brevo/brevo-handler.php:370
 #: inc/emails/providers/elastic/elastic-handler.php:464
-#: inc/emails/providers/mailgun/mailgun-handler.php:285
+#: inc/emails/providers/mailgun/mailgun-handler.php:214
 #: inc/emails/providers/mailjet/mailjet-handler.php:260
-#: inc/emails/providers/netcore/netcore-handler.php:104
+#: inc/emails/providers/netcore/netcore-handler.php:217
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:332
 #: inc/emails/providers/smtp2go/smtp2go-handler.php:280
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:309
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:282
 msgid "API Key"
 msgstr ""
 
@@ -406,138 +409,187 @@ msgstr ""
 msgid "Email sending failed via Elastic Email. Error: %1$s"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:54
-msgid "Gmail connection saved successfully."
+#: inc/emails/providers/gmail/gmail-handler.php:83
+msgid "Failed to authenticate with Gmail."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:72
-msgid "Gmail sending not yet implemented."
+#: inc/emails/providers/gmail/gmail-handler.php:109
+msgid "No authorization code or refresh token provided. Please authenticate first."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:84
+#: inc/emails/providers/gmail/gmail-handler.php:113
+msgid "Failed to retrieve authentication tokens. Please try to re-authenticate"
+msgstr ""
+
+#: inc/emails/providers/gmail/gmail-handler.php:119
+msgid "Successfully authenticated with Gmail."
+msgstr ""
+
+#: inc/emails/providers/gmail/gmail-handler.php:137
+#: inc/emails/providers/gmail/gmail-handler.php:177
+msgid "Failed to send email via Gmail."
+msgstr ""
+
+#: inc/emails/providers/gmail/gmail-handler.php:171
+msgid "Email sent successfully via Gmail."
+msgstr ""
+
+#: inc/emails/providers/gmail/gmail-handler.php:183
+msgid "Error sending email via Gmail: "
+msgstr ""
+
+#: inc/emails/providers/gmail/gmail-handler.php:195
 msgid "Gmail Connection"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:85
+#: inc/emails/providers/gmail/gmail-handler.php:196
 msgid "Enter the details below to connect with your Gmail account."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:88
-msgid "Gmail"
+#: inc/emails/providers/gmail/gmail-handler.php:199
+msgid "Google Workspace / Gmail"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:104
+#: inc/emails/providers/gmail/gmail-handler.php:231
 #: inc/emails/providers/outlook/outlook-handler.php:104
 msgid "Client ID"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:106
+#: inc/emails/providers/gmail/gmail-handler.php:233
 msgid "Enter your Gmail Client ID"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:111
+#. translators: %s:  URL.
+#: inc/emails/providers/gmail/gmail-handler.php:235
+msgid "Get Client ID and Secret ID from Google Cloud Platform. Follow the Gmail %s"
+msgstr ""
+
+#: inc/emails/providers/gmail/gmail-handler.php:236
+msgid "documentation."
+msgstr ""
+
+#: inc/emails/providers/gmail/gmail-handler.php:242
 #: inc/emails/providers/outlook/outlook-handler.php:112
 msgid "Client Secret"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:113
+#: inc/emails/providers/gmail/gmail-handler.php:244
 msgid "Enter your Gmail Client Secret"
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:119
-msgid "Refresh Token"
+#: inc/emails/providers/gmail/gmail-handler.php:252
+msgid "Paste the authorization code or refresh token here."
 msgstr ""
 
-#: inc/emails/providers/gmail/gmail-handler.php:121
-msgid "Enter your Gmail Refresh Token"
+#: inc/emails/providers/gmail/gmail-handler.php:259
+#: inc/emails/providers/outlook/outlook-handler.php:120
+msgid "Redirect URI"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:69
-msgid "API key, domain, or from email is missing in the connection data."
+#: inc/emails/providers/gmail/gmail-handler.php:263
+msgid "Copy the above URL and add it to the \"Authorized Redirect URIs\" section in your Google Cloud Project. Ensure the URL matches exactly."
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:73
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:72
-msgid "The \"From Email\" is not a valid email address."
+#: inc/emails/providers/gmail/gmail-handler.php:270
+msgid "Authenticate with Google"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:90
-msgid "Failed to fetch domains: "
+#: inc/emails/providers/gmail/gmail-handler.php:271
+msgid "Click here to re-authenticate"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:95
-msgid "Failed to validate API key or retrieve domains. Please check your API key."
+#: inc/emails/providers/gmail/gmail-handler.php:285
+msgid "The Return Path is where bounce messages (failed delivery notices) are sent. Enable this to receive bounce notifications at the \"From Email\" address if delivery fails."
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:102
-msgid "Invalid response received from Mailgun API."
+#: inc/emails/providers/gmail/gmail-handler.php:327
+msgid "Failed to encode body to JSON."
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:115
-msgid "Domain is not active or does not exist in your Mailgun account."
+#: inc/emails/providers/gmail/gmail-handler.php:347
+msgid "Unknow error from Gmail API."
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:122
-msgid "The domain of the \"From Email\" does not match the connection domain."
+#: inc/emails/providers/gmail/gmail-handler.php:369
+msgid "Failed to get new token from Gmail API"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:126
-msgid "Mailgun connection authenticated successfully."
+#: inc/emails/providers/gmail/gmail-handler.php:378
+msgid "Failed to authenticate"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:157
+#. translators: %s: Error description.
+#: inc/emails/providers/gmail/gmail-handler.php:380
+#: inc/emails/providers/gmail/gmail-handler.php:424
+msgid "Failed to get new token from Gmail API: %s"
+msgstr ""
+
+#: inc/emails/providers/gmail/gmail-handler.php:403
+msgid "Successfully added new tokens."
+msgstr ""
+
+#: inc/emails/providers/gmail/gmail-handler.php:417
+#: inc/emails/providers/gmail/gmail-handler.php:422
+msgid "Failed to get new token from Gmail API."
+msgstr ""
+
+#: inc/emails/providers/mailgun/mailgun-handler.php:60
+msgid "Mailgun connection saved successfully."
+msgstr ""
+
+#: inc/emails/providers/mailgun/mailgun-handler.php:86
 msgid "Mailgun domain is missing."
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:235
-#: inc/emails/providers/mailgun/mailgun-handler.php:250
+#: inc/emails/providers/mailgun/mailgun-handler.php:164
+#: inc/emails/providers/mailgun/mailgun-handler.php:179
 msgid "Mailgun send failed: "
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:247
+#: inc/emails/providers/mailgun/mailgun-handler.php:176
 msgid "Email sent successfully via Mailgun."
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:264
+#: inc/emails/providers/mailgun/mailgun-handler.php:193
 msgid "Mailgun Connection"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:265
+#: inc/emails/providers/mailgun/mailgun-handler.php:194
 msgid "Enter the details below to connect with your Mailgun account."
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:268
+#: inc/emails/providers/mailgun/mailgun-handler.php:197
 msgid "Mailgun"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:287
+#: inc/emails/providers/mailgun/mailgun-handler.php:216
 msgid "Enter your Mailgun API key"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:293
+#: inc/emails/providers/mailgun/mailgun-handler.php:222
 msgid "Domain"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:295
+#: inc/emails/providers/mailgun/mailgun-handler.php:224
 msgid "Enter your Mailgun domain"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:303
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:320
+#: inc/emails/providers/mailgun/mailgun-handler.php:232
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:293
 msgid "US"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:304
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:321
+#: inc/emails/providers/mailgun/mailgun-handler.php:233
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:294
 msgid "EU"
 msgstr ""
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:307
+#: inc/emails/providers/mailgun/mailgun-handler.php:236
 msgid "Select your Mailgun region"
 msgstr ""
 
 #. translators: %s: www.mailgun.com/about/regions/ URL.
-#: inc/emails/providers/mailgun/mailgun-handler.php:309
+#: inc/emails/providers/mailgun/mailgun-handler.php:238
 msgid "Select the endpoint you want to use for sending messages. If you are subject to EU laws, you may need to use the EU region. %1$sLearn more at Mailgun.com%2$s"
 msgstr ""
 
@@ -592,28 +644,45 @@ msgstr ""
 msgid "Enter your Mailjet Secret key"
 msgstr ""
 
-#: inc/emails/providers/netcore/netcore-handler.php:54
+#: inc/emails/providers/netcore/netcore-handler.php:72
 msgid "Netcore connection saved successfully."
 msgstr ""
 
-#: inc/emails/providers/netcore/netcore-handler.php:72
-msgid "Netcore sending not yet implemented."
+#: inc/emails/providers/netcore/netcore-handler.php:149
+msgid "Email sending failed via Netcore. Failed to encode email body to JSON."
 msgstr ""
 
-#: inc/emails/providers/netcore/netcore-handler.php:84
+#: inc/emails/providers/netcore/netcore-handler.php:166
+#: inc/emails/providers/netcore/netcore-handler.php:182
+msgid "Email sending failed via Netcore. "
+msgstr ""
+
+#: inc/emails/providers/netcore/netcore-handler.php:179
+msgid "Email sent successfully via Netcore."
+msgstr ""
+
+#: inc/emails/providers/netcore/netcore-handler.php:196
 msgid "Netcore Connection"
 msgstr ""
 
-#: inc/emails/providers/netcore/netcore-handler.php:85
+#: inc/emails/providers/netcore/netcore-handler.php:197
 msgid "Enter the details below to connect with your Netcore account."
 msgstr ""
 
-#: inc/emails/providers/netcore/netcore-handler.php:88
+#: inc/emails/providers/netcore/netcore-handler.php:200
 msgid "Netcore"
 msgstr ""
 
-#: inc/emails/providers/netcore/netcore-handler.php:106
+#: inc/emails/providers/netcore/netcore-handler.php:219
 msgid "Enter your Netcore API key"
+msgstr ""
+
+#: inc/emails/providers/netcore/netcore-handler.php:238
+msgid "Select your Netcore region"
+msgstr ""
+
+#: inc/emails/providers/netcore/netcore-handler.php:239
+msgid "Select the endpoint you want to use for sending messages. If you are subject to EU laws, you may need to use the EU region."
 msgstr ""
 
 #: inc/emails/providers/outlook/outlook-handler.php:54
@@ -642,10 +711,6 @@ msgstr ""
 
 #: inc/emails/providers/outlook/outlook-handler.php:114
 msgid "Enter your Outlook Client Secret"
-msgstr ""
-
-#: inc/emails/providers/outlook/outlook-handler.php:120
-msgid "Redirect URI"
 msgstr ""
 
 #: inc/emails/providers/outlook/outlook-handler.php:122
@@ -943,66 +1008,62 @@ msgstr ""
 msgid "Enter your SMTP2GO API Key"
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:65
-msgid "Authentication key is missing."
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:66
+msgid "Required fields are missing."
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:92
-msgid "Failed to validate API key."
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:73
+msgid "The \"From Email\" is not a valid email address."
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:100
-msgid "Failed to validate API key. Please check your API key."
-msgstr ""
-
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:106
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:79
 msgid "SparkPost connection saved successfully."
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:129
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:102
 msgid "API key is missing in the connection data."
 msgstr ""
 
 #. translators: %s: Error message.
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:204
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:177
 msgid "Error: %s"
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:217
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:190
 msgid "Email sent successfully via SparkPost."
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:222
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:195
 msgid "Unknown error"
 msgstr ""
 
 #. translators: %s: Error message.
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:227
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:200
 msgid "Email sending failed via SparkPost. Error: %s"
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:288
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:261
 msgid "SparkPost Connection"
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:289
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:262
 msgid "Enter the details below to connect with your SparkPost account."
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:292
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:265
 msgid "SparkPost"
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:311
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:284
 msgid "Enter your SparkPost API key"
 msgstr ""
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:324
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:297
 msgid "Select your SpartPost region"
 msgstr ""
 
 #. translators: %s: www.mailgun.com/about/regions/ URL.
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:326
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:299
 msgid "Select the endpoint you want to use for sending messages. If you are subject to EU laws, you may need to use the EU region. %1$sLearn more at SparkPost.com%2$s"
 msgstr ""
 
@@ -1071,7 +1132,7 @@ msgstr ""
 msgid "Force From Name"
 msgstr ""
 
-#. translators: %s: https://suremails.com/docs/multiple-backup-connections/ URL.
+#. translators: %s: https://suremails.com/docs/multiple-backup-connections?utm_campaign=suremails&utm_medium=suremails-dashboard URL.
 #: inc/providers.php:119
 msgid "Set the order in which connections should be used to send emails. The connection for the \"From Email\" specified above and the lowest sequence number will be used first. If that connection fails, the next connection with the same \"From Email\" and the following lowest sequence number will be used. %1$sMore Information here%2$s"
 msgstr ""
@@ -1140,6 +1201,26 @@ msgstr ""
 
 #: build/main.js:2
 msgid "Show more"
+msgstr ""
+
+#: build/main.js:2
+msgid "Copied to clipboard"
+msgstr ""
+
+#: build/main.js:2
+msgid "Copy to clipboard"
+msgstr ""
+
+#: build/main.js:2
+msgid "There was an issue getting the auth URL."
+msgstr ""
+
+#: build/main.js:2
+msgid "Error In Auth URL"
+msgstr ""
+
+#: build/main.js:2
+msgid "There was an issue generating the auth URL."
 msgstr ""
 
 #: build/main.js:2
@@ -1816,6 +1897,22 @@ msgstr ""
 
 #: build/main.js:2
 msgid "Date"
+msgstr ""
+
+#: build/main.js:2
+msgid "Welcome to SureMail"
+msgstr ""
+
+#: build/main.js:2
+msgid "Let’s Get Your First Connection Set Up!"
+msgstr ""
+
+#: build/main.js:2
+msgid "Connect to a trusted SMTP provider to ensure secure and reliable email delivery."
+msgstr ""
+
+#: build/main.js:2
+msgid "Connect with SMTP Provider"
 msgstr ""
 
 #: build/main.js:2

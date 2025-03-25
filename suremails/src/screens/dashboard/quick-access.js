@@ -9,7 +9,7 @@ const quickAccessItems = [
 		id: '1',
 		icon: <HelpCircle className="w-4 h-4" />,
 		label: __( 'Help Center', 'suremails' ),
-		link: 'https://suremails.com/docs',
+		link: suremails?.docsURL,
 	},
 	{
 		id: '2',
@@ -33,7 +33,7 @@ export const QuickAccess = ( { items = quickAccessItems } ) => (
 		gap="xs"
 	>
 		<Container.Item className="p-1 md:w-full lg:w-full">
-			<Title title={ __( 'Quick Access', 'suremails' ) } tag="h6" />
+			<Title title={ __( 'Quick Access', 'suremails' ) } tag="h4" />
 		</Container.Item>
 		<Container.Item className="flex flex-col gap-1 p-1 rounded-lg md:w-full lg:w-full bg-field-primary-background">
 			{ items.map( ( button ) => (

@@ -5,7 +5,7 @@ Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.3.0
+Stable tag: 1.4.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -242,6 +242,12 @@ Yes, SureMail uses secure encryption methods like TLS/SSL to protect your email 
 5. Email Logs – Monitor your email activity with detailed logs to track successful, failed, in progress, and blocked emails easily.
 
 == Changelog ==
+
+v1.4.0 - 25-March-2025
+- New: Added Netcore email service provider.
+- New: Added Gmail email service provider.
+- Fix: Fixed issue where the i18n translations were not working.
+- Fix: Fixed AWS subdomain verification issue.
 
 v1.3.0 - 27-February-2025
 - New: Added the PHP Mail service provider.

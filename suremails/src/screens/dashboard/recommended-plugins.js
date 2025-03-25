@@ -347,7 +347,7 @@ const RecommendedPlugins = () => {
 									'Extend Your Website',
 									'suremails'
 								) }
-								tag="h6"
+								tag="h4"
 							/>
 						</Container.Item>
 					</Container>

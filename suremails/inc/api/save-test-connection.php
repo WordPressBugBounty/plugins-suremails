@@ -135,7 +135,8 @@ class SaveTestConnection extends Api_Base {
 			}
 
 			// If the connection is authenticated, store the connection data.
-			$new_connection_data = $this->store_connection( $connection_data );
+			$add_extra_fields    = $this->add_extra_fields( $connection_data, $auth_result );
+			$new_connection_data = $this->store_connection( $add_extra_fields );
 
 			return new WP_REST_Response(
 				[
@@ -239,6 +240,42 @@ class SaveTestConnection extends Api_Base {
 
 		// Update the options in the WordPress database.
 		update_option( SUREMAILS_CONNECTIONS, Settings::instance()->encrypt_all( $options ) );
+
+		return $connection_data;
+	}
+
+	/**
+	 * Add extra fields to the connection data.
+	 *
+	 * @param array $connection_data The connection data.
+	 * @param array $new_fields The new fields to add.
+	 * @return array The updated connection data.
+	 */
+	protected function add_extra_fields( $connection_data, $new_fields ) {
+
+		$providers = [
+			'GMAIL',
+
+		];
+
+		if ( ! in_array( $connection_data['type'], $providers ) ) {
+			return $connection_data;
+		}
+
+		if ( isset( $new_fields['refresh_token'] ) ) {
+			$connection_data['refresh_token'] = $new_fields['refresh_token'];
+		}
+		if ( isset( $new_fields['access_token'] ) ) {
+			$connection_data['access_token'] = $new_fields['access_token'];
+		}
+		if ( isset( $new_fields['expires_in'] ) ) {
+			$connection_data['expires_in'] = $new_fields['expires_in'];
+		}
+		if ( isset( $new_fields['expire_stamp'] ) ) {
+			$connection_data['expire_stamp'] = $new_fields['expire_stamp'];
+		}
+
+		unset( $connection_data['auth_code'] );
 
 		return $connection_data;
 	}

@@ -47,7 +47,7 @@ const RecentLogs = ( { recentLogs, hasConnections = true } ) => {
 			<div className="flex items-center justify-between p-1">
 				<Title
 					title={ __( 'Recent Email Logs', 'suremails' ) }
-					tag="h5"
+					tag="h3"
 				/>
 				{ recentLogs.length > 0 && (
 					<Button

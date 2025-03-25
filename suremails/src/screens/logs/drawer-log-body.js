@@ -14,6 +14,7 @@ import {
 } from '@utils/utils';
 import CollapsibleSection from '@components/collapsible-section';
 import ContentGuardChecks from './content-guard-checks';
+import Title from '@components/title/title';
 
 const DrawerLogBody = ( { log } ) => {
 	const [ selectedRetry, setSelectedRetry ] = useState( null );
@@ -218,9 +219,7 @@ const DrawerLogBody = ( { log } ) => {
 			{ /* Email Body Section */ }
 			<CollapsibleSection defaultOpen>
 				<CollapsibleSection.Trigger>
-					<h3 className="text-sm font-medium text-field-label">
-						{ __( 'Email Body', 'suremails' ) }
-					</h3>
+					<Title tag="h4" title={ __( 'Email Body', 'suremails' ) } />
 				</CollapsibleSection.Trigger>
 				<CollapsibleSection.Content className="bg-background-secondary rounded overflow-hidden">
 					<div ref={ createAndAttachEmailBody( log.body ) }>
@@ -237,9 +236,10 @@ const DrawerLogBody = ( { log } ) => {
 			{ /* Server Response Section */ }
 			<CollapsibleSection defaultOpen>
 				<CollapsibleSection.Trigger>
-					<h3 className="text-sm font-medium text-field-label">
-						{ __( 'Server Response', 'suremails' ) }
-					</h3>
+					<Title
+						tag="h4"
+						title={ __( 'Server Response', 'suremails' ) }
+					/>
 				</CollapsibleSection.Trigger>
 				<CollapsibleSection.Content>
 					<div className="flex flex-col gap-2 mt-2">
@@ -324,9 +324,10 @@ const DrawerLogBody = ( { log } ) => {
 			{ /* Email Headers Section */ }
 			<CollapsibleSection defaultOpen>
 				<CollapsibleSection.Trigger>
-					<h3 className="text-sm font-medium text-field-label">
-						{ __( 'Email Headers', 'suremails' ) }
-					</h3>
+					<Title
+						tag="h4"
+						title={ __( 'Email Headers', 'suremails' ) }
+					/>
 				</CollapsibleSection.Trigger>
 				<CollapsibleSection.Content>
 					<div className="mt-2 space-y-2">
@@ -413,13 +414,14 @@ const DrawerLogBody = ( { log } ) => {
 			{ /* Email Attachments Section */ }
 			<CollapsibleSection defaultOpen={ attachments.length > 0 }>
 				<CollapsibleSection.Trigger>
-					<h3 className="text-sm font-medium text-field-label">
-						{ sprintf(
+					<Title
+						tag="h4"
+						title={ sprintf(
 							/* translators: %d: Number of attachments. */
 							__( 'Attachments (%d)', 'suremails' ),
 							attachments.length
 						) }
-					</h3>
+					/>
 				</CollapsibleSection.Trigger>
 				<CollapsibleSection.Content>
 					<div className="mt-2">

@@ -20,7 +20,7 @@ const EmptyState = ( {
 				<div className="flex flex-col justify-center w-full px-2 gap-2">
 					<div className="space-y-2">
 						{ /* Heading */ }
-						<Title title={ title } tag="h4" />
+						<Title title={ title } tag="h1" />
 						{ /* Description */ }
 						<p className="mb-3 text-base font-normal text-text-secondary">
 							{ description }

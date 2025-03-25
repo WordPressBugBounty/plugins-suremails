@@ -158,10 +158,7 @@ const NavMenu = () => {
 							size="xs"
 							icon={ <CircleHelp /> }
 							onClick={ () =>
-								window.open(
-									'https://suremails.com/docs/',
-									'_blank'
-								)
+								window.open( suremails?.docsURL, '_blank' )
 							}
 							href=""
 						/>

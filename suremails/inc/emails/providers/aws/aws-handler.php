@@ -88,7 +88,16 @@ class AwsHandler implements ConnectionHandler {
 
 			$from_email_domain = substr( strrchr( $this->connection_data['from_email'], '@' ), 1 );
 
-			if ( in_array( $from_email_domain, $verified_domains, true ) ) {
+			$domain_matched = false;
+			foreach ( $verified_domains as $verified_domain ) {
+				$pos = strpos( $from_email_domain, $verified_domain );
+				if ( $pos !== false && $pos === strlen( $from_email_domain ) - strlen( $verified_domain ) ) {
+					$domain_matched = true;
+					break;
+				}
+			}
+
+			if ( $domain_matched ) {
 				$result['success'] = true;
 				$result['message'] = __( 'AWS SES authentication successful.', 'suremails' );
 			} else {

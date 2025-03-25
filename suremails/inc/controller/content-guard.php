@@ -115,12 +115,8 @@ class ContentGuard {
 	 * @since 1.0.0
 	 */
 	public function generate_hash( $content ) {
-		/**
-		 * Commenting the code until v1.3.1 release
-		 *
-		 * $nouns   = $this->find_proper_nouns( $content );
-		 * $content = $this->trim_strings( $content, $nouns );
-		 */
+		$nouns   = $this->find_proper_nouns( $content );
+		$content = $this->trim_strings( $content, $nouns );
 		return md5( $content );
 	}
 

@@ -51,9 +51,16 @@ const ProvidersDrawer = ( {
 	}, [ selectedProviderData, currentConnection ] );
 
 	useEffect( () => {
-		if ( currentConnection && currentConnection.type ) {
+		if ( currentConnection?.type ) {
 			setSelectedProvider( currentConnection.type );
-			setFormData( currentConnection );
+
+			setFormData( ( prevData ) => ( {
+				...prevData,
+				...currentConnection,
+			} ) );
+		} else {
+			setSelectedProvider( null );
+			setFormData( null );
 		}
 	}, [ currentConnection ] );
 
@@ -173,8 +180,8 @@ const ProvidersDrawer = ( {
 	};
 
 	const hasChanges =
-		JSON.stringify( formData ) !== JSON.stringify( currentConnection );
-
+		JSON.stringify( formData ) !== JSON.stringify( currentConnection ) ||
+		formData?.force_save === true;
 	const handleSaveChanges = async () => {
 		if ( ! hasChanges ) {
 			toast.info( __( 'No changes to save.', 'suremails' ) );

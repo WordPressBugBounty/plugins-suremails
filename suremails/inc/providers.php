@@ -115,9 +115,9 @@ class Providers {
 			'priority'         => [
 				'required'    => true,
 				'datatype'    => 'int',
-				'help_text'   => sprintf(       // translators: %s: https://suremails.com/docs/multiple-backup-connections/ URL.
+				'help_text'   => sprintf(       // translators: %s: https://suremails.com/docs/multiple-backup-connections?utm_campaign=suremails&utm_medium=suremails-dashboard URL.
 					__( 'Set the order in which connections should be used to send emails. The connection for the "From Email" specified above and the lowest sequence number will be used first. If that connection fails, the next connection with the same "From Email" and the following lowest sequence number will be used. %1$sMore Information here%2$s', 'suremails' ),
-					'<a href="' . esc_url( 'https://suremails.com/docs/multiple-backup-connections/' ) . '" target="_blank">',
+					'<a href="' . esc_url( 'https://suremails.com/docs/multiple-backup-connections?utm_campaign=suremails&utm_medium=suremails-dashboard' ) . '" target="_blank">',
 					'</a>'
 				),
 				'label'       => __( 'Connection Sequence for From Email', 'suremails' ),

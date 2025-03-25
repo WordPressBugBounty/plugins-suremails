@@ -4,6 +4,7 @@ import CollapsibleSection from '@components/collapsible-section';
 import { Badge } from '@bsf/force-ui';
 import { CheckIcon, XIcon } from 'lucide-react';
 import { CONTENT_GUARD_CATEGORIES } from '@utils/constants';
+import Title from '@components/title/title';
 
 const transformCategoryLabel = ( key ) => {
 	if ( ! key ) {
@@ -45,9 +46,10 @@ const ContentGuardChecks = ( { log } ) => {
 		contentGuardActivated && (
 			<CollapsibleSection defaultOpen>
 				<CollapsibleSection.Trigger className="flex items-center gap-1">
-					<h3 className="text-sm font-medium text-field-label">
-						{ __( 'Reputation Shield Checks', 'suremails' ) }
-					</h3>
+					<Title
+						tag="h4"
+						title={ __( 'Reputation Shield Checks', 'suremails' ) }
+					/>
 					<span className="ml-1 text-xs font-normal text-field-helper">
 						{ totalPass }/{ totalCategories }
 					</span>

@@ -22,7 +22,7 @@ const Tooltip = ( {
 	tooltipPortalRoot = 'suremails-root-app',
 	tooltipPortalId = 'suremails-root-app',
 	children,
-	className,
+	className = 'z-999999',
 	...props
 } ) => {
 	return (

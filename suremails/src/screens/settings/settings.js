@@ -178,7 +178,7 @@ const Settings = () => {
 					<Title
 						size="md"
 						title={ __( 'General Settings', 'suremails' ) }
-						tag="h4"
+						tag="h1"
 					/>
 
 					<Button

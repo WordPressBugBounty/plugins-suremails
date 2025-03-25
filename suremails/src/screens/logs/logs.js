@@ -608,7 +608,7 @@ const Logs = () => {
 						<div className="flex items-center justify-between p-1.25">
 							<Title
 								title={ __( 'Email Logs', 'suremails' ) }
-								tag="h4"
+								tag="h1"
 							/>
 							<div className="flex space-x-4">
 								{ selectedLogs.length > 0 ? (

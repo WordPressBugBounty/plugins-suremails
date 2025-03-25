@@ -155,6 +155,9 @@ class Plugin {
 				'dashboardUrl' => esc_url( admin_url( 'options-general.php?page=' . SUREMAILS . '#/dashboard' ) ),
 			]
 		);
+
+		// Set the script translations.
+		wp_set_script_translations( 'suremails-admin-notice', 'suremails', SUREMAILS_DIR . 'languages' );
 	}
 
 	/**
@@ -231,10 +234,14 @@ class Plugin {
 				'_ajax_nonce'              => current_user_can( 'manage_options' ) ? wp_create_nonce( 'suremails_plugin' ) : '',
 				'contentGuardPopupStatus'  => Settings::instance()->show_content_guard_lead_popup(),
 				'contentGuardActiveStatus' => get_option( 'suremails_content_guard_activated', 'no' ),
-				'termsURL'                 => 'https://suremails.com/terms',
-				'privacyPolicyURL'         => 'https://suremails.com/privacy-policy',
+				'termsURL'                 => 'https://suremails.com/terms?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'privacyPolicyURL'         => 'https://suremails.com/privacy-policy?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'docsURL'                  => 'https://suremails.com/docs?utm_campaign=suremails&utm_medium=suremails-dashboard',
 			]
 		);
+
+		// Set the script translations.
+		wp_set_script_translations( 'suremails-react-script', 'suremails', SUREMAILS_DIR . 'languages' );
 	}
 
 	/**

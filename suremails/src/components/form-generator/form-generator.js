@@ -1,7 +1,11 @@
-import { Input, Select, Label, Checkbox } from '@bsf/force-ui';
+import { Input, Select, Label, Checkbox, Button, toast } from '@bsf/force-ui';
 import TruncateText from '@components/truncate-text';
 import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
+import { cn } from '@utils/utils';
+import CopyButton from '@components/copy-button';
+import { get_gmail_auth_url } from '@api/auth';
+import { __ } from '@wordpress/i18n';
 
 const SHOW_MORE_CHARACTER_LIMIT = 50;
 
@@ -36,6 +40,64 @@ const FormField = ( {
 	inlineValidator,
 	formStateValues,
 } ) => {
+	const check_auth_code = () => {
+		if ( formStateValues?.refresh_token || formStateValues?.auth_code ) {
+			return false;
+		}
+		return true;
+	};
+
+	if ( field?.name === 'auth_code' && formStateValues?.refresh_token ) {
+		return null;
+	}
+	const render_auth_code = check_auth_code();
+	const handleGmailAuth = async ( provider, client_id, client_secret ) => {
+		const timestampOffset = 5 * 60 * 1000;
+		if ( provider?.toLowerCase() === 'gmail' ) {
+			localStorage.setItem(
+				'formStateValues',
+				JSON.stringify( {
+					...formStateValues,
+				} )
+			);
+			localStorage.setItem(
+				'formStateValuesTimestamp',
+				Date.now() + timestampOffset
+			);
+		}
+
+		try {
+			const response = await get_gmail_auth_url(
+				provider,
+				client_id,
+				client_secret
+			);
+			if ( response?.auth_url ) {
+				window.open(
+					response.auth_url,
+					'_self',
+					'noopener noreferrer'
+				);
+			} else {
+				toast.error( __( 'Error In Auth URL', 'suremails' ), {
+					description: __(
+						'There was an issue generating the auth URL.',
+						'suremails'
+					),
+				} );
+			}
+		} catch ( error ) {
+			toast.error( __( 'Error In Auth URL', 'suremails' ), {
+				description:
+					error.message ||
+					__(
+						'There was an issue generating the auth URL.',
+						'suremails'
+					),
+			} );
+		}
+	};
+
 	const handleChange = ( newValue ) => {
 		let convertedValue = newValue;
 		try {
@@ -52,28 +114,51 @@ const FormField = ( {
 		onChange?.( field.name, transformedValue );
 	};
 
+	const handleButtonClick = () => {
+		// If field has a href, open it in a new tab
+		if ( field.href ) {
+			try {
+				window.open(
+					field.href,
+					field?.target || '_self',
+					'noopener noreferrer'
+				);
+			} catch ( error ) {
+				// eslint-disable-next-line no-console
+				console.error( error );
+			}
+		}
+	};
+
+	let renderField = null;
 	switch ( field.input_type ) {
 		case 'text':
 		case 'password':
 		case 'email':
 		case 'number':
-			return (
-				<div className="flex flex-col gap-1.5 py-2 pl-2">
-					<Input
-						name={ field.name }
-						type={ field.input_type }
-						size="md"
-						value={ value || '' }
-						onChange={ handleChange }
-						onBlur={ inlineValidator }
-						error={ errors?.[ field.name ] }
-						placeholder={ field.placeholder }
-						label={ field.label }
-						required={ field.required }
-						className="w-full"
-						min={ field.min }
-						autoComplete="off"
-					/>
+			renderField = (
+				<div className="flex w-full flex-col gap-1.5 py-2 pl-2">
+					<div className="w-full flex items-end justify-start gap-2 [&>div]:w-full">
+						<Input
+							name={ field.name }
+							type={ field.input_type }
+							size="md"
+							value={ value || '' }
+							onChange={ handleChange }
+							onBlur={ inlineValidator }
+							error={ errors?.[ field.name ] }
+							placeholder={ field.placeholder }
+							label={ field.label }
+							required={ field.required }
+							className={ field.class_name || 'w-full' }
+							min={ field.min }
+							autoComplete="off"
+							readOnly={ field.read_only || false }
+						/>
+						{ field.copy_button && (
+							<CopyButton text={ value } className="size-10" />
+						) }
+					</div>
 					{ !! errors?.[ field.name ] && (
 						<p className="text-text-error text-sm">
 							{ errors?.[ field.name ] }
@@ -87,9 +172,9 @@ const FormField = ( {
 					) }
 				</div>
 			);
-
+			break;
 		case 'select':
-			return (
+			renderField = (
 				<div className="flex flex-col gap-1.5 py-2 pl-2">
 					<Label
 						size="sm"
@@ -130,9 +215,9 @@ const FormField = ( {
 					) }
 				</div>
 			);
-
+			break;
 		case 'checkbox':
-			return (
+			renderField = (
 				<div className="p-2">
 					<Checkbox
 						name={ field.name }
@@ -152,10 +237,63 @@ const FormField = ( {
 					/>
 				</div>
 			);
-
+			break;
+		case 'button':
+			renderField = (
+				<div className="w-full space-y-1.5 py-2 pl-2">
+					{ field.label && (
+						<Label
+							size="sm"
+							className="w-full"
+							required={ field.required }
+						>
+							{ field.label }
+						</Label>
+					) }
+					<Button
+						className={ cn( 'w-full', field?.className ) }
+						variant={ field.variant ?? 'primary' }
+						onClick={ () => {
+							if ( field?.on_click && field.on_click?.params ) {
+								const provider =
+									field?.on_click?.params?.provider;
+								const client_id =
+									formStateValues?.client_id || '';
+								const client_secret =
+									formStateValues?.client_secret || '';
+								handleGmailAuth(
+									provider,
+									client_id,
+									client_secret,
+									formStateValues
+								);
+							} else {
+								handleButtonClick();
+							}
+						} }
+						size={ field.size ?? 'sm' }
+						disabled={ field.disabled?.( formStateValues ) }
+						destructive={ ! render_auth_code }
+					>
+						{ formStateValues?.refresh_token ||
+						formStateValues?.auth_code
+							? field.alt_button_text
+							: field.button_text }
+					</Button>
+					{ field.help_text && (
+						<HelpText
+							text={ field.help_text }
+							showMore={ field?.helpShowMore ?? false }
+						/>
+					) }
+				</div>
+			);
+			break;
 		default:
-			return null;
+			renderField = null;
 	}
+
+	return renderField;
 };
 
 const FormGenerator = ( {

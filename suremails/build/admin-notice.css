@@ -169,6 +169,9 @@
 :is(#suremails-root-app, #suremails-admin-notice) .collapse{
     visibility: collapse
 }
+:is(#suremails-root-app, #suremails-admin-notice) .\!static{
+    position: static !important
+}
 :is(#suremails-root-app, #suremails-admin-notice) .static{
     position: static
 }
@@ -532,6 +535,9 @@
 }
 :is(#suremails-root-app, #suremails-admin-notice) .mt-14{
     margin-top: 3.5rem
+}
+:is(#suremails-root-app, #suremails-admin-notice) .mt-16{
+    margin-top: 4rem
 }
 :is(#suremails-root-app, #suremails-admin-notice) .mt-2{
     margin-top: 0.5rem
@@ -4551,6 +4557,10 @@
 
 :is(#suremails-root-app, #suremails-admin-notice) :is(.\[\&\>a\]\:pl-0>a){
     padding-left: 0px
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.\[\&\>div\]\:w-full>div){
+    width: 100%
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) :is(.\[\&\>input\]\:min-h-8>input){

@@ -39,7 +39,23 @@ const Connections = () => {
 	useEffect( () => {
 		if ( location.state?.openDrawer ) {
 			setIsDrawerOpen( true );
-			// Reset the state to prevent reopening on refresh
+
+			const storedFormState =
+				JSON.parse( localStorage.getItem( 'formStateValues' ) ) || {};
+
+			const expirationTime = 5 * 60 * 1000;
+			const storedTime = localStorage.getItem(
+				'formStateValuesTimestamp'
+			);
+
+			if ( storedTime && Date.now() - storedTime > expirationTime ) {
+				localStorage.removeItem( 'formStateValues' );
+				localStorage.removeItem( 'formStateValuesTimestamp' );
+			} else {
+				setCurrentConnection( storedFormState );
+				localStorage.removeItem( 'formStateValues' );
+				localStorage.removeItem( 'formStateValuesTimestamp' );
+			}
 			navigate( location.pathname, { replace: true, state: {} } );
 		}
 	}, [ location.state, navigate ] );
@@ -239,7 +255,7 @@ const Connections = () => {
 					<div className="flex items-center justify-between w-full gap-2 px-2 py-2.25 opacity-100">
 						<Title
 							title={ __( 'Email Connections', 'suremails' ) }
-							tag="h4"
+							tag="h1"
 						/>
 						<Button
 							variant="primary"
@@ -406,8 +422,8 @@ const Connections = () => {
 				<ProvidersDrawer
 					isOpen={ isDrawerOpen }
 					setIsOpen={ setIsDrawerOpen }
-					currentConnection={ currentConnection }
-					onSave={ updateConnections } // Pass callback for updating
+					currentConnection={ currentConnection } // Preselect provider with form data
+					onSave={ updateConnections }
 					providers={ providersList }
 					isProvidersLoading={ isProvidersLoading }
 					sequenceId={ getNewConnectionSequenceId() }

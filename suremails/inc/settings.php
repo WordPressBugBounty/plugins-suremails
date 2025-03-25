@@ -258,4 +258,19 @@ class Settings {
 
 		return $settings;
 	}
+
+	/**
+	 * Encrypt data using base64.
+	 *
+	 * @param array $connection_data The input string which needs to be encrypted.
+	 * @since 1.4.0
+	 * @return void The encrypted string.
+	 */
+	public function update_connection( $connection_data ) {
+		$settings                      = $this->get_settings();
+		$settings['connections']['id'] = $connection_data;
+		$this->encrypt_all( $settings );
+		update_option( SUREMAILS_CONNECTIONS, $settings );
+		Settings::$connections = null;
+	}
 }
