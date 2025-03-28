@@ -43,12 +43,11 @@ const Connections = () => {
 			const storedFormState =
 				JSON.parse( localStorage.getItem( 'formStateValues' ) ) || {};
 
-			const expirationTime = 5 * 60 * 1000;
-			const storedTime = localStorage.getItem(
-				'formStateValuesTimestamp'
-			);
+			const expirationTime = Date.now();
+			const stored = localStorage.getItem( 'formStateValuesTimestamp' );
+			const storedTime = parseInt( stored, 10 );
 
-			if ( storedTime && Date.now() - storedTime > expirationTime ) {
+			if ( storedTime && storedTime < expirationTime ) {
 				localStorage.removeItem( 'formStateValues' );
 				localStorage.removeItem( 'formStateValuesTimestamp' );
 			} else {

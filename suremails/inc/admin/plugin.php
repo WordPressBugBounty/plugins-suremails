@@ -238,6 +238,7 @@ class Plugin {
 				'privacyPolicyURL'         => 'https://suremails.com/privacy-policy?utm_campaign=suremails&utm_medium=suremails-dashboard',
 				'docsURL'                  => 'https://suremails.com/docs?utm_campaign=suremails&utm_medium=suremails-dashboard',
 				'supportURL'               => 'https://suremails.com/contact/?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'adminURL'                 => admin_url( 'options-general.php?page=' . SUREMAILS ),
 			]
 		);
 

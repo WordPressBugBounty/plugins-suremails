@@ -267,10 +267,11 @@ class Settings {
 	 * @return void The encrypted string.
 	 */
 	public function update_connection( $connection_data ) {
-		$settings                      = $this->get_settings();
-		$settings['connections']['id'] = $connection_data;
-		$this->encrypt_all( $settings );
-		update_option( SUREMAILS_CONNECTIONS, $settings );
+		$settings                       = $this->get_settings();
+		$id                             = $connection_data['id'];
+		$settings['connections'][ $id ] = $connection_data;
+		$encrypted_settings             = $this->encrypt_all( $settings );
+		update_option( SUREMAILS_CONNECTIONS, $encrypted_settings );
 		Settings::$connections = null;
 	}
 }

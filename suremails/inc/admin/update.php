@@ -33,6 +33,9 @@ class Update {
 		'1.3.0' => [
 			'updater_1_3_0',
 		],
+		'1.4.2' => [
+			'updater_1_4_2',
+		],
 	];
 
 	/**
@@ -164,5 +167,23 @@ class Update {
 		}
 
 		update_option( SUREMAILS_CONNECTIONS, Settings::instance()->encrypt_all( $settings ) );
+	}
+
+	/**
+	 * Migrations for version 1.4.2
+	 * Remove empty connection id from settings. The gmail connection id was empty and connections were stored in non encrypted format. This is a fix for that.
+	 *
+	 * @return void
+	 * @since 1.4.2
+	 */
+	public function updater_1_4_2() {
+
+		$settings            = Settings::instance()->get_raw_settings();
+		$empty_connection_id = $settings['connections']['id'] ?? null;
+
+		if ( $empty_connection_id !== null ) {
+			unset( $settings['connections']['id'] );
+			update_option( SUREMAILS_CONNECTIONS, Settings::instance()->encrypt_all( $settings ) );
+		}
 	}
 }
