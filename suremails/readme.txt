@@ -5,7 +5,7 @@ Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
 Tested up to: 6.7
 Requires PHP: 7.4
-Stable tag: 1.4.2
+Stable tag: 1.5.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -243,11 +243,17 @@ Yes, SureMail uses secure encryption methods like TLS/SSL to protect your email 
 
 == Changelog ==
 
-v1.4.2 - 27-March-2025
+v1.5.0 - 08-April-2025
+- New: Introduced a "Resend" feature for re-sending emails.
+- New: Implemented attachment storage for enhanced email handling.
+- New: Added "Email Simulation" feature for simulating email sending.
+- Fix: Fixed an issue regarding Reputation Shield logging twice in the database.
+
+v1.4.2 - 28-March-2025
 - Fix: Gmail Provider - Fixed an issue where a duplicate connection for the Gmail provider was being added when the connection expired.
 - Fix: Gmail Provider - Fixed an issue where some users faced an access denied error while sending emails.
 
-v1.4.1 - 25-March-2025 
+v1.4.1 - 25-March-2025
 - Fix: Fixed a PHP error with Gmail connections when using PHP versions lower than 8.1.
 
 v1.4.0 - 25-March-2025

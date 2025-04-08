@@ -6,6 +6,7 @@ import { resendEmails } from '@api/logs'; // Import resendEmails function
 import { __ } from '@wordpress/i18n';
 import DrawerLogBody from './drawer-log-body';
 import { Redo2, LoaderCircle as LoaderIcon } from 'lucide-react';
+import { get_pending_status } from '@utils/utils';
 
 const EmailLogDrawer = ( {
 	log,
@@ -59,11 +60,10 @@ const EmailLogDrawer = ( {
 			const data = await resendEmails( [ log.id ] );
 			if ( data.success ) {
 				toast.success(
-					__( 'Emails resent successfully.', 'suremails' )
+					__( 'Email resent successfully.', 'suremails' )
 				);
-				onResendSuccess();
 			} else {
-				toast.error( __( 'Failed to resend emails.', 'suremails' ), {
+				toast.error( __( 'Failed to resend the email.', 'suremails' ), {
 					description:
 						data.message ||
 						__(
@@ -73,13 +73,15 @@ const EmailLogDrawer = ( {
 				} );
 			}
 		} catch ( error ) {
-			toast.error( __( 'Error resending emails.', 'suremails' ), {
+			toast.error( __( 'Failed to resend the email.', 'suremails' ), {
 				description:
 					error.message ||
 					__( 'There was an issue resending emails.', 'suremails' ),
 			} );
 		} finally {
 			setIsLoading( false );
+			// Trigger refetch of the log even if the request failed.
+			onResendSuccess();
 		}
 	};
 
@@ -103,7 +105,7 @@ const EmailLogDrawer = ( {
 									{ __( 'Email Log', 'suremails' ) }
 								</Drawer.Title>
 								<Button
-									className="py-0.5 font-semibold hidden"
+									className="py-0.5 font-semibold"
 									iconPosition="left"
 									size="xs"
 									variant="primary"
@@ -116,6 +118,9 @@ const EmailLogDrawer = ( {
 									}
 									onClick={ handleResendClick } // Updated onClick handler
 									loading={ isLoading } // Add loading prop
+									disabled={ get_pending_status(
+										log?.status
+									) }
 								>
 									{ __( 'Resend', 'suremails' ) }
 								</Button>

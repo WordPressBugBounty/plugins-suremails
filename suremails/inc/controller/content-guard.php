@@ -9,6 +9,7 @@
 
 namespace SureMails\Inc\Controller;
 
+use SureMails\Inc\ConnectionManager;
 use SureMails\Inc\Emails\Handler\ProcessEmailData;
 use SureMails\Inc\Settings;
 use SureMails\Inc\Traits\Instance;
@@ -306,14 +307,16 @@ class ContentGuard {
 		$new_server_response = [
 			'retry'      => 0,
 			'Message'    => __( 'Email content is flagged.', 'suremails' ),
-			'Connection' => 'Reputation Shield',
+			'Connection' => __( 'Reputation Shield', 'suremails' ),
 			'timestamp'  => current_time( 'mysql' ),
 		];
 
 		$email_data_processor = ProcessEmailData::instance();
 		$logger               = Logger::instance();
+		$connection_manager   = ConnectionManager::instance();
 		$atts['to']           = $email_data_processor->process_to( $atts['to'] );
 		$atts['headers']      = $email_data_processor->process_headers( $atts['headers'] );
+		$atts['attachments']  = $email_data_processor->process_attachments( $atts['attachments'] );
 		$from_email           = $atts['headers']['from']['email'];
 		$email_from           = '';
 		if ( ! empty( $from_email ) ) {
@@ -340,13 +343,50 @@ class ContentGuard {
 			]
 		);
 
-		$log_id = $logger->log_email( $handler_response );
+		$log_id = $logger->get_id();
 
-		if ( is_wp_error( $log_id ) ) {
-			LogError::instance()->log_error( 'Failed to log email: ' . $log_id->get_error_message() );
-			return false;
+		if ( $log_id === null ) {
+			// First time logging.
+			$log_id = $logger->log_email( $handler_response );
+
+			if ( is_wp_error( $log_id ) ) {
+				LogError::instance()->log_error( 'Failed to log email: ' . $log_id->get_error_message() );
+				return false;
+			}
+
+			return $log_id;
+		}
+		$log_entry = (array) $logger->get_log( $log_id );
+		$meta      = $log_entry['meta'] ?? [
+			'retry'  => 0,
+			'resend' => 0,
+		];
+
+		if ( $connection_manager->get_is_retried() ) {
+			$meta['retry'] += 1;
 		}
 
+		$existing_responses = $log_entry['response'];
+		if ( ! is_array( $existing_responses ) ) {
+			$existing_responses = [];
+		}
+		$meta['content_guard']        = $atts['content_guard'];
+		$new_server_response['retry'] = $meta['retry'];
+		$existing_responses[]         = $new_server_response;
+		$update_data                  = [
+			'meta'       => $meta,
+			'response'   => $existing_responses,
+			'status'     => Logger::STATUS_BLOCKED,
+			'updated_at' => current_time( 'mysql' ),
+			'connection' => '',
+		];
+		$update_result                = $logger->update_log( $log_id, $update_data );
+		$connection_manager->reset();
+		if ( is_wp_error( $update_result ) || ! $update_result ) {
+			// translators: %d is the log ID.
+			LogError::instance()->log_error( sprintf( __( 'Failed to update log ID %d.', 'suremails' ), $log_id ) );
+			return false;
+		}
 		return $log_id;
 	}
 

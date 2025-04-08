@@ -44,10 +44,10 @@ const recommendedPluginsData = [
 		id: '4',
 		badgeText: __( 'Free', 'suremails' ),
 		svg: <SureTriggersLogo />,
-		title: __( 'SureTriggers', 'suremails' ),
+		title: __( 'Ottokit', 'suremails' ),
 		description: __( 'Automate your WordPress setup.', 'suremails' ),
 		slug: 'suretriggers',
-		name: __( 'SureTriggers', 'suremails' ),
+		name: __( 'Ottokit', 'suremails' ),
 	},
 ];
 

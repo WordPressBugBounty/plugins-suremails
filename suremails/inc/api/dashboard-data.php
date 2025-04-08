@@ -116,7 +116,7 @@ class DashboardData extends Api_Base {
 	public function get_recent_logs() {
 		return EmailLog::instance()->get(
 			[
-				'order' => [ 'created_at' => 'DESC' ],
+				'order' => [ 'updated_at' => 'DESC' ],
 				'limit' => 6,
 			]
 		);

@@ -786,19 +786,185 @@ export const SpectraLogo = ( props ) => (
 
 export const SureTriggersLogo = ( props ) => (
 	<svg
-		width="48"
-		height="48"
-		viewBox="0 0 48 48"
+		width="52"
+		height="52"
+		viewBox="0 0 52 52"
 		fill="none"
 		xmlns="http://www.w3.org/2000/svg"
 		{ ...props }
 	>
-		<path
-			fillRule="evenodd"
-			clipRule="evenodd"
-			d="M24.0001 48C37.255 48 48 37.2547 48 23.9999C48 10.7451 37.255 0 24.0001 0C10.7452 0 0 10.7451 0 23.9999C0 37.2547 10.7452 48 24.0001 48ZM24.1035 11.9999C22.1764 11.9999 19.5095 13.102 18.1468 14.4615L14.4458 18.1538H32.893L39.0613 11.9999H24.1035ZM29.8223 33.5383C28.4596 34.8978 25.7927 35.9999 23.8656 35.9999H8.90777L15.0761 29.846H33.5233L29.8223 33.5383ZM35.8177 21.2307H11.3684L10.2135 22.3845C7.47882 24.846 8.2899 26.7691 12.1196 26.7691H36.6352L37.7905 25.6153C40.4985 23.1683 39.6475 21.2307 35.8177 21.2307Z"
-			fill="#0553F0"
-		/>
+		<g filter="url(#filter0_d_17130_33424)">
+			<g clipPath="url(#clip0_17130_33424)">
+				<rect
+					x="2"
+					y="2"
+					width="48"
+					height="48"
+					rx="12.9231"
+					fill="#D2F059"
+				/>
+				<g filter="url(#filter1_dddd_17130_33424)">
+					<path
+						fillRule="evenodd"
+						clipRule="evenodd"
+						d="M25.9963 35.6777C31.3412 35.6777 35.6733 31.3451 35.6733 26.0005C35.6733 20.6559 31.3412 16.3232 25.9963 16.3232C20.6514 16.3232 16.3193 20.6559 16.3193 26.0005C16.3193 31.3451 20.6514 35.6777 25.9963 35.6777ZM25.9963 43.078C34.1601 43.078 40.986 37.3493 42.6734 29.6924H47.2264V22.3078L42.6732 22.3078C40.9855 14.6513 34.1598 8.92297 25.9963 8.92297C17.8328 8.92297 11.0071 14.6513 9.31944 22.3078L4.76562 22.3078V29.6924H9.31928C11.0067 37.3493 17.8325 43.078 25.9963 43.078Z"
+						fill="url(#paint0_linear_17130_33424)"
+					/>
+				</g>
+			</g>
+		</g>
+		<defs>
+			<filter
+				id="filter0_d_17130_33424"
+				x="0.615385"
+				y="0.615385"
+				width="50.7692"
+				height="50.7692"
+				filterUnits="userSpaceOnUse"
+				colorInterpolationFilters="sRGB"
+			>
+				<feFlood floodOpacity="0" result="BackgroundImageFix" />
+				<feColorMatrix
+					in="SourceAlpha"
+					type="matrix"
+					values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+					result="hardAlpha"
+				/>
+				<feMorphology
+					radius="1.38462"
+					operator="dilate"
+					in="SourceAlpha"
+					result="effect1_dropShadow_17130_33424"
+				/>
+				<feOffset />
+				<feComposite in2="hardAlpha" operator="out" />
+				<feColorMatrix
+					type="matrix"
+					values="0 0 0 0 0.777287 0 0 0 0 0.9125 0 0 0 0 0.231927 0 0 0 1 0"
+				/>
+				<feBlend
+					mode="normal"
+					in2="BackgroundImageFix"
+					result="effect1_dropShadow_17130_33424"
+				/>
+				<feBlend
+					mode="normal"
+					in="SourceGraphic"
+					in2="effect1_dropShadow_17130_33424"
+					result="shape"
+				/>
+			</filter>
+			<filter
+				id="filter1_dddd_17130_33424"
+				x="-3.1163"
+				y="6.29567"
+				width="58.2245"
+				height="49.9188"
+				filterUnits="userSpaceOnUse"
+				colorInterpolationFilters="sRGB"
+			>
+				<feFlood floodOpacity="0" result="BackgroundImageFix" />
+				<feColorMatrix
+					in="SourceAlpha"
+					type="matrix"
+					values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+					result="hardAlpha"
+				/>
+				<feOffset dy="5.25461" />
+				<feGaussianBlur stdDeviation="3.94096" />
+				<feComposite in2="hardAlpha" operator="out" />
+				<feColorMatrix
+					type="matrix"
+					values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.06 0"
+				/>
+				<feBlend
+					mode="normal"
+					in2="BackgroundImageFix"
+					result="effect1_dropShadow_17130_33424"
+				/>
+				<feColorMatrix
+					in="SourceAlpha"
+					type="matrix"
+					values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+					result="hardAlpha"
+				/>
+				<feOffset dx="-1.18229" dy="3.94096" />
+				<feGaussianBlur stdDeviation="2.29889" />
+				<feComposite in2="hardAlpha" operator="out" />
+				<feColorMatrix
+					type="matrix"
+					values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.04 0"
+				/>
+				<feBlend
+					mode="normal"
+					in2="effect1_dropShadow_17130_33424"
+					result="effect2_dropShadow_17130_33424"
+				/>
+				<feColorMatrix
+					in="SourceAlpha"
+					type="matrix"
+					values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+					result="hardAlpha"
+				/>
+				<feOffset dy="1.31365" />
+				<feGaussianBlur stdDeviation="1.31365" />
+				<feComposite in2="hardAlpha" operator="out" />
+				<feColorMatrix
+					type="matrix"
+					values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.03 0"
+				/>
+				<feBlend
+					mode="normal"
+					in2="effect2_dropShadow_17130_33424"
+					result="effect3_dropShadow_17130_33424"
+				/>
+				<feColorMatrix
+					in="SourceAlpha"
+					type="matrix"
+					values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 127 0"
+					result="hardAlpha"
+				/>
+				<feOffset dy="1.31365" />
+				<feGaussianBlur stdDeviation="0.656827" />
+				<feComposite in2="hardAlpha" operator="out" />
+				<feColorMatrix
+					type="matrix"
+					values="0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.08 0"
+				/>
+				<feBlend
+					mode="normal"
+					in2="effect3_dropShadow_17130_33424"
+					result="effect4_dropShadow_17130_33424"
+				/>
+				<feBlend
+					mode="normal"
+					in="SourceGraphic"
+					in2="effect4_dropShadow_17130_33424"
+					result="shape"
+				/>
+			</filter>
+			<linearGradient
+				id="paint0_linear_17130_33424"
+				x1="25.9961"
+				y1="43.0779"
+				x2="25.9961"
+				y2="8.92297"
+				gradientUnits="userSpaceOnUse"
+			>
+				<stop stopColor="#072F50" stopOpacity="0.95" />
+				<stop offset="1" stopColor="#172A39" stopOpacity="0.75" />
+			</linearGradient>
+			<clipPath id="clip0_17130_33424">
+				<rect
+					x="2"
+					y="2"
+					width="48"
+					height="48"
+					rx="12.9231"
+					fill="white"
+				/>
+			</clipPath>
+		</defs>
 	</svg>
 );
 

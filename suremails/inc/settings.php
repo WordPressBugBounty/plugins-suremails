@@ -33,7 +33,7 @@ const DEFAULT_CONNECTION_DETAILS = [
 	],
 	'log_emails'              => 'yes',
 	'delete_email_logs_after' => '30_days',
-	'email_simulation'        => 'yes',
+	'email_simulation'        => 'no',
 ];
 
 /**
@@ -273,5 +273,20 @@ class Settings {
 		$encrypted_settings             = $this->encrypt_all( $settings );
 		update_option( SUREMAILS_CONNECTIONS, $encrypted_settings );
 		Settings::$connections = null;
+	}
+
+	/**
+	 * Get the simulation status. If the email simulation is enabled, return true.
+	 * Otherwise, return false.
+	 *
+	 * @since 1.5.0
+	 * @return bool The simulation status. True if the email simulation is enabled, false otherwise.
+	 */
+	public function get_email_simulation_status() {
+		$options = $this->get_settings();
+		if ( isset( $options['email_simulation'] ) && $options['email_simulation'] === 'yes' ) {
+			return true;
+		}
+		return false;
 	}
 }

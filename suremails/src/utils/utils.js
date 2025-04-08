@@ -322,10 +322,16 @@ export const getPaginationRange = (
 /**
  * Get the label for the log status
  *
- * @param {string} status - The status of the log
+ * @param {string} status   - The status of the log
+ * @param {Array}  response - Array of response objects.
  * @return {string} - The label for the status
  */
-export const getStatusLabel = ( status ) => {
+export const getStatusLabel = ( status, response ) => {
+	const simulated = isResponseSimulated( response );
+
+	if ( simulated ) {
+		return __( 'Simulated', 'suremails' );
+	}
 	switch ( status ) {
 		case 'sent':
 			return __( 'Successful', 'suremails' );
@@ -343,10 +349,16 @@ export const getStatusLabel = ( status ) => {
 /**
  * Get the variant for the log status badge
  *
- * @param {string} status - The status of the log
+ * @param {string} status   - The status of the log
+ * @param {Array}  response - Array of response objects.
  * @return {string} - The variant for the badge
  */
-export const getStatusVariant = ( status ) => {
+export const getStatusVariant = ( status, response ) => {
+	const simulated = isResponseSimulated( response );
+
+	if ( simulated ) {
+		return 'yellow';
+	}
 	switch ( status ) {
 		case 'sent':
 			return 'green';
@@ -359,6 +371,25 @@ export const getStatusVariant = ( status ) => {
 		default:
 			return 'gray'; // Fallback color for unknown statuses
 	}
+};
+
+/**
+ * Determines if the response indicates a simulated log.
+ *
+ * It finds the response element with the highest "retry" value and returns its "simulated" flag.
+ *
+ * @param {Array} response - Array of response objects.
+ * @return {boolean} - True if the element with the highest retry has simulated set to true, false otherwise.
+ */
+const isResponseSimulated = ( response ) => {
+	if ( ! Array.isArray( response ) || response.length === 0 ) {
+		return false;
+	}
+	// Find the response object with the maximum "retry" value.
+	const maxRetryEntry = response.reduce( ( prev, curr ) =>
+		curr.retry >= prev.retry ? curr : prev
+	);
+	return maxRetryEntry.simulated;
 };
 
 /**
@@ -638,4 +669,17 @@ export const get_connection_message = ( connection_title, timeStamp ) => {
 		hour12: true,
 	} );
 	return `Used ${ connection_title }, at ${ formattedTimeStamp }`;
+};
+
+/**
+ * Check if the status is pending or not
+ *
+ * @param {string} status - The status of the log
+ * @return {boolean} - Whether the status is pending
+ */
+export const get_pending_status = ( status ) => {
+	if ( status && status === 'pending' ) {
+		return true;
+	}
+	return false;
 };

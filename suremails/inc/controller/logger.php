@@ -167,13 +167,6 @@ class Logger {
 	private $email_log;
 
 	/**
-	 * Indicates if the resending an email.
-	 *
-	 * @var bool|null
-	 */
-	private $is_resend = false;
-
-	/**
 	 * Logger constructor.
 	 *
 	 * Initializes the database connection, sets the table name, initializes Settings, and EmailLog.
@@ -469,25 +462,6 @@ class Logger {
 	}
 
 	/**
-	 * Sets the fallback status.
-	 *
-	 * @param bool $is_resend Indicates if resending an email.
-	 * @return void
-	 */
-	public function set_is_resend( bool $is_resend ) {
-		$this->is_resend = (bool) $is_resend;
-	}
-
-	/**
-	 * Retrieves the fallback status.
-	 *
-	 * @return bool|null The resend status.
-	 */
-	public function get_is_resend() {
-		return $this->is_resend;
-	}
-
-	/**
 	 * Prepares log data by merging provided data with default values.
 	 *
 	 * @param array $args The data to merge with defaults.
@@ -572,8 +546,6 @@ class Logger {
 	 * @return bool|WP_Error True on success, WP_Error on failure.
 	 */
 	public function update_log( int $log_id, array $data ) {
-		// Handle 'updated_at' timestamp.
-		$data['updated_at'] = current_time( 'mysql' );
 
 		// Update the log entry using the EmailLog class.
 		try {

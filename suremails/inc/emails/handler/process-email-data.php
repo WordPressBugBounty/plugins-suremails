@@ -122,12 +122,20 @@ class ProcessEmailData {
 	private $subject = '';
 
 	/**
+	 * Indicates if the email is a resend.
+	 *
+	 * @var bool
+	 */
+	private $is_resend = false;
+
+	/**
 	 * ProcessEmailData constructor.
 	 *
 	 * Initializes default values for properties.
 	 */
 	public function __construct() {
-		$this->x_mailer = 'WordPress/' . get_bloginfo( 'version' );
+		$this->x_mailer  = 'WordPress/' . get_bloginfo( 'version' );
+		$this->is_resend = ConnectionManager::instance()->get_is_resend();
 	}
 
 	/**
@@ -321,14 +329,36 @@ class ProcessEmailData {
 	 * @return array Array of sanitized attachment file paths.
 	 */
 	public function process_attachments( $attachments ) {
-		$processed_attachments = [];
+		$processed_attachments          = [];
+		$processed_uploaded_attachments = [];
 
 		// If attachments are a string, split them by newlines.
 		if ( ! is_array( $attachments ) ) {
 			$attachments = explode( "\n", str_replace( "\r\n", "\n", $attachments ) );
 		}
+		$upload = Uploads::instance();
 
+		// Process each attachment.
+		$uploaded_attachments = $upload->handle_attachments( $attachments );
 		foreach ( (array) $attachments as $attachment ) {
+			$attachment = trim( $attachment );
+			if ( empty( $attachment ) ) {
+				continue;
+			}
+			if ( $this->is_resend === true ) {
+				$path = Uploads::get_suremails_base_dir();
+				if ( ! is_wp_error( $path ) && isset( $path['path'] ) ) {
+					$attachment = $path['path'] . '/attachments/' . $attachment;
+				}
+			}
+			// Validate the attachment path.
+			$attachment = sanitize_text_field( $attachment );
+			if ( is_readable( $attachment ) ) {
+				$processed_attachments[] = $attachment;
+			}
+		}
+
+		foreach ( (array) $uploaded_attachments as $attachment ) {
 			$attachment = trim( $attachment );
 			if ( empty( $attachment ) ) {
 				continue;
@@ -337,13 +367,13 @@ class ProcessEmailData {
 			// Validate the attachment path.
 			$attachment = sanitize_text_field( $attachment );
 			if ( file_exists( $attachment ) && is_readable( $attachment ) ) {
-				$processed_attachments[] = $attachment;
+				$processed_uploaded_attachments[] = $attachment;
 			}
 		}
 
 		$this->set_attachments( $processed_attachments );
 
-		return $processed_attachments;
+		return $processed_uploaded_attachments;
 	}
 
 	/**
@@ -497,8 +527,8 @@ class ProcessEmailData {
 		$mail_data = compact( 'to', 'headers', 'message', 'attachments', 'subject', );
 		// Structure the processed data.
 		$processed_data = [
-			'to'          => $this->get_to(),
-			'headers'     => [
+			'to'                   => $this->get_to(),
+			'headers'              => [
 				'from'          => $this->get_from(),          // Array of name and email.
 				'cc'            => $this->get_cc(),            // Array of name and email.
 				'bcc'           => $this->get_bcc(),           // Array of name and email.
@@ -509,9 +539,10 @@ class ProcessEmailData {
 				'x_mailer'      => $this->get_x_mailer(),
 				'extra_headers' => $this->get_extra_headers(), // Associative array.
 			],
-			'message'     => $this->get_message(),
-			'attachments' => $this->get_attachments(),
-			'subject'     => $this->get_subject(),
+			'message'              => $this->get_message(),
+			'attachments'          => $this->get_attachments(),
+			'subject'              => $this->get_subject(),
+			'uploaded_attachments' => $processed_attachments,
 		];
 
 		$phpmailer = ConnectionManager::instance()->get_phpmailer();
@@ -574,7 +605,8 @@ class ProcessEmailData {
 			// Add Attachments.
 			if ( ! empty( $processed_data['attachments'] ) ) {
 				foreach ( $processed_data['attachments'] as $attachment ) {
-					$phpmailer->addAttachment( $attachment );
+					$file_name = $this->get_attachment_name( $attachment );
+					$phpmailer->addAttachment($attachment, $file_name);
 				}
 			}
 
@@ -590,6 +622,22 @@ class ProcessEmailData {
 		}
 
 		return $processed_data;
+	}
+
+	/**
+	 * Get the attachment name.
+	 *
+	 * @param string $attachment The attachment path.
+	 * @return string The attachment name.
+	 */
+	public function get_attachment_name( $attachment ) {
+
+		if ( $this->is_resend === false ) {
+			return basename( $attachment );
+		}
+
+		$base_name = basename( $attachment );
+		return substr( $base_name, strpos( $base_name, '-' ) + 1 );
 	}
 
 	/**

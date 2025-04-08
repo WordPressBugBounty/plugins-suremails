@@ -10,6 +10,7 @@
 namespace SureMails\Inc\Emails\Providers\SENDGRID;
 
 use SureMails\Inc\Emails\Handler\ConnectionHandler;
+use SureMails\Inc\Emails\ProviderHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -28,13 +29,6 @@ class SendgridHandler implements ConnectionHandler {
 	 * @var array
 	 */
 	protected $connection_data;
-
-	/**
-	 * SendGrid Base API URL.
-	 *
-	 * @var string
-	 */
-	private $base_url = 'https://api.sendgrid.com/v3';
 
 	/**
 	 * SendGrid API endpoint for sending emails.
@@ -82,79 +76,9 @@ class SendgridHandler implements ConnectionHandler {
 			];
 		}
 
-		$from_email = sanitize_email( $this->connection_data['from_email'] );
-
-		// Check if the sender email is verified.
-		$verified_senders = $this->get_api_data( $this->base_url . '/verified_senders', $this->get_headers( $this->connection_data['api_key'] ) );
-
-		if ( is_wp_error( $verified_senders ) ) {
-			return [
-				'success'    => false,
-				'message'    => __( 'Failed to retrieve verified senders: ', 'suremails' ) . $verified_senders->get_error_message(),
-				'error_code' => $verified_senders->get_error_code(),
-			];
-		}
-
-		$sender_verified = false;
-		if ( isset( $verified_senders['results'] ) && is_array( $verified_senders['results'] ) ) {
-			foreach ( $verified_senders['results'] as $sender ) {
-				if ( isset( $sender['from_email'] ) && strtolower( $sender['from_email'] ) === strtolower( $from_email ) && isset( $sender['verified'] ) && $sender['verified'] ) {
-					$sender_verified = true;
-					break;
-				}
-			}
-		}
-
-		if ( $sender_verified ) {
-			return [
-				'success'    => true,
-				'message'    => __( 'SendGrid connection authenticated successfully. Sender email is verified.', 'suremails' ),
-				'error_code' => 200,
-			];
-		}
-
-		$parts  = explode( '@', $from_email );
-		$domain = isset( $parts[1] ) ? trim( $parts[1] ) : '';
-
-		if ( empty( $domain ) ) {
-			return [
-				'success'    => false,
-				'message'    => __( 'Invalid sender email format. Domain missing.', 'suremails' ),
-				'error_code' => 400,
-			];
-		}
-
-		$domains_response = $this->get_api_data( $this->base_url . '/whitelabel/domains', $this->get_headers( $this->connection_data['api_key'] ) );
-
-		if ( is_wp_error( $domains_response ) ) {
-			return [
-				'success'    => false,
-				'message'    => __( 'Failed to retrieve whitelabel domains: ', 'suremails' ) . $domains_response->get_error_message(),
-				'error_code' => $domains_response->get_error_code(),
-			];
-		}
-
-		$domain_verified = false;
-		if ( is_array( $domains_response ) ) {
-			foreach ( $domains_response as $whitelabel_domain ) {
-				if ( isset( $whitelabel_domain['domain'] ) && strtolower( $whitelabel_domain['domain'] ) === strtolower( $domain ) && isset( $whitelabel_domain['valid'] ) && $whitelabel_domain['valid'] ) {
-					$domain_verified = true;
-					break;
-				}
-			}
-		}
-
-		if ( ! $domain_verified ) {
-			return [
-				'success'    => false,
-				'message'    => __( 'SendGrid authentication failed: Sender email or domain is not verified.', 'suremails' ),
-				'error_code' => rest_authorization_required_code(),
-			];
-		}
-
 		return [
 			'success'    => true,
-			'message'    => __( 'SendGrid connection authenticated successfully. Domain of sender email is verified.', 'suremails' ),
+			'message'    => __( 'SendGrid connection saved successfully.', 'suremails' ),
 			'error_code' => 200,
 		];
 	}
@@ -231,32 +155,26 @@ class SendgridHandler implements ConnectionHandler {
 		}
 
 		if ( ! empty( $processed_data['attachments'] ) ) {
-			$email_payload['attachments'] = array_filter(
-				array_map(
-					static function ( $attachment ) {
-						$file_path = sanitize_text_field( $attachment );
-						if ( $file_path !== false ) {
-							if ( is_file( $attachment ) && file_exists( $file_path ) && is_readable( $file_path ) ) {
-								$file_content = file_get_contents( $attachment );
-								if ( $file_content !== false ) {
-									$file_name  = basename( $attachment );
-									$content_id = wp_hash( $attachment );
-									$mime_type  = mime_content_type( $attachment );
-									return [
-										'type'        => $mime_type,
-										'filename'    => $file_name,
-										'disposition' => 'attachment',
-										'content_id'  => $content_id,
-										'content'     => base64_encode( $file_content ),
-									];
-								}
-							}
-						}
-						return null; // Skip invalid or unreadable files.
-					},
-					$processed_data['attachments']
-				)
-			);
+			$data = [];
+			foreach ( $processed_data['attachments'] as $attachment ) {
+
+				$attachment_values = ProviderHelper::get_attachment( $attachment );
+
+				if ( ! $attachment_values ) {
+					continue;
+				}
+				$data[] = [
+					'type'        => $attachment_values['type'],
+					'filename'    => $attachment_values['name'],
+					'disposition' => 'attachment',
+					'content_id'  => $attachment_values['id'],
+					'content'     => $attachment_values['blob'],
+				];
+			}
+
+			if ( ! empty( $data ) ) {
+				$email_payload['attachments'] = $data;
+			}
 		}
 
 		// Send email via SendGrid API.
@@ -335,46 +253,6 @@ class SendgridHandler implements ConnectionHandler {
 				'encrypt'     => true,
 			],
 		];
-	}
-
-	/**
-	 * Retrieve data from SendGrid API using GET requests.
-	 *
-	 * @param string $url     The full API URL.
-	 * @param array  $headers The request headers.
-	 * @return array|\WP_Error The decoded response data or a WP_Error on failure.
-	 */
-	private function get_api_data( $url, array $headers ) {
-		$response = wp_remote_get(
-			$url,
-			[
-				'headers' => $headers,
-				'timeout' => 30,
-			]
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-
-		if ( in_array( $response_code, [ 401, 403 ], true ) ) {
-			return new \WP_Error( 'unauthorized', __( 'Unauthorized: API key invalid or insufficient permissions.', 'suremails' ), $response_code );
-		}
-
-		if ( $response_code >= 400 ) {
-			return new \WP_Error( 'api_error', __( 'SendGrid API returned an error.', 'suremails' ), $response_code );
-		}
-
-		$body         = wp_remote_retrieve_body( $response );
-		$decoded_body = json_decode( $body, true );
-
-		if ( null === $decoded_body ) {
-			return new \WP_Error( 'json_decode_error', __( 'Failed to decode JSON response from SendGrid.', 'suremails' ), $response_code );
-		}
-
-		return $decoded_body;
 	}
 
 }

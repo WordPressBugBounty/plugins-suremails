@@ -11,8 +11,10 @@ namespace SureMails\Inc\Controller;
 
 use SureMails\Inc\ConnectionManager;
 use SureMails\Inc\DB\EmailLog;
+use SureMails\Inc\Emails\ProviderHelper;
 use SureMails\Inc\Settings;
 use SureMails\Inc\Traits\Instance;
+use SureMails\Inc\Traits\SendEmail;
 use SureMails\Inc\Utils\LogError;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -27,6 +29,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Emails {
 
 	use Instance;
+	use SendEmail;
 
 	/**
 	 * Private constructor to enforce Singleton pattern.
@@ -82,16 +85,19 @@ class Emails {
 		$message    = $log_entry['body'];
 		$headers    = $log_entry['headers'];
 		$attachment = $log_entry['attachments'];
-		wp_mail( $to, $subject, $message, $headers, $attachment );
+
+		self::send( $to, $subject, $message, $headers, $attachment );
 	}
 
 	/**
 	 * Deletes old email logs based on the configured retention period.
 	 *
+	 * This function checks the configured retention period for email logs
+	 * and deletes any logs and attachments that are older than the specified period.
+	 *
 	 * @return void
 	 */
 	public function delete_old_email_logs() {
-
 		$options          = Settings::instance()->get_settings();
 		$retention_period = $options['delete_email_logs_after'] ?? 'none';
 
@@ -113,18 +119,65 @@ class Emails {
 			$date_threshold = gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) );
 		}
 
-		// Delete logs older than the date threshold.
+		// Proceed only if we have a valid deletion threshold.
 		if ( $date_threshold ) {
-			// Check if EmailLog class exists.
+			// Ensure the EmailLog class exists before proceeding.
 			if ( class_exists( 'SureMails\Inc\DB\EmailLog' ) ) {
 				$email_log = EmailLog::instance();
 
-				// Attempt to delete old logs using 'where' condition.
+				// Fetch logs that are older than the threshold date.
+				$logs_to_delete = $email_log->get(
+					[
+						'select' => 'id, attachments',
+						'where'  => [
+							'updated_at <' => $date_threshold,
+						],
+					]
+				);
+
+				// Use the helper to extract log IDs and unique attachments.
+				$extracted = null;
+				if ( ! is_array( $logs_to_delete ) || empty( $logs_to_delete ) ) {
+
+					return;
+				}
+				$extracted            = ProviderHelper::extract_log_data( $logs_to_delete );
+				$log_ids              = $extracted['log_ids'] ?? [];
+				$all_attachments_list = $extracted['attachments'] ?? [];
+
+				// Build conditions to check for attachments in logs that should be retained.
+				$where                 = ProviderHelper::build_attachment_like_conditions( $all_attachments_list );
+				$where['id NOT IN']    = $log_ids;
+				$where['updated_at >'] = $date_threshold;
+
+				// Fetch logs that are still retained (so we don't delete shared attachments).
+				$logs_kept = $email_log->get(
+					[
+						'select' => 'attachments',
+						'where'  => $where,
+					]
+				);
+
+				// Track attachments that should be retained.
+				$attachments_kept = [];
+				if ( ! empty( $logs_kept ) ) {
+					foreach ( $logs_kept as $log ) {
+						if ( ! empty( $log['attachments'] ) ) {
+							$attachments_kept = array_merge( $attachments_kept, (array) $log['attachments'] );
+						}
+					}
+				}
+				$attachments_kept = array_unique( $attachments_kept );
+
+				// Delete only attachments that are no longer in any retained logs.
+				ProviderHelper::delete_unused_attachments( $all_attachments_list, $attachments_kept );
+
+				// Attempt to delete email logs older than the threshold date.
 				try {
 					$email_log->delete(
 						[
 							'where' => [
-								'created_at <' => $date_threshold,
+								'updated_at <' => $date_threshold,
 							],
 						]
 					);
@@ -134,5 +187,4 @@ class Emails {
 			}
 		}
 	}
-
 }

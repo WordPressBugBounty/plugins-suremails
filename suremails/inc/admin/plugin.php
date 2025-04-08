@@ -227,7 +227,8 @@ class Plugin {
 			'suremails-react-script',
 			'suremails',
 			[
-				'siteUrl'                  => esc_url( get_site_url() ),
+				'siteUrl'                  => esc_url( get_site_url( get_current_blog_id() ) ),
+				'attachmentUrl'            => $this->get_attachment_url(),
 				'userEmail'                => wp_get_current_user()->user_email,
 				'version'                  => SUREMAILS_VERSION,
 				'nonce'                    => current_user_can( 'manage_options' ) ? wp_create_nonce( 'wp_rest' ) : '',
@@ -267,6 +268,25 @@ class Plugin {
 		$links[]       = $settings_link;
 
 		return $links;
+	}
+
+	/**
+	 * Get the attachment URL.
+	 * This is used to display the attachment in the email log. The attachment URL is used to display the attachment in the email log.
+	 * The attachment URL is different for multisite and single site installations. For multisite, the attachment URL is based on the current blog ID.
+	 *
+	 * @return string
+	 */
+	private function get_attachment_url() {
+
+		$attachment_base_url = '';
+		if ( is_multisite() ) {
+			$current_blog_id     = get_current_blog_id();
+			$attachment_base_url = esc_url( get_site_url( $current_blog_id ) ) . '/wp-content/uploads/sites/' . $current_blog_id . '/suremails/attachments/';
+		} else {
+			$attachment_base_url = esc_url( get_site_url() ) . '/wp-content/uploads/suremails/attachments/';
+		}
+		return $attachment_base_url;
 	}
 }
 

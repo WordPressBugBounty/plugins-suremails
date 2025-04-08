@@ -7,10 +7,31 @@ import { SureMailIcon } from 'assets/icons';
 import { cn } from '@utils/utils';
 import useWhatsNewRSS from '../../lib/useWhatsNewRSS';
 import { __ } from '@wordpress/i18n';
+import { useQuery } from '@tanstack/react-query';
+import { fetchSettings } from '@api/settings';
+
 const NavMenu = () => {
 	const location = useLocation();
 	const navigate = useNavigate();
 	const version = window.suremails?.version || '1.0.0';
+
+	// Fetch settings data via react-query
+	const { data: settingsData } = useQuery( {
+		queryKey: [ 'settings' ],
+		queryFn: fetchSettings,
+		select: ( response ) => response.data,
+		refetchOnWindowFocus: false,
+	} );
+
+	/**
+	 * Check if email simulation is active or not based on the settings data.
+	 * If email_simulation is set to 'yes' then email simulation is active.
+	 *
+	 * @constant {boolean} emailSimulation - Email simulation status. True if active, false otherwise. Default is false.
+	 * @type {boolean}
+	 */
+	const emailSimulation = settingsData?.email_simulation === 'yes';
+
 	// Define navigation items
 	const navItems = [
 		{ name: 'Dashboard', path: '/dashboard' },
@@ -34,7 +55,7 @@ const NavMenu = () => {
 
 	useWhatsNewRSS( {
 		uniqueKey: 'suremails',
-		rssFeedURL: 'https://suremails.com/whats-new/feed/', // TODO: domain name change to surerank.
+		rssFeedURL: 'https://suremails.com/whats-new/feed/',
 		selector: '#suremails_whats_new',
 		flyout: {
 			title: __( "What's New?", 'suremails' ),
@@ -145,6 +166,20 @@ const NavMenu = () => {
 
 				{ /* Right Section: Version Badge and Icons */ }
 				<Topbar.Right className="p-5">
+					{ emailSimulation && (
+						<Topbar.Item className="gap-2">
+							<Badge
+								label={ __(
+									'Email Simulation Active',
+									'suremails'
+								) }
+								size="sm"
+								type="pill"
+								variant="yellow"
+								disableHover={ true }
+							/>
+						</Topbar.Item>
+					) }
 					<Topbar.Item>
 						<Badge
 							label={ `V ${ version }` }

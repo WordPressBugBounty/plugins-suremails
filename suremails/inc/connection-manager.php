@@ -30,6 +30,13 @@ class ConnectionManager {
 	public $is_default = false;
 
 	/**
+	 * If email simulation is enabled. If enabled, the email will not be sent. Instead, it will be logged. Default is false.
+	 *
+	 * @var bool
+	 */
+	public $email_simulation = false;
+
+	/**
 	 * Global PHPMailer instance.
 	 *
 	 * @var PHPMailer|null
@@ -119,7 +126,8 @@ class ConnectionManager {
 	 * Initializes connection data and sets up hooks for refreshing connections.
 	 */
 	private function __construct() {
-		$this->connections = Settings::instance()->get_settings();
+		$this->connections      = Settings::instance()->get_settings();
+		$this->email_simulation = Settings::instance()->get_email_simulation_status();
 	}
 
 	/**
@@ -254,6 +262,25 @@ class ConnectionManager {
 	}
 
 	/**
+	 * Set if the email is a resend.
+	 *
+	 * @param bool $is_resend Indicates if the email is a resend.
+	 * @return void
+	 */
+	public function set_is_resend( bool $is_resend ) {
+		$this->is_resend = $is_resend;
+	}
+
+	/**
+	 * Retrieves the resend status.
+	 *
+	 * @return bool The resend status.
+	 */
+	public function get_is_resend() {
+		return $this->is_resend;
+	}
+
+	/**
 	 * Initializes the PHPMailer instance if not already set.
 	 *
 	 * @return PHPMailer The PHPMailer instance.
@@ -316,6 +343,9 @@ class ConnectionManager {
 		$next_index             = $this->current_index;
 		$from_email_connections = $this->from_email_connections;
 
+		if ( $next_index + 1 >= count( $from_email_connections ) ) {
+			$this->is_last = true;
+		}
 		if ( $next_index >= count( $from_email_connections ) ) {
 
 			$this->is_last = true;

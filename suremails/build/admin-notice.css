@@ -488,6 +488,9 @@
 :is(#suremails-root-app, #suremails-admin-notice) .ml-2{
     margin-left: 0.5rem
 }
+:is(#suremails-root-app, #suremails-admin-notice) .ml-3{
+    margin-left: 0.75rem
+}
 :is(#suremails-root-app, #suremails-admin-notice) .ml-4{
     margin-left: 1rem
 }
@@ -1144,9 +1147,6 @@
 :is(#suremails-root-app, #suremails-admin-notice) .resize{
     resize: both
 }
-:is(#suremails-root-app, #suremails-admin-notice) .list-inside{
-    list-style-position: inside
-}
 :is(#suremails-root-app, #suremails-admin-notice) .list-disc{
     list-style-type: disc
 }
@@ -1363,6 +1363,11 @@
     --tw-space-x-reverse: 0;
     margin-right: calc(0.5rem * var(--tw-space-x-reverse));
     margin-left: calc(0.5rem * calc(1 - var(--tw-space-x-reverse)))
+}
+:is(#suremails-root-app, #suremails-admin-notice) :is(.space-x-3 > :not([hidden]) ~ :not([hidden])){
+    --tw-space-x-reverse: 0;
+    margin-right: calc(0.75rem * var(--tw-space-x-reverse));
+    margin-left: calc(0.75rem * calc(1 - var(--tw-space-x-reverse)))
 }
 :is(#suremails-root-app, #suremails-admin-notice) :is(.space-x-4 > :not([hidden]) ~ :not([hidden])){
     --tw-space-x-reverse: 0;
@@ -3060,6 +3065,10 @@
     content: var(--tw-content)
 }
 
+:is(#suremails-root-app, #suremails-admin-notice) .first\:-mt-\[13px\]:first-child{
+    margin-top: -13px
+}
+
 :is(#suremails-root-app, #suremails-admin-notice) .first\:rounded-bl:first-child{
     border-bottom-left-radius: 0.25rem
 }
@@ -3079,6 +3088,10 @@
 :is(#suremails-root-app, #suremails-admin-notice) .first\:border-border-subtle:first-child{
     --tw-border-opacity: 1;
     border-color: rgb(229 231 235 / var(--tw-border-opacity, 1))
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) .last\:-mb-\[13px\]:last-child{
+    margin-bottom: -13px
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) .last\:rounded-br:last-child{
@@ -3160,6 +3173,12 @@
     --tw-ring-offset-width: 2px
 }
 
+:is(#suremails-root-app, #suremails-admin-notice) .hover\:scale-110:hover{
+    --tw-scale-x: 1.1;
+    --tw-scale-y: 1.1;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+}
+
 :is(#suremails-root-app, #suremails-admin-notice) .hover\:border-border-disabled:hover{
     --tw-border-opacity: 1;
     border-color: rgb(229 231 235 / var(--tw-border-opacity, 1))
@@ -3233,6 +3252,11 @@
 :is(#suremails-root-app, #suremails-admin-notice) .hover\:bg-badge-hover-yellow:hover{
     --tw-bg-opacity: 1;
     background-color: rgb(254 249 195 / var(--tw-bg-opacity, 1))
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) .hover\:bg-blue-50:hover{
+    --tw-bg-opacity: 1;
+    background-color: rgb(239 246 255 / var(--tw-bg-opacity, 1))
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) .hover\:bg-button-danger-hover:hover{
@@ -3497,11 +3521,6 @@
 :is(#suremails-root-app, #suremails-admin-notice) .focus\:ring-border-interactive:focus{
     --tw-ring-opacity: 1;
     --tw-ring-color: rgb(13 126 232 / var(--tw-ring-opacity, 1))
-}
-
-:is(#suremails-root-app, #suremails-admin-notice) .focus\:ring-button-danger-hover:focus{
-    --tw-ring-opacity: 1;
-    --tw-ring-color: rgb(185 28 28 / var(--tw-ring-opacity, 1))
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) .focus\:ring-field-color-error:focus{

@@ -59,7 +59,7 @@ const Settings = () => {
 			id: '',
 			connection_title: '',
 		},
-		emailSimulation: true,
+		emailSimulation: false,
 	} );
 
 	useLayoutEffect( () => {
@@ -294,10 +294,7 @@ const Settings = () => {
 						</div>
 					) }
 
-					<Skeleton
-						className="w-full h-px mt-2 mb-2 border opacity-100 border-border-subtle"
-						variant="rectangular"
-					/>
+					<LineSkeleton />
 					{ /* Default Connection */ }
 					<div className="flex flex-col w-full h-auto gap-1.5">
 						<Select
@@ -337,11 +334,44 @@ const Settings = () => {
 							) }
 						</Label>
 					</div>
+
+					<LineSkeleton />
+
+					{ /* Email Simulation  */ }
+					<div className="flex w-[648px] gap-3">
+						<Switch
+							checked={ formState.emailSimulation }
+							onChange={ ( value ) => {
+								handleChange( 'emailSimulation', value );
+							} }
+							size="sm"
+							label={ {
+								heading: __( 'Email Simulation', 'suremails' ),
+								description: __(
+									'Disable sending all emails. If you enable this, no email will be sent but the email logs will be recorded here.',
+									'suremails'
+								),
+							} }
+						/>
+					</div>
 				</div>
 				{ /* Safe Guard Settings */ }
 				<SafeGuardSection />
 			</div>
 		</>
+	);
+};
+
+/*
+ * Line Skeleton Component
+ * Used to show a divider line between settings sections
+ */
+const LineSkeleton = () => {
+	return (
+		<Skeleton
+			className="w-full h-px mt-2 mb-2 border opacity-100 border-border-subtle"
+			variant="rectangular"
+		/>
 	);
 };
 

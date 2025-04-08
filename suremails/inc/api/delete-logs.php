@@ -10,6 +10,7 @@
 namespace SureMails\Inc\API;
 
 use SureMails\Inc\DB\EmailLog;
+use SureMails\Inc\Emails\ProviderHelper;
 use SureMails\Inc\Traits\Instance;
 use WP_REST_Request;
 use WP_REST_Response;
@@ -25,6 +26,7 @@ if ( ! defined( 'ABSPATH' ) ) {
  * Handles the `/delete-logs` REST API endpoint.
  */
 class DeleteLogs extends Api_Base {
+
 	use Instance;
 
 	/**
@@ -65,22 +67,73 @@ class DeleteLogs extends Api_Base {
 	}
 
 	/**
-	 * Delete email logs based on provided log IDs.
+	 *  Deletes selected email logs and removes associated attachments if they are not used in other logs.
 	 *
 	 * @param WP_REST_Request<array<string, mixed>> $request The REST request object.
 	 * @return WP_REST_Response The REST API response.
 	 */
 	public function delete_email_log( $request ) {
 		// Retrieve and validate log IDs from the request.
-		$log_ids = $request->get_param( 'log_ids' );
+		$log_ids   = $request->get_param( 'log_ids' );
+		$email_log = EmailLog::instance();
 
-		// Attempt to delete multiple logs using the updated 'delete' method.
-		$deleted_count = EmailLog::instance()->delete(
+		// Fetch logs marked for deletion, along with their attachments.
+		$logs_to_delete = $email_log->get(
+			[
+				'select' => 'attachments',
+				'where'  => [ 'id IN' => $log_ids ],
+			]
+		);
+
+		// Return error if no logs are found.
+		if ( ! is_array( $logs_to_delete ) ) {
+			return new WP_REST_Response(
+				[
+					'success' => false,
+					'message' => 'Failed to retrieve logs to delete.',
+				],
+				500
+			);
+		}
+
+		// Use the helper to extract log IDs and unique attachments.
+		$extracted            = ProviderHelper::extract_log_data( $logs_to_delete );
+		$all_attachments_list = $extracted['attachments'];
+
+		// Build conditions to check for attachments in retained logs.
+		$where              = ProviderHelper::build_attachment_like_conditions( $all_attachments_list );
+		$where['id NOT IN'] = $log_ids;
+
+		// Fetch logs that are still retained (so we don't delete shared attachments).
+		$logs_to_retain = $email_log->get(
+			[
+				'select' => 'id, attachments',
+				'where'  => $where,
+			]
+		);
+
+		// Track which attachments should be deleted and which should be kept.
+		$attachments_kept = [];
+		if ( ! empty( $logs_to_retain ) ) {
+			foreach ( $logs_to_retain as $log ) {
+				if ( ! empty( $log['attachments'] ) ) {
+					$attachments_kept = array_merge( $attachments_kept, (array) $log['attachments'] );
+				}
+			}
+		}
+		$attachments_kept = array_unique( $attachments_kept );
+
+		// Delete only attachments that are no longer used in retained logs.
+		ProviderHelper::delete_unused_attachments( $all_attachments_list, $attachments_kept );
+
+		// Delete email logs from the database.
+		$deleted_count = $email_log->delete(
 			[
 				'ids' => $log_ids,
 			]
 		);
 
+		// Return an error if deletion fails.
 		if ( $deleted_count === false ) {
 			return new WP_REST_Response(
 				[
@@ -91,6 +144,7 @@ class DeleteLogs extends Api_Base {
 			);
 		}
 
+		// Construct the success message.
 		if ( count( $log_ids ) === $deleted_count ) {
 			$message = "{$deleted_count} log(s) deleted successfully.";
 		} else {
@@ -98,6 +152,7 @@ class DeleteLogs extends Api_Base {
 			$message   = "{$deleted_count} log(s) deleted successfully. {$remaining} log(s) could not be deleted.";
 		}
 
+		// Return the response.
 		return new WP_REST_Response(
 			[
 				'success' => true,

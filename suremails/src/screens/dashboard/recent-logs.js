@@ -157,10 +157,12 @@ const RecentLogs = ( { recentLogs, hasConnections = true } ) => {
 										<Badge
 											className="inline-block"
 											label={ getStatusLabel(
-												log.status
+												log.status,
+												log?.response
 											) }
 											variant={ getStatusVariant(
-												log.status
+												log.status,
+												log?.response
 											) }
 											size="sm"
 											type="pill"
@@ -170,7 +172,7 @@ const RecentLogs = ( { recentLogs, hasConnections = true } ) => {
 										{ truncateText( log.subject, 30 ) }
 									</Table.Cell>
 									<Table.Cell className="px-3 py-3 text-sm font-normal text-text-secondary">
-										{ formatDate( log.created_at, {
+										{ formatDate( log.updated_at, {
 											day: true,
 											month: true,
 										} ) }

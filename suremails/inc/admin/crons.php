@@ -9,6 +9,7 @@
 
 namespace SureMails\Inc\Admin;
 
+use SureMails\Inc\ConnectionManager;
 use SureMails\Inc\Controller\ContentGuard;
 use SureMails\Inc\Controller\Emails;
 use SureMails\Inc\Controller\Logger;
@@ -63,7 +64,7 @@ class Crons {
 	 * @return void
 	 */
 	public function schedule_retry_failed_email( int $log_id ) {
-		if ( empty( $log_id ) ) {
+		if ( empty( $log_id ) || ConnectionManager::instance()->get_is_resend() ) {
 			return;
 		}
 
@@ -78,7 +79,7 @@ class Crons {
 		}
 
 		// Check if the maximum number of retries has been reached.
-		if ( isset( $log_entry['meta'] ) && isset( $log_entry['meta']['retry'] ) && intval( $log_entry['meta']['retry'] ) > 1 ) {
+		if ( isset( $log_entry['meta'] ) && isset( $log_entry['meta']['retry'] ) && intval( $log_entry['meta']['retry'] ) >= 1 ) {
 			return;
 		}
 

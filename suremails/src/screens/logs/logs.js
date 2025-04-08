@@ -35,6 +35,7 @@ import {
 	getPaginationRange,
 	getStatusLabel,
 	getStatusVariant,
+	get_pending_status,
 } from '@utils/utils';
 import Tooltip from '@components/tooltip/tooltip';
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query';
@@ -173,7 +174,7 @@ const Logs = () => {
 		onSuccess: ( response ) => {
 			if ( response.success ) {
 				toast.success(
-					__( 'Emails resent successfully.', 'suremails' )
+					__( 'Email(s) resent successfully.', 'suremails' )
 				);
 
 				// Invalidate and refetch logs
@@ -188,13 +189,16 @@ const Logs = () => {
 			}
 		},
 		onError: ( resendError ) => {
-			toast.error( __( 'Failed to resend emails.', 'suremails' ), {
+			toast.error( __( 'Failed to resend the email(s).', 'suremails' ), {
 				description:
 					resendError.message ||
 					__( 'There was an issue resending emails.', 'suremails' ),
 			} );
 		},
 		onSettled: () => {
+			queryClient.invalidateQueries( {
+				queryKey: [ 'logs' ],
+			} );
 			setIsDialogOpen( false );
 			setSelectedLogs( [] );
 		},
@@ -306,6 +310,15 @@ const Logs = () => {
 		setPage( newPage );
 	};
 
+	/**
+	 * Determine if the Resend button should be disabled based on the selected logs.
+	 * The button should be disabled if any of the selected logs are in pending status.
+	 */
+	const isResendDisabled = selectedLogs.some( ( id ) => {
+		const log = logs.find( ( logItem ) => logItem.id === id );
+		return log && get_pending_status( log.status );
+	} );
+
 	// Conditional Rendering: Determine what to display based on loading and logs
 	let content;
 
@@ -381,8 +394,14 @@ const Logs = () => {
 							<Table.Cell>
 								<Badge
 									className="max-w-fit"
-									label={ getStatusLabel( log.status ) }
-									variant={ getStatusVariant( log.status ) }
+									label={ getStatusLabel(
+										log.status,
+										log?.response
+									) }
+									variant={ getStatusVariant(
+										log.status,
+										log?.response
+									) }
 									size="sm"
 									disableHover
 								/>
@@ -400,7 +419,7 @@ const Logs = () => {
 								/>
 							</Table.Cell>
 							<Table.Cell>
-								{ formatDate( log.created_at, {
+								{ formatDate( log.updated_at, {
 									day: true,
 									month: true,
 									year: true,
@@ -418,10 +437,9 @@ const Logs = () => {
 										) }
 										position="top"
 										arrow
-										className="hidden"
 									>
 										<Button
-											className="text-icon-secondary hidden hover:text-icon-primary"
+											className="text-icon-secondary hover:text-icon-primary"
 											size="xs"
 											onClick={ () =>
 												handleResend( [ log.id ] )
@@ -431,6 +449,9 @@ const Logs = () => {
 											aria-label={ __(
 												'Resend',
 												'suremails'
+											) }
+											disabled={ get_pending_status(
+												log?.status
 											) }
 										/>
 									</Tooltip>
@@ -621,7 +642,8 @@ const Logs = () => {
 											onClick={ () =>
 												handleResend( selectedLogs )
 											}
-											className="font-medium hidden"
+											className="font-medium"
+											disabled={ isResendDisabled }
 										>
 											{ __(
 												'Resend Emails',

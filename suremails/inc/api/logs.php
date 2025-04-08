@@ -129,17 +129,19 @@ class Logs extends Api_Base {
 		if ( ! empty( $start_datetime ) ) {
 			if ( empty( $end_datetime ) ) {
 				$end_datetime = $start_datetime;
-				$end_datetime->setTime( 23, 59, 59 );
 			}
-			$where['created_at >='] = $start_datetime->format( 'Y-m-d H:i:s' );
-			$where['created_at <='] = $end_datetime->format( 'Y-m-d H:i:s' );
+			$start_datetime->setTime( 0, 0, 0 );
+			$end_datetime->setTime( 23, 59, 59 );
+			$where['updated_at >='] = $start_datetime->format( 'Y-m-d H:i:s' );
+			$where['updated_at <='] = $end_datetime->format( 'Y-m-d H:i:s' );
 		}
 
 		if ( in_array( $filter, EmailLog::instance()->get_statuses(), true ) ) {
 			$where['status'] = $filter;
 		}
 		if ( ! empty( $search ) ) {
-			$where['subject LIKE'] = '%' . $search . '%';
+			$where['subject LIKE']     = '%' . $search . '%';
+			$where['OR email_to LIKE'] = '%' . $search . '%';
 		}
 
 		// Fetch paginated logs.
@@ -184,7 +186,7 @@ class Logs extends Api_Base {
 		return $email_log->get(
 			[
 				'where'  => $where,
-				'order'  => [ 'created_at' => 'DESC' ],
+				'order'  => [ 'updated_at' => 'DESC' ],
 				'limit'  => $per_page,
 				'offset' => $offset,
 			]

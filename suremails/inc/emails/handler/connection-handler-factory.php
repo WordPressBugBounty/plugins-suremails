@@ -8,6 +8,10 @@
 
 namespace SureMails\Inc\Emails\Handler;
 
+use SureMails\Inc\API\SaveTestConnection;
+use SureMails\Inc\Emails\Providers\Simulator\SimulationHandler;
+use SureMails\Inc\Settings;
+
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
 }
@@ -24,6 +28,14 @@ class ConnectionHandlerFactory {
 	 * @return ConnectionHandler|null
 	 */
 	public static function create( array $connection_data ) {
+
+		// Check if simulation is enabled. If enabled, return simulation handler.
+		if ( self::should_use_simulation() ) {
+			$handler = new SimulationHandler( [] );
+			if ( $handler instanceof ConnectionHandler ) {
+				return $handler;
+			}
+		}
 		$handler_class = 'SureMails\\Inc\\Emails\\Providers\\' . strtoupper( $connection_data['type'] ) . '\\' . ucfirst( strtolower( $connection_data['type'] ) ) . 'Handler';
 
 		if ( class_exists( $handler_class ) ) {
@@ -36,5 +48,18 @@ class ConnectionHandlerFactory {
 		}
 
 		return null;
+	}
+
+	/**
+	 * Determine if simulation mode should be used and it's not a invokation from Save Test Connection.
+	 * The simulation mode is used to test email sending without actually sending emails.
+	 *
+	 * @since 1.5.0
+	 *
+	 * @return bool
+	 */
+	private static function should_use_simulation() {
+		return Settings::instance()->get_email_simulation_status()
+			&& ! SaveTestConnection::instance()->saving_connection;
 	}
 }

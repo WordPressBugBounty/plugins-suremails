@@ -10,6 +10,7 @@
 namespace SureMails\Inc\Emails\Providers\MAILGUN;
 
 use SureMails\Inc\Emails\Handler\ConnectionHandler;
+use SureMails\Inc\Emails\ProviderHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -257,26 +258,14 @@ class MailgunHandler implements ConnectionHandler {
 		$payload         = '';
 
 		foreach ( $attachments as $attachment ) {
-			$file      = false;
-			$file_name = '';
+			$attachment_values = ProviderHelper::get_attachment( $attachment );
+			if ( ! empty( $attachment_values ) ) {
 
-			try {
-				if ( is_file( $attachment ) && is_readable( $attachment ) ) {
-					$file_name = basename( $attachment );
-					$file      = file_get_contents( $attachment );
-				}
-			} catch ( \Exception $e ) {
-				$file = false;
+				$attachment_data[] = [
+					'content' => $attachment_values['content'],
+					'name'    => $attachment_values['name'],
+				];
 			}
-
-			if ( $file === false || empty( $file_name ) ) {
-				continue;
-			}
-
-			$attachment_data[] = [
-				'content' => $file,
-				'name'    => $file_name,
-			];
 		}
 
 		if ( ! empty( $attachment_data ) ) {

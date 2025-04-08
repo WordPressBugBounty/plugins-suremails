@@ -61,84 +61,19 @@ class Smtp2goHandler implements ConnectionHandler {
 			'error_code' => 200,
 		];
 
-		try {
-			$from_email = $this->connection_data['from_email'] ?? '';
-			if ( empty( $from_email ) ) {
-				$result['message'] = __( 'from_email is not provided.', 'suremails' );
-				return $result;
-			}
-
-			$headers = $this->get_request_headers();
-
-			// Check single sender emails.
-			$single_sender_url = 'https://api.smtp2go.com/v3/single_sender_emails/view';
-			$response          = wp_safe_remote_post(
-				$single_sender_url,
-				[
-					'headers' => $headers,
-					'timeout' => 10,
-				]
-			);
-			if ( is_wp_error( $response ) ) {
-				$result['message'] = __( 'SMTP2GO authentication failed: ', 'suremails' ) . $response->get_error_message();
-				return $result;
-			}
-			$data = json_decode( wp_remote_retrieve_body( $response ), true );
-			if ( isset( $data['data']['senders'] ) && is_array( $data['data']['senders'] ) ) {
-				foreach ( $data['data']['senders'] as $sender ) {
-					if ( isset( $sender['email_address'] ) && strtolower( $sender['email_address'] ) === strtolower( $from_email ) ) {
-						if ( ! empty( $sender['verified'] ) && true === $sender['verified'] ) {
-							$result['success'] = true;
-							$result['message'] = __( 'SMTP2GO authentication successful.', 'suremails' );
-							return $result;
-						}
-						break;
-					}
-				}
-			}
-
-			$domain_url = 'https://api.smtp2go.com/v3/domain/view';
-			$response   = wp_safe_remote_post(
-				$domain_url,
-				[
-					'headers' => $headers,
-					'timeout' => 10,
-				]
-			);
-			if ( is_wp_error( $response ) ) {
-				$result['message'] = __( 'SMTP2GO authentication failed: ', 'suremails' ) . $response->get_error_message();
-				return $result;
-			}
-			$data = json_decode( wp_remote_retrieve_body( $response ), true );
-			if ( isset( $data['data']['domains'] ) && is_array( $data['data']['domains'] ) ) {
-				$email_domain = strrchr( $from_email, '@' );
-				$email_domain = $email_domain !== false ? substr( $email_domain, 1 ) : '';
-				foreach ( $data['data']['domains'] as $domain_entry ) {
-					if ( isset( $domain_entry['domain']['domain'] ) ) {
-						$domain_val = strtolower( $domain_entry['domain']['domain'] );
-						$fulldomain = isset( $domain_entry['domain']['fulldomain'] ) ? strtolower( $domain_entry['domain']['fulldomain'] ) : '';
-						if ( strtolower( $email_domain ) === $domain_val || strtolower( $email_domain ) === $fulldomain ) {
-							if ( isset( $domain_entry['trackers'] ) && is_array( $domain_entry['trackers'] ) ) {
-								foreach ( $domain_entry['trackers'] as $tracker ) {
-									if ( ! empty( $tracker['enabled'] ) && true === $tracker['enabled'] ) {
-										$result['success'] = true;
-										$result['message'] = __( 'SMTP2GO authentication successful via domain verification.', 'suremails' );
-										return $result;
-									}
-								}
-							}
-						}
-					}
-				}
-				$result['message'] = __( 'SMTP2GO authentication failed: The from_email or domain is not verified.', 'suremails' );
-			} else {
-				$result['message'] = __( 'SMTP2GO authentication failed: Unable to retrieve data. Please check if you have entered the correct API key.', 'suremails' );
-			}
-		} catch ( Exception $e ) {
-			$result['message'] = __( 'SMTP2GO authentication failed: ', 'suremails' ) . $e->getMessage();
+		if ( empty( $this->connection_data['api_key'] ) || empty( $this->connection_data['from_email'] ) ) {
+			return [
+				'success'    => false,
+				'message'    => __( 'API key or From Email is missing in the connection data.', 'suremails' ),
+				'error_code' => 400,
+			];
 		}
 
-		return $result;
+		return [
+			'success'    => true,
+			'message'    => __( 'SMTP2GO connection saved successfully.', 'suremails' ),
+			'error_code' => 200,
+		];
 	}
 
 	/**

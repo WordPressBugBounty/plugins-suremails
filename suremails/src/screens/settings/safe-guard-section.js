@@ -222,7 +222,7 @@ const TermsAndPrivacyText = () => (
 			__html: sprintf(
 				// translators: %1$s is the Terms link and %2$s is the Privacy Policy link.
 				__(
-					'By continuing you agree to our %1$s and %2$s.',
+					'By activating you agree to our %1$s and %2$s.',
 					'suremails'
 				),
 				renderToString(

@@ -9,6 +9,7 @@
 
 namespace SureMails\Inc\API;
 
+use SureMails\Inc\ConnectionManager;
 use SureMails\Inc\Controller\Logger;
 use SureMails\Inc\DB\EmailLog;
 use SureMails\Inc\Traits\Instance;
@@ -77,9 +78,10 @@ class ResendEmail extends Api_Base {
 			);
 		}
 
-		$sanitized_log_ids = array_map( 'intval', $log_ids );
-		$results           = [];
-		$logger            = Logger::instance();
+		$sanitized_log_ids  = array_map( 'intval', $log_ids );
+		$results            = [];
+		$logger             = Logger::instance();
+		$connection_manager = ConnectionManager::instance();
 		foreach ( $sanitized_log_ids as $log_id ) {
 			$logs = $email_log->get(
 				[
@@ -109,7 +111,7 @@ class ResendEmail extends Api_Base {
 			];
 
 			$logger->set_id( $log_id );
-			$logger->set_is_resend( true );
+			$connection_manager->set_is_resend( true );
 
 			$email_sent = self::send( $atts['to'], $atts['subject'], $atts['message'], $atts['headers'], $atts['attachments'] );
 
@@ -127,7 +129,7 @@ class ResendEmail extends Api_Base {
 				];
 			}
 		}
-		$logger->set_is_resend( false );
+		$connection_manager->set_is_resend( false );
 
 		$overall_success = array_reduce( $results, static fn( $carry, $item) => $carry || $item['success'], false );
 

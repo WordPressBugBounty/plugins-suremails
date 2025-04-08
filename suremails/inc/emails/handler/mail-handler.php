@@ -178,9 +178,10 @@ class MailHandler {
 		$send_result = $handler->send( $atts, $this->logger->get_id(), $connection, $processed_data );
 
 		// Setting status and messageee.
-		$handler_response['success'] = $send_result['success'] ?? false;
-		$handler_response['status']  = $handler_response['success'] ? Logger::STATUS_SENT : Logger::STATUS_FAILED;
-		$handler_response['message'] = $send_result['message'] ?? ( $handler_response['success'] ? 'Email sent successfully.' : 'Failed to send email.' );
+		$handler_response['success']         = $send_result['success'] ?? false;
+		$handler_response['status']          = $handler_response['success'] ? Logger::STATUS_SENT : Logger::STATUS_FAILED;
+		$handler_response['message']         = $send_result['message'] ?? ( $handler_response['success'] ? __( 'Email sent successfully.', 'suremails' ) : __( 'Failed to send email.', 'suremails' ) );
+		$handler_response['email_simulated'] = $send_result['email_simulated'] ?? false;
 
 		if ( $handler_response['success'] ) {
 			do_action( 'wp_mail_succeeded', $mail_data );
@@ -264,6 +265,7 @@ class MailHandler {
 			'Message'    => $handler_response['message'],
 			'Connection' => $handler_response['connection_title'],
 			'timestamp'  => current_time( 'mysql' ),
+			'simulated'  => $handler_response['email_simulated'] ?? false,
 
 		];
 
@@ -284,14 +286,14 @@ class MailHandler {
 				'subject'     => $atts['subject'] ?? '',
 				'body'        => $atts['message'] ?? '',
 				'headers'     => $formatted_headers,
-				'attachments' => $atts['attachments'] ?? [],
+				'attachments' => $atts['uploaded_attachments'] ?? [],
 				'status'      => $status,
 				'response'    => [ $new_server_response ],
 				'connection'  => $source,
 			]
 		);
 
-		if ( $log_data['status'] !== Logger::STATUS_SENT && ! $this->connection_manager->get_is_testing() ) {
+		if ( $log_data['status'] !== Logger::STATUS_SENT && ! $this->connection_manager->get_is_testing() && ! $this->connection_manager->get_is_resend() ) {
 			$log_data['status'] = Logger::STATUS_PENDING;
 		}
 
@@ -299,6 +301,7 @@ class MailHandler {
 		$log_id = $this->logger->get_id();
 
 		if ( $log_id === null ) {
+
 			// First time logging.
 			$log_id = $this->logger->log_email( $log_data );
 
@@ -329,7 +332,7 @@ class MailHandler {
 		}
 		$new_server_response['retry'] = $meta['retry'];
 
-		if ( $this->logger->get_is_resend() ) {
+		if ( $this->connection_manager->get_is_resend() && $log_data['status'] === Logger::STATUS_SENT ) {
 			$meta['resend'] += 1;
 		}
 
@@ -409,7 +412,7 @@ class MailHandler {
 	 */
 	private function should_retry_increase() {
 		return (
-			! $this->logger->get_is_resend() &&
+			! $this->connection_manager->get_is_resend() &&
 			$this->connection_manager->get_is_retried() &&
 			$this->connection_manager->get_is_first()
 		) || (
@@ -434,6 +437,10 @@ class MailHandler {
 		}
 
 		if ( $this->connection_manager->get_is_retried() && $this->connection_manager->get_is_last() ) {
+			return true;
+		}
+
+		if ( $this->connection_manager->get_is_resend() && $this->connection_manager->get_is_last() ) {
 			return true;
 		}
 

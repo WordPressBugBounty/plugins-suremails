@@ -1,7 +1,12 @@
 // ConfirmationDialog.js
 import { Dialog, Button, Loader, Input, Label } from '@bsf/force-ui';
 import PropTypes from 'prop-types';
-import { useState, useLayoutEffect } from '@wordpress/element';
+import {
+	useState,
+	useLayoutEffect,
+	useEffect,
+	useRef,
+} from '@wordpress/element';
 import { __, sprintf } from '@wordpress/i18n';
 import { z } from 'zod';
 
@@ -32,6 +37,15 @@ const ConfirmationDialog = ( {
 	const [ confirmationText, setConfirmationText ] = useState( '' );
 	const [ errorMessage, setErrorMessage ] = useState( '' );
 	const [ loading, setLoading ] = useState( false );
+	// Ref to check if component is mounted. Used to prevent state updates on unmounted components.
+	const isMounted = useRef( true );
+
+	useEffect( () => {
+		isMounted.current = true;
+		return () => {
+			isMounted.current = false;
+		};
+	}, [] );
 
 	const handleConfirm = async () => {
 		if ( typeof onConfirm !== 'function' ) {
@@ -42,9 +56,14 @@ const ConfirmationDialog = ( {
 		}
 		setLoading( true );
 
-		await onConfirm();
-
-		setLoading( false );
+		try {
+			await onConfirm();
+		} catch ( error ) {
+		} finally {
+			if ( isMounted.current ) {
+				setLoading( false );
+			}
+		}
 	};
 
 	const handleCancel = () => {
@@ -147,7 +166,6 @@ const ConfirmationDialog = ( {
 						{ cancelButtonText }
 					</Button>
 					<Button
-						className="focus:ring-button-danger-hover"
 						variant="primary"
 						onClick={ handleConfirm }
 						icon={

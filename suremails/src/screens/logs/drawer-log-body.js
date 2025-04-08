@@ -14,6 +14,7 @@ import {
 } from '@utils/utils';
 import CollapsibleSection from '@components/collapsible-section';
 import ContentGuardChecks from './content-guard-checks';
+import { AttachmentList } from '@components/attachments/attachments';
 import Title from '@components/title/title';
 
 const DrawerLogBody = ( { log } ) => {
@@ -154,8 +155,14 @@ const DrawerLogBody = ( { log } ) => {
 								/>
 								<Badge
 									className="py-0.5"
-									label={ getStatusLabel( log.status ) }
-									variant={ getStatusVariant( log.status ) }
+									label={ getStatusLabel(
+										log.status,
+										log?.response
+									) }
+									variant={ getStatusVariant(
+										log.status,
+										log?.response
+									) }
 									disableHover
 								/>
 							</div>
@@ -174,7 +181,7 @@ const DrawerLogBody = ( { log } ) => {
 								</strong>
 							</p>
 							<p className="text-sm font-normal text-text-secondary">
-								{ formatDate( log.created_at, {
+								{ formatDate( log.updated_at, {
 									day: true,
 									month: true,
 									year: true,
@@ -194,12 +201,12 @@ const DrawerLogBody = ( { log } ) => {
 								{ log.subject }
 							</strong>
 						</p>
-						<div className="flex items-start justify-start">
+						<div className="flex items-start justify-start gap-1">
 							<p>
-								<strong className="text-sm font-normal text-text-tertiary hidden">
+								<strong className="text-sm font-normal text-text-tertiary">
 									{ __( 'Resent:', 'suremails' ) }
 								</strong>{ ' ' }
-								<strong className="text-sm font-normal text-text-primary hidden">
+								<strong className="text-sm font-normal text-text-primary">
 									{ log.meta?.resend }
 								</strong>
 							</p>
@@ -424,29 +431,7 @@ const DrawerLogBody = ( { log } ) => {
 					/>
 				</CollapsibleSection.Trigger>
 				<CollapsibleSection.Content>
-					<div className="mt-2">
-						{ attachments.length > 0 ? (
-							<ul className="space-y-1 list-inside">
-								{ attachments.map( ( attachment, index ) => (
-									<li key={ index }>
-										{ attachment ??
-											sprintf(
-												/* translators: %s: Attachment number. */
-												__(
-													'Attachment %s',
-													'suremails'
-												),
-												index + 1
-											) }
-									</li>
-								) ) }
-							</ul>
-						) : (
-							<p className="text-sm text-text-secondary">
-								{ __( 'No attachments.', 'suremails' ) }
-							</p>
-						) }
-					</div>
+					<AttachmentList attachments={ attachments } />
 				</CollapsibleSection.Content>
 			</CollapsibleSection>
 		</div>

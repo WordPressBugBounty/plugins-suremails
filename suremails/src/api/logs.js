@@ -115,7 +115,7 @@ export const resendEmails = async ( logIds ) => {
 	} catch ( error ) {
 		throw new Error(
 			error.message ||
-				__( 'There was an issue resending emails.', 'suremails' )
+				__( 'There was an issue resending the email(s).', 'suremails' )
 		);
 	}
 };

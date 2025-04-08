@@ -10,6 +10,7 @@
 namespace SureMails\Inc\Emails\Providers\BREVO;
 
 use SureMails\Inc\Emails\Handler\ConnectionHandler;
+use SureMails\Inc\Emails\ProviderHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -28,13 +29,6 @@ class BrevoHandler implements ConnectionHandler {
 	 * @var array
 	 */
 	protected $connection_data;
-
-	/**
-	 * Brevo Base API URL.
-	 *
-	 * @var string
-	 */
-	private $base_url = 'https://api.brevo.com/v3';
 
 	/**
 	 * The Brevo API URL (for sending emails).
@@ -122,85 +116,18 @@ class BrevoHandler implements ConnectionHandler {
 	 * @return array The result of the authentication attempt.
 	 */
 	public function authenticate() {
-		$result = [
-			'success'    => false,
-			'message'    => '',
-			'error_code' => 200,
-		];
 
 		if ( empty( $this->connection_data['api_key'] ) || empty( $this->connection_data['from_email'] ) ) {
-			$result['message']    = __( 'API key or From Email is missing in the connection data.', 'suremails' );
-			$result['error_code'] = 400;
-			return $result;
+			return [
+				'success'    => false,
+				'message'    => __( 'API key or From Email is missing in the connection data.', 'suremails' ),
+				'error_code' => 400,
+			];
 		}
-
-		$request_headers = [
-			'Api-Key'      => sanitize_text_field( $this->connection_data['api_key'] ),
-			'Content-Type' => 'application/json',
-			'Accept'       => 'application/json',
+		return [
+			'success' => true,
+			'message' => __( 'Brevo Connection saved successfully.', 'suremails' ),
 		];
-
-		$senders = $this->get_api_data( '/senders?ip=&domain=', $request_headers );
-		if ( is_wp_error( $senders ) ) {
-			$result['message']    = __( 'Failed to get senders: ', 'suremails' ) . $senders->get_error_message();
-			$result['error_code'] = $senders->get_error_code();
-			return $result;
-		}
-
-		$from_email   = sanitize_email( $this->connection_data['from_email'] );
-		$sender_found = false;
-		if ( isset( $senders['senders'] ) && is_array( $senders['senders'] ) ) {
-			foreach ( $senders['senders'] as $sender ) {
-				if ( isset( $sender['email'] ) && strtolower( $sender['email'] ) === strtolower( $from_email ) ) {
-					$sender_found = true;
-					break;
-				}
-			}
-		}
-
-		if ( $sender_found ) {
-			$result['success'] = true;
-			$result['message'] = __( 'Brevo connection authenticated successfully. Sender email exists.', 'suremails' );
-			return $result;
-		}
-
-		$parts  = explode( '@', $from_email );
-		$domain = isset( $parts[1] ) ? trim( $parts[1] ) : '';
-
-		if ( empty( $domain ) ) {
-			$result['message']    = __( 'Invalid sender email format. Domain missing.', 'suremails' );
-			$result['error_code'] = 400;
-			return $result;
-		}
-
-		$domains = $this->get_api_data( '/senders/domains', $request_headers );
-		if ( is_wp_error( $domains ) ) {
-			$result['message']    = __( 'Failed to get domains: ', 'suremails' ) . $domains->get_error_message();
-			$result['error_code'] = $domains->get_error_code();
-			return $result;
-		}
-
-		$domain_found = false;
-		if ( isset( $domains['domains'] ) && is_array( $domains['domains'] ) ) {
-			foreach ( $domains['domains'] as $domain_item ) {
-				if ( isset( $domain_item['domain_name'] ) && strtolower( $domain_item['domain_name'] ) === strtolower( $domain ) ) {
-					if ( ! empty( $domain_item['authenticated'] ) && ! empty( $domain_item['verified'] ) ) {
-						$domain_found = true;
-					}
-					break;
-				}
-			}
-		}
-
-		if ( $domain_found ) {
-			$result['success'] = true;
-			$result['message'] = __( 'Brevo connection authenticated successfully. Domain is authenticated and verified.', 'suremails' );
-		} else {
-			$result['message']    = __( 'Brevo authentication failed: Sender email not found and the domain is not authenticated/verified.', 'suremails' );
-			$result['error_code'] = 401;
-		}
-
-		return $result;
 	}
 
 	/**
@@ -277,18 +204,16 @@ class BrevoHandler implements ConnectionHandler {
 		if ( ! empty( $processed_data['attachments'] ) ) {
 			$attachments = [];
 			foreach ( $processed_data['attachments'] as $attachment ) {
-				$file_path = sanitize_text_field( $attachment );
-				if ( is_file( $file_path ) && file_exists( $file_path ) && is_readable( $file_path ) ) {
-					$extension = pathinfo( $attachment, PATHINFO_EXTENSION );
-					if ( in_array( $extension, $this->allowed_extensions, true ) ) {
-						$file_content = file_get_contents( $file_path );
-						if ( false !== $file_content ) {
-							$attachments[] = [
-								'name'    => basename( $file_path ),
-								'content' => base64_encode( $file_content ),
-							];
-						}
-					}
+				$attachment_values = ProviderHelper::get_attachment( $attachment );
+				if ( ! $attachment_values ) {
+					continue;
+				}
+				$extension = $attachment_values['extension'];
+				if ( in_array( $extension, $this->allowed_extensions, true ) ) {
+					$attachments[] = [
+						'name'    => $attachment_values['name'],
+						'content' => $attachment_values['blob'],
+					];
 				}
 			}
 			if ( ! empty( $attachments ) ) {
@@ -373,39 +298,6 @@ class BrevoHandler implements ConnectionHandler {
 				'encrypt'     => true,
 			],
 		];
-	}
-
-	/**
-	 * Retrieve data from Brevo API using the base URL.
-	 *
-	 * This function sends a GET request to the Brevo API using the provided endpoint
-	 * (appended to the base URL) and returns the decoded response. If the response indicates
-	 * a 401 Unauthorized status, a WP_Error is returned accordingly.
-	 *
-	 * @param string $endpoint The relative endpoint (e.g. "/senders?ip=&domain=" or "/senders/domains").
-	 * @param array  $headers  Request headers to use.
-	 * @return array|\WP_Error The decoded response data or a WP_Error on failure.
-	 */
-	private function get_api_data( $endpoint, array $headers ) {
-		$url      = $this->base_url . $endpoint;
-		$response = wp_remote_get(
-			$url,
-			[
-				'headers' => $headers,
-			]
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return $response;
-		}
-
-		$response_code = wp_remote_retrieve_response_code( $response );
-		if ( 401 === $response_code ) {
-			return new \WP_Error( 'unauthorized', __( 'Unauthorized: API key invalid', 'suremails' ), $response_code );
-		}
-
-		$body = wp_remote_retrieve_body( $response );
-		return json_decode( $body, true );
 	}
 
 	/**

@@ -30,6 +30,15 @@ class SaveTestConnection extends Api_Base {
 	use Instance;
 
 	/**
+	 * Indicates whether the current flow is for saving a connection.
+	 * When simulation mode is enabled, this flag ensures that the Connection  Handler Factory returns the appropriate handler for performing the save operation.
+	 *
+	 * @since 1.5.0
+	 * @var bool True if saving a connection, false otherwise.
+	 */
+	public $saving_connection = false;
+
+	/**
 	 * Route base.
 	 *
 	 * @var string
@@ -72,9 +81,10 @@ class SaveTestConnection extends Api_Base {
 	 */
 	public function handle_test_save_email_connection( $request ) {
 		try {
-			$params   = $request->get_json_params();
-			$settings = $params['settings'] ?? [];
-			$provider = strtoupper( sanitize_text_field( $params['provider'] ?? '' ) );
+			$params                  = $request->get_json_params();
+			$settings                = $params['settings'] ?? [];
+			$provider                = strtoupper( sanitize_text_field( $params['provider'] ?? '' ) );
+			$this->saving_connection = true;
 
 			$options = Providers::instance()->get_provider_options( $provider );
 
@@ -154,6 +164,9 @@ class SaveTestConnection extends Api_Base {
 				],
 				500
 			);
+		} finally {
+			// Reset the saving_connection flag.
+			$this->saving_connection = false;
 		}
 	}
 

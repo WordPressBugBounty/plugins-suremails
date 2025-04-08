@@ -64,48 +64,10 @@ class MailjetHandler implements ConnectionHandler {
 	 */
 	public function authenticate() {
 
-		$api_key    = $this->connection_data['api_key'] ?? '';
-		$secret_key = $this->connection_data['secret_key'] ?? '';
-
-		if ( empty( $api_key ) || empty( $secret_key ) ) {
+		if ( empty( $this->connection_data['api_key'] ) || empty( $this->connection_data['from_email'] ) || empty( $this->connection_data['secret_key'] ) ) {
 			return [
 				'success' => false,
 				'message' => __( 'Authentication keys are missing.', 'suremails' ),
-			];
-		}
-
-		$response = wp_remote_get(
-			$this->authenticate_api_url,
-			[
-				'headers' => [
-					'Authorization' => 'Basic ' . base64_encode( "{$api_key}:{$secret_key}" ),
-					'Content-Type'  => 'application/json',
-				],
-				'timeout' => 15,
-			]
-		);
-
-		if ( is_wp_error( $response ) ) {
-			return [
-				'success' => false,
-				'message' => sprintf(
-					/* translators: 1: Error Message */
-					__( 'Authentication error: %1$s', 'suremails' ),
-					$response->get_error_message()
-				),
-			];
-		}
-
-		$status_code = wp_remote_retrieve_response_code( $response );
-
-		if ( $status_code !== 200 ) {
-			return [
-				'success' => false,
-				'message' => sprintf(
-					/* translators: 1: Error Message */
-					__( 'Mailjet: Authentication failed: %1$s', 'suremails' ),
-					$response['response']['message']
-				),
 			];
 		}
 
@@ -202,7 +164,8 @@ class MailjetHandler implements ConnectionHandler {
 		if ( is_wp_error( $response ) ) {
 			return [
 				'success' => false,
-				'message' => 'Error: ' . $response->get_error_message(),
+				/* translators: %s: Error message. */
+				'message' => sprintf( __( 'Email sending failed via Mailjet. %s', 'suremails' ), $response->get_error_message() ),
 				'send'    => false,
 			];
 		}
@@ -222,7 +185,7 @@ class MailjetHandler implements ConnectionHandler {
 			'success' => false,
 			'message' => sprintf(
 				/* translators: %s: Error message. */
-				__( 'Email sending failed via Mailjet: %s', 'suremails' ),
+				__( 'Email sending failed via Mailjet. %s', 'suremails' ),
 				$response_body['ErrorMessage']
 			),
 			'send'    => false,

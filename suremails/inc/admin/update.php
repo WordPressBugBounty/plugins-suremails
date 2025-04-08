@@ -36,6 +36,9 @@ class Update {
 		'1.4.2' => [
 			'updater_1_4_2',
 		],
+		'1.5.0' => [
+			'updater_1_5_0',
+		],
 	];
 
 	/**
@@ -167,6 +170,23 @@ class Update {
 		}
 
 		update_option( SUREMAILS_CONNECTIONS, Settings::instance()->encrypt_all( $settings ) );
+	}
+
+	/**
+	 * Migrations for version 1.5.0
+	 * Update email simulation setting to 'no' if it is already set. This is to ensure that the setting is set to 'no' by default.
+	 *
+	 * @return void
+	 * @since 1.5.0
+	 */
+	public function updater_1_5_0() {
+		$settings = Settings::instance()->get_raw_settings();
+
+		$is_set_email_simulation = isset( $settings['email_simulation'] );
+		if ( $is_set_email_simulation ) {
+			$settings['email_simulation'] = 'no';
+			update_option( SUREMAILS_CONNECTIONS, $settings );
+		}
 	}
 
 	/**

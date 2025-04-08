@@ -79,10 +79,20 @@ class EmailLog {
 				if ( ! isset( $log['attachments'] ) ) {
 					return $log;
 				}
-				$log['headers']     = maybe_unserialize( $log['headers'] );
-				$log['attachments'] = maybe_unserialize( $log['attachments'] );
-				$log['response']    = maybe_unserialize( $log['response'] );
-				$log['meta']        = ! empty( $log['meta'] ) ? json_decode( $log['meta'], true ) : [];
+				if ( isset( $log['headers'] ) && ! empty( $log['headers'] ) ) {
+					$log['headers'] = maybe_unserialize( $log['headers'] );
+				}
+				if ( isset( $log['attachments'] ) && ! empty( $log['attachments'] ) ) {
+					$log['attachments'] = maybe_unserialize( $log['attachments'] );
+				}
+				if ( isset( $log['response'] ) && ! empty( $log['response'] ) ) {
+					$log['response'] = maybe_unserialize( $log['response'] );
+				}
+				if ( isset( $log['meta'] ) && ! empty( $log['meta'] ) ) {
+					$log['meta'] = json_decode( $log['meta'], true );
+				} else {
+					$log['meta'] = [];
+				}
 
 				if ( ! is_array( $log['attachments'] ) ) {
 					$log['attachments'] = [];
@@ -191,6 +201,7 @@ class EmailLog {
 			$data['response']    = maybe_serialize( $data['response'] );
 			$data['attachments'] = maybe_serialize( $data['attachments'] );
 			$data['meta']        = ! empty( $data['meta'] ) ? wp_json_encode( $data['meta'] ) : null;
+			$data['updated_at']  = current_time( 'mysql' );
 
 			// Prepare data types.
 			$format = [
@@ -204,6 +215,7 @@ class EmailLog {
 				'%s', // response.
 				'%s', // meta.
 				'%s', // connection.
+				'%s', // updated_at.
 			];
 
 			// Insert into the database.
@@ -249,8 +261,17 @@ class EmailLog {
 		$group_by = ! empty( $args['group_by'] ) && is_string( $args['group_by'] ) ? $args['group_by'] : '';
 		$having   = ! empty( $args['having'] ) && is_array( $args['having'] ) ? $args['having'] : [];
 		$order_by = ! empty( $args['order'] ) && is_array( $args['order'] ) ? $args['order'] : [];
-		$limit    = isset( $args['limit'] ) ? intval( $args['limit'] ) : 10;
-		$offset   = isset( $args['offset'] ) ? intval( $args['offset'] ) : 0;
+
+		if ( isset( $args['limit'] ) || isset( $args['offset'] ) ) {
+			$limit        = isset( $args['limit'] ) ? intval( $args['limit'] ) : 0;
+			$offset       = isset( $args['offset'] ) ? intval( $args['offset'] ) : 0;
+			$limit_object = Db_Helper::form_limit_clause( $limit, $offset );
+			$limit_clause = is_string( $limit_object['clause'] ) ? $limit_object['clause'] : '';
+			$values_limit = is_array( $limit_object['values'] ) ? $limit_object['values'] : [];
+		} else {
+			$limit_clause = '';
+			$values_limit = [];
+		}
 
 		try {
 			$values_where = [];
@@ -270,11 +291,6 @@ class EmailLog {
 
 			// Build ORDER BY clause.
 			$order_clause = Db_Helper::form_order_by_clause( $order_by );
-
-			// Build LIMIT and OFFSET.
-			$limit_object = Db_Helper::form_limit_clause( $limit, $offset );
-			$limit_clause = is_string( $limit_object['clause'] ) ? $limit_object['clause'] : '';
-			$values_limit = is_array( $limit_object['values'] ) ? $limit_object['values'] : [];
 
 			// Combine all parts.
 			$sql = "SELECT {$select} FROM `{$this->table_name}` {$where_clause} {$group_by_clause} {$having_clause} {$order_clause} {$limit_clause}";
