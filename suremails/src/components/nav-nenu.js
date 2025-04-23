@@ -38,7 +38,7 @@ const NavMenu = () => {
 		{ name: 'Settings', path: '/settings' },
 		{ name: 'Connections', path: '/connections' },
 		{ name: 'Email Logs', path: '/logs' },
-		{ name: 'Notifications', path: '/notifications', comingSoon: true },
+		{ name: 'Notifications', path: '/notifications' },
 	];
 
 	// Get the current active path
@@ -79,33 +79,16 @@ const NavMenu = () => {
 					<HamburgerMenu className="lg:hidden">
 						<HamburgerMenu.Toggle className="size-6" />
 						<HamburgerMenu.Options>
-							{ navItems.map( ( option ) =>
-								option.comingSoon ? (
-									<HamburgerMenu.Option
-										key={ option.name }
-										className=" cursor-not-allowed opacity-50"
-									>
-										{ option.name }
-										<Badge
-											label="Coming Soon"
-											size="xs"
-											variant="blue"
-											className="pl-1 pr-1 ml-1"
-										/>
-									</HamburgerMenu.Option>
-								) : (
-									<HamburgerMenu.Option
-										key={ option.name }
-										tag={ Link }
-										to={ option.path }
-										active={
-											activePath.trim() === option.path
-										}
-									>
-										{ option.name }
-									</HamburgerMenu.Option>
-								)
-							) }
+							{ navItems.map( ( option ) => (
+								<HamburgerMenu.Option
+									key={ option.name }
+									tag={ Link }
+									to={ option.path }
+									active={ activePath.trim() === option.path }
+								>
+									{ option.name }
+								</HamburgerMenu.Option>
+							) ) }
 						</HamburgerMenu.Options>
 					</HamburgerMenu>
 					<Topbar.Item>
@@ -126,40 +109,20 @@ const NavMenu = () => {
 				>
 					<Topbar.Item className="h-full">
 						<nav className="h-full space-x-4">
-							{ navItems.map( ( item ) =>
-								item.comingSoon ? (
-									<span
-										key={ item.name }
-										className={ cn(
-											'inline-flex items-center relative h-full content-center px-1 text-sm text-text-disabled font-medium bg-transparent cursor-not-allowed opacity-50',
-											activePath.trim() === item.path
-												? 'text-text-primary'
-												: ''
-										) }
-									>
-										{ item.name }
-										<Badge
-											label="Coming Soon"
-											size="xs"
-											variant="blue"
-											className="pl-1 pr-1 ml-1"
-										/>
-									</span>
-								) : (
-									<Link
-										key={ item.name }
-										to={ item.path }
-										className={ cn(
-											'inline-block relative h-full content-center px-1 text-sm text-text-secondary font-medium no-underline bg-transparent focus:outline-none shadow-none border-1 hover:text-text-primary transition-colors duration-300',
-											activePath.trim() === item.path
-												? 'text-text-primary border-none after:content-[""] after:absolute after:bottom-0 after:inset-x-0 after:h-px after:bg-border-interactive after:transition-all after:duration-300'
-												: ''
-										) }
-									>
-										{ item.name }
-									</Link>
-								)
-							) }
+							{ navItems.map( ( item ) => (
+								<Link
+									key={ item.name }
+									to={ item.path }
+									className={ cn(
+										'inline-block relative h-full content-center px-1 text-sm text-text-secondary font-medium no-underline bg-transparent focus:outline-none shadow-none border-1 hover:text-text-primary transition-colors duration-300',
+										activePath.trim() === item.path
+											? 'text-text-primary border-none after:content-[""] after:absolute after:bottom-0 after:inset-x-0 after:h-px after:bg-border-interactive after:transition-all after:duration-300'
+											: ''
+									) }
+								>
+									{ item.name }
+								</Link>
+							) ) }
 						</nav>
 					</Topbar.Item>
 				</Topbar.Middle>

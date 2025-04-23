@@ -383,7 +383,14 @@ class MailHandler {
 		}
 
 		if ( $connection === null ) {
-			$connection = $this->connection_manager->get_default_connection();
+			// No connection found for the from_email. Use the default connection first then get all connections from from_email of default connection and use as fallback sequence based on priority.
+			$default_connection = $this->connection_manager->get_default_connection( false );
+			$default_from_email = $default_connection['from_email'] ?? null;
+			$this->connection_manager->set_from_email( $default_from_email );
+
+			// Swap default connection to true to get all connections from from_email of default connection but first connection should be default connection.
+			$this->connection_manager->swap_default_connection = true;
+			$connection                                        = $this->get_connection_from_email( $default_from_email );
 		}
 
 		return $connection;

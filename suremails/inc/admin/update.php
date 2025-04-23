@@ -143,7 +143,7 @@ class Update {
 				if ( version_compare( $current_db_version, $version, '<' ) ) {
 					foreach ( $update_callbacks as $update_callback ) {
 						if ( false === $this->get_migration_status( $version ) ) {
-							call_user_func( [ $this, $update_callback ] );
+							$this->$update_callback();
 							$this->set_migration_status( $version, true );
 						}
 					}

@@ -3,17 +3,17 @@ Contributors: brainstormforce
 Donate link: https://www.paypal.me/BrainstormForce
 Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
-Tested up to: 6.7
+Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.5.0
+Stable tag: 1.6.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
-SureMail – SMTP Plugin with Multiple SMTP Providers, Email Logs, and Auto-Retry
+SureMail – SMTP and Email Logs Plugin with Amazon SES, Postmark, and Other Providers
 
 == Description ==
 
-### Send WordPress Emails with Confidence Using Multiple SMTP Providers and Advanced Fail-Safe Features ###
+### 100% Free SMTP Plugin with Premium Features — Connect Amazon SES, Postmark, View Detailed Email Logs and More ###
 
 ★★★★★
 
@@ -60,16 +60,14 @@ SureMail supports multiple SMTP providers:
 3. Mailgun
 4. Mailjet
 5. Google Workspace / Gmail
-6. Microsoft 365 / Outlook.com
+6. MailerSend
 7. Postmark
 8. SparkPost
 9. Elastic Email
 10. Brevo
-11. Zoho Mail
-12. SendLayer
-13. SMTP.com
-14. SMTP2GO
-15. Other SMTP
+11. SMTP2GO
+12. Netcore
+13. Other SMTP
 
 Plus, you can customize the "From Name" and "From Email" for each SMTP connection, ensuring consistent and professional branding across all your communications.
 
@@ -242,6 +240,12 @@ Yes, SureMail uses secure encryption methods like TLS/SSL to protect your email 
 5. Email Logs – Monitor your email activity with detailed logs to track successful, failed, in progress, and blocked emails easily.
 
 == Changelog ==
+
+v1.6.0 - 23-April-2025
+- New: Introduced a 'Notifications' feature to send notifications using OttoKit.
+- New: Added the MailerSend service provider.
+- Improvement: Improved the fallback connection for the 'from_email' in the default connection.
+- Fix: Gmail Connection: Updated the Google API Client API to support PHP version 7.4.
 
 v1.5.0 - 08-April-2025
 - New: Introduced a "Resend" feature for re-sending emails.

@@ -2,16 +2,13 @@
 /**
  * GmailHandler.php
  *
- * Handles sending emails using Gmail with the Google API PHP Client.
+ * Handles sending emails using Gmail via direct API calls.
  *
  * @package SureMails\Inc\Emails\Providers\Gmail
  */
 
 namespace SureMails\Inc\Emails\Providers\GMAIL;
 
-use Google\Client;
-use Google\Service\Gmail;
-use Google\Service\Gmail\Message;
 use SureMails\Inc\ConnectionManager;
 use SureMails\Inc\Emails\Handler\ConnectionHandler;
 use SureMails\Inc\Settings;
@@ -29,32 +26,22 @@ if ( ! defined( 'ABSPATH' ) ) {
 class GmailHandler implements ConnectionHandler {
 
 	/**
+	 * OAuth token endpoint.
+	 */
+	private const TOKEN_URL = 'https://accounts.google.com/o/oauth2/token';
+
+	/**
+	 * Gmail send API endpoint.
+	 */
+	private const SEND_URL = 'https://gmail.googleapis.com/gmail/v1/users/me/messages/send';
+
+	/**
 	 * Gmail connection data.
 	 *
 	 * @var array
 	 */
 	private $connection_data;
 
-	/**
-	 * Gmail service.
-	 *
-	 * @var Gmail
-	 */
-	private $gmail_service;
-
-	/**
-	 * Gmail message.
-	 *
-	 * @var Message
-	 */
-	private $gmail_message;
-
-	/**
-	 * Google API Client.
-	 *
-	 * @var Client
-	 */
-	private $client;
 	/**
 	 * Constructor.
 	 *
@@ -63,28 +50,27 @@ class GmailHandler implements ConnectionHandler {
 	 * @param array $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
+		// Ensure our connection data is available.
 		$this->connection_data = $connection_data;
-		$this->client          = new Client();
-		$this->client->setClientId( $this->connection_data['client_id'] );
-		$this->client->setClientSecret( $this->connection_data['client_secret'] );
 	}
 
 	/**
 	 * Authenticate the Gmail connection.
 	 *
-	 * This method handles the entire OAuth flow.
+	 * This method handles the entire OAuth flow using direct API calls.
 	 *
 	 * @return void|array
 	 */
 	public function authenticate() {
-
 		$result = [
 			'success' => false,
 			'message' => __( 'Failed to authenticate with Gmail.', 'suremails' ),
-
 		];
+
 		$tokens    = [];
 		$auth_code = $this->connection_data['auth_code'] ?? '';
+
+		// First-time exchange of authorization code.
 		if ( ! empty( $auth_code ) ) {
 			$body   = [
 				'code'          => $auth_code,
@@ -93,12 +79,14 @@ class GmailHandler implements ConnectionHandler {
 				'client_id'     => $this->connection_data['client_id'],
 				'client_secret' => $this->connection_data['client_secret'],
 			];
-			$tokens = $this->api_call( 'https://accounts.google.com/o/oauth2/token', $body, 'POST' );
+			$tokens = $this->api_call( self::TOKEN_URL, $body, 'POST' );
 
 			if ( is_wp_error( $tokens ) ) {
 				$result['message'] = $tokens->get_error_message();
 				return $result;
 			}
+
+			// Refresh the tokinss using existing refresh token.
 		} elseif ( ! empty( $this->connection_data['refresh_token'] ) ) {
 			$new_tokens = $this->get_new_token();
 			if ( isset( $new_tokens['success'] ) && $new_tokens['success'] === false ) {
@@ -109,42 +97,48 @@ class GmailHandler implements ConnectionHandler {
 			$result['message'] = __( 'No authorization code or refresh token provided. Please authenticate first.', 'suremails' );
 			return $result;
 		}
-		if ( ! is_array( $tokens ) || ! isset( $tokens['expires_in'], $tokens['access_token'], $tokens['refresh_token'] ) ) {
+
+		// Validate token response.
+		if ( ! is_array( $tokens ) || empty( $tokens['access_token'] ) || empty( $tokens['expires_in'] ) ) {
 			$result['message'] = __( 'Failed to retrieve authentication tokens. Please try to re-authenticate', 'suremails' );
 			return $result;
 		}
+
+		// Merge in token data and timestamps.
 		$result                 = array_merge( $result, $tokens );
 		$result['expire_stamp'] = time() + $tokens['expires_in'];
 		$result['success']      = true;
 		$result['message']      = __( 'Successfully authenticated with Gmail.', 'suremails' );
+
 		return $result;
 	}
 
 	/**
-	 * Send email using Gmail via the Google API Client.
+	 * Send email using Gmail via direct API call.
 	 *
-	 * @param array $atts           Email attributes.
-	 * @param int   $log_id         Log ID.
-	 * @param array $connection_data     Connection data.
-	 * @param array $processed_data Processed email data.
+	 * @param array $atts             Email attributes.
+	 * @param int   $log_id           Log ID.
+	 * @param array $connection_data  Connection data.
+	 * @param array $processed_data   Processed email data.
 	 *
 	 * @return array The result of the sending attempt.
 	 */
 	public function send( array $atts, $log_id, array $connection_data, $processed_data ) {
 
-		$result   = [
+		$result = [
 			'success' => false,
-			'message' => __( 'Failed to send email via Gmail.', 'suremails' ),
+			'message' => __( 'Email sending failed via Gmail.', 'suremails' ),
 		];
+
 		$response = $this->check_tokens();
 		if ( isset( $response['success'] ) && $response['success'] === false ) {
 			return $response;
 		}
 
 		$phpmailer = ConnectionManager::instance()->get_phpmailer();
-		$phpmailer->setFrom( $connection_data['from_email'], $connection_data['from_name'] );
+		$phpmailer->setFrom( $this->connection_data['from_email'], $this->connection_data['from_name'] );
 		if ( ! empty( $this->connection_data['return_path'] ) && $this->connection_data['return_path'] === true ) {
-			$phpmailer->Sender = $connection_data['from_email']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			$phpmailer->Sender = $this->connection_data['from_email']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		}
 
 		$phpmailer->preSend();
@@ -153,36 +147,48 @@ class GmailHandler implements ConnectionHandler {
 		// Convert to URL-safe Base64 encoding.
 		$encoded_raw_message = str_replace( [ '+', '/', '=' ], [ '-', '_', '' ], $encoded_raw_message );
 
-		$token = [
-			'access_token'  => $this->connection_data['access_token'],
-			'expires_in'    => $this->connection_data['expire_stamp'] - time(),
-			'refresh_token' => $this->connection_data['refresh_token'],
-		];
-		$this->client->setAccessToken( $token );
-		$this->gmail_service = new Gmail( $this->client );
-		$this->gmail_message = new Message();
-		$this->gmail_message->setRaw( $encoded_raw_message );
-
-		try {
-			$result = $this->gmail_service->users_messages->send( 'me', $this->gmail_message );
-			if ( isset( $result->id ) ) {
-				return [
-					'success'  => true,
-					'message'  => __( 'Email sent successfully via Gmail.', 'suremails' ),
-					'email_id' => $result->id,
-				];
-			}
-				return [
-					'success' => false,
-					'message' => __( 'Failed to send email via Gmail.', 'suremails' ),
-				];
-
-		} catch ( \Exception $e ) {
+		$body = wp_json_encode( [ 'raw' => $encoded_raw_message ] );
+		if ( false === $body ) {
 			return [
 				'success' => false,
-				'message' => __( 'Error sending email via Gmail: ', 'suremails' ) . $e->getMessage(),
+				'message' => __( 'Email sending failed via Gmail. Failed to encode email message to JSON.', 'suremails' ),
 			];
 		}
+		$args = [
+			'headers' => [
+				'Authorization' => 'Bearer ' . $this->connection_data['access_token'],
+				'Content-Type'  => 'application/json',
+			],
+			'body'    => $body,
+			'method'  => 'POST',
+			'timeout' => 15,
+		];
+
+		$request = wp_remote_post( self::SEND_URL, $args );
+		if ( is_wp_error( $request ) ) {
+			return [
+				'success' => false,
+				'message' => $request->get_error_message(),
+			];
+		}
+
+		$response_body = json_decode( wp_remote_retrieve_body( $request ), true );
+		if ( ! empty( $response_body['id'] ) ) {
+			return [
+				'success'  => true,
+				'message'  => __( 'Email sent successfully via Gmail.', 'suremails' ),
+				'email_id' => $response_body['id'],
+			];
+		}
+
+		$msg = __( 'Email sending failed via Gmail.', 'suremails' );
+		if ( ! empty( $response_body['error']['message'] ) ) {
+			$msg .= ' ' . $response_body['error']['message'];
+		}
+		return [
+			'success' => false,
+			'message' => $msg,
+		];
 	}
 
 	/**
@@ -197,7 +203,7 @@ class GmailHandler implements ConnectionHandler {
 			'fields'            => self::get_specific_fields(),
 			'icon'              => 'GmailIcon',
 			'display_name'      => __( 'Google Workspace / Gmail', 'suremails' ),
-			'provider_type'     => PHP_VERSION_ID >= 80100 ? 'free' : 'not_compatible',
+			'provider_type'     => 'free',
 			'field_sequence'    => [
 				'connection_title',
 				'client_id',
@@ -213,7 +219,6 @@ class GmailHandler implements ConnectionHandler {
 				'auth_code',
 			],
 			'provider_sequence' => 27,
-			'prerequisite'      => __( 'This provider does not work with your version of PHP. Please upgrade to PHP 8.1 or higher to use this provider.', 'suremails' ),
 		];
 	}
 
@@ -232,7 +237,8 @@ class GmailHandler implements ConnectionHandler {
 				'label'       => __( 'Client ID', 'suremails' ),
 				'input_type'  => 'text',
 				'placeholder' => __( 'Enter your Gmail Client ID', 'suremails' ),
-				'help_text'   => sprintf(       // translators: %s:  URL.
+				'help_text'   => sprintf(
+					// translators: %s: Documentation link.
 					__( 'Get Client ID and Secret ID from Google Cloud Platform. Follow the Gmail %s', 'suremails' ),
 					'<a href="' . esc_url( 'https://suremails.com/docs/gmail?utm_campaign=suremails&utm_medium=suremails-dashboard' ) . '" target="_blank">' . __( 'documentation.', 'suremails' ) . '</a>'
 				),
@@ -244,7 +250,6 @@ class GmailHandler implements ConnectionHandler {
 				'input_type'  => 'password',
 				'placeholder' => __( 'Enter your Gmail Client Secret', 'suremails' ),
 				'encrypt'     => true,
-
 			],
 			'auth_code'     => [
 				'required'    => false,
@@ -300,61 +305,49 @@ class GmailHandler implements ConnectionHandler {
 			],
 		];
 	}
-
 	/**
-	 * Get the Gmail connection data.
+	 * Make an API call.
 	 *
-	 * @param string $url   The URL to make the API call to.
-	 * @param array  $body The body arguments to send with the API call.
-	 * @param string $type The type of request to make.
-	 * @since 1.4.0
+	 * @param string $url   The URL to call.
+	 * @param array  $body  The body arguments.
+	 * @param string $type  The HTTP method to use.
 	 *
-	 * @return array|WP_Error The Gmail connection data.
+	 * @return array|WP_Error The API response.
 	 */
-	private function api_call( $url, $body, $type = 'GET' ) {
-			$headers = [
-				'Content-Type'              => 'application/http',
+	private function api_call( $url, $body = [], $type = 'GET' ) {
+		$args = [
+			'headers' => [
+				'Content-Type'              => 'application/json',
 				'Content-Transfer-Encoding' => 'binary',
 				'MIME-Version'              => '1.0',
-				'timeout'                   => 10,
-			];
+			],
+			'method'  => $type,
+			'timeout' => 15,
+		];
 
-			$args = [
-				'headers' => $headers,
-			];
-			if ( $body && is_array( $body ) ) {
-				$body = wp_json_encode( $body );
-				if ( $body === false ) {
-					return new WP_Error( 422, __( 'Failed to encode body to JSON.', 'suremails' ) );
-				}
-				$args['body'] = $body;
+		if ( ! empty( $body ) ) {
+			$json = wp_json_encode( $body );
+			if ( false === $json ) {
+				return new WP_Error( 422, __( 'Failed to encode body to JSON.', 'suremails' ) );
 			}
+			$args['body'] = $json;
+		}
 
-			$args['method'] = $type;
+		$request = wp_remote_request( $url, $args );
+		if ( is_wp_error( $request ) ) {
+			return new WP_Error( 422, $request->get_error_message() );
+		}
 
-			$request = null;
-			if ( is_array( $args ) ) {
-				$request = wp_safe_remote_request( $url, $args );
-			}
+		$response = json_decode( wp_remote_retrieve_body( $request ), true );
 
-			if ( is_wp_error( $request ) ) {
-				$message = $request->get_error_message();
-				return new WP_Error( 422, $message );
-			}
+		if ( ! empty( $response['error'] ) ) {
 
-			$body = json_decode( wp_remote_retrieve_body( $request ), true );
+			$error = $response['error_description']
+				?? ( $response['error']['message'] ?? __( 'Unknown error from Gmail API.', 'suremails' ) );
+			return new WP_Error( 422, $error );
+		}
 
-			if ( ! empty( $body['error'] ) ) {
-				$error = __( 'Unknow error from Gmail API.', 'suremails' );
-				if ( isset( $body['error_description'] ) ) {
-					$error = $body['error_description'];
-				} elseif ( ! empty( $body['error']['message'] ) ) {
-					$error = $body['error']['message'];
-				}
-				return new WP_Error( 422, $error );
-			}
-
-			return $body;
+		return $response;
 	}
 
 	/**
@@ -367,65 +360,71 @@ class GmailHandler implements ConnectionHandler {
 	private function check_tokens() {
 		$result = [
 			'success' => false,
-			'message' => __( 'Failed to get new token from Gmail API', 'suremails' ),
+			'message' => __( 'Failed to get new token from Gmail API.', 'suremails' ),
 		];
-		if ( empty( $this->connection_data['refresh_token'] ) || empty( $this->connection_data['access_token'] ) || empty( $this->connection_data['expire_stamp'] ) ) {
+
+		if (
+			empty( $this->connection_data['refresh_token'] )
+			|| empty( $this->connection_data['access_token'] )
+			|| empty( $this->connection_data['expire_stamp'] )
+		) {
 			return $result;
 		}
-		$expiring = $this->connection_data['expire_stamp'] - 500;
-		if ( $expiring < time() ) {
-			$new_tokens = $this->client->refreshToken( $this->connection_data['refresh_token'] );
-			if ( ! empty( $new_tokens['error'] ) ) {
-				$error_description = $new_tokens['error_description'] ?? __( 'Failed to authenticate', 'suremails' );
-				// translators: %s: Error description.
-				$result['message'] = sprintf( __( 'Failed to get new token from Gmail API: %s', 'suremails' ), $error_description );
+
+		if ( time() > $this->connection_data['expire_stamp'] - 500 ) {
+			$new = $this->client_refresh_token( $this->connection_data['refresh_token'] );
+			if ( is_wp_error( $new ) ) {
+				$result['message'] = sprintf(
+					// translators: %s: Error message.
+					__( 'Email sending failed via Gmail. Failed to refresh Gmail token: %s', 'suremails' ),
+					$new->get_error_message()
+				);
 				return $result;
 			}
-			$token = [];
-			if ( ! empty( $new_tokens['access_token'] ) ) {
-				$token['access_token'] = $new_tokens['access_token'];
-			}
-			if ( ! empty( $new_tokens['expires_in'] ) ) {
-				$token['expires_in'] = $new_tokens['expires_in'];
-			}
-			if ( ! empty( $new_tokens['refresh_token'] ) ) {
-				$token['refresh_token'] = $new_tokens['refresh_token'];
-			}
-			$this->client->setAccessToken( $token );
-			$this->connection_data['access_token']  = $new_tokens['access_token'];
-			$this->connection_data['expire_stamp']  = time() + $new_tokens['expires_in'];
-			$this->connection_data['expires_in']    = $new_tokens['expires_in'];
-			$this->connection_data['refresh_token'] = $new_tokens['refresh_token'];
-			Settings::instance()->update_connection( $this->connection_data );
 
+			// Update stored tokens.
+			$this->connection_data['access_token']  = $new['access_token'];
+			$this->connection_data['expire_stamp']  = time() + $new['expires_in'];
+			$this->connection_data['expires_in']   = $new['expires_in'];
+			$this->connection_data['refresh_token'] = $new['refresh_token'] ?? $this->connection_data['refresh_token'];
+			Settings::instance()->update_connection( $this->connection_data );
 		}
 
-		$result['success'] = true;
-		$result['message'] = __( 'Successfully added new tokens.', 'suremails' );
-
-		return $result;
+		return [
+			'success' => true,
+			'message' => __( 'Successfully updated tokens.', 'suremails' ),
+		];
 	}
 
 	/**
-	 * Get the Gmail connection data.
+	 * Refresh the access token using the refresh token.
 	 *
-	 * @since 1.4.0
-	 * @return array The Gmail connection data.
+	 * @param string $refresh_token The refresh token.
+	 * @return array|WP_Error The new token data.
+	 */
+	private function client_refresh_token( $refresh_token ) {
+		$body = [
+			'grant_type'    => 'refresh_token',
+			'client_id'     => $this->connection_data['client_id'],
+			'client_secret' => $this->connection_data['client_secret'],
+			'refresh_token' => $refresh_token,
+		];
+		return $this->api_call( self::TOKEN_URL, $body, 'POST' );
+	}
+
+	/**
+	 * Get a new access token using the refresh token.
+	 *
+	 * @return array The new token data.
 	 */
 	private function get_new_token() {
-		$result = [
-			'success' => false,
-			'message' => __( 'Failed to get new token from Gmail API.', 'suremails' ),
-		];
-		$this->client->refreshToken( $this->connection_data['refresh_token'] );
-		$new_tokens = $this->client->getAccessToken();
-		if ( ! empty( $new_tokens['error'] ) ) {
-			$error_description = $new_tokens['error_description'] ?? __( 'Failed to get new token from Gmail API.', 'suremails' );
-			// translators: %s: Error description.
-			$result['message'] = sprintf( __( 'Failed to get new token from Gmail API: %s', 'suremails' ), $error_description );
-			return $result;
+		$tokens = $this->client_refresh_token( $this->connection_data['refresh_token'] );
+		if ( is_wp_error( $tokens ) ) {
+			return [
+				'success' => false,
+				'message' => $tokens->get_error_message(),
+			];
 		}
-		$result['success'] = true;
-		return $new_tokens;
+		return array_merge( $tokens, [ 'success' => true ] );
 	}
 }

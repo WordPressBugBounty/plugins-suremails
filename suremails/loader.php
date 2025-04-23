@@ -14,10 +14,10 @@ use SureMails\Inc\Admin\Crons;
 use SureMails\Inc\Admin\Plugin;
 use SureMails\Inc\Admin\Update;
 use SureMails\Inc\Ajax\Ajax;
+use SureMails\Inc\Analytics\Analytics;
 use SureMails\Inc\API\Api_Init;
 use SureMails\Inc\Controller\ContentGuard;
 use SureMails\Inc\Lib\Suremails_Nps_Survey;
-use SureMails\Inc\Lib\Suremails_Utm_Analytics;
 use SureMails\Inc\Nps_Notice;
 
 /**
@@ -89,6 +89,7 @@ class Loader {
 		ContentGuard::instance();
 		Crons::instance();
 		Api_Init::instance();
+		Analytics::instance();
 	}
 
 	/**
@@ -97,10 +98,35 @@ class Loader {
 	 * @return void
 	 */
 	public function load_libraries() {
-		// load utm analytics.
-		if ( class_exists( 'SureMails\Inc\Lib\Suremails_Utm_Analytics' ) && ! apply_filters( 'suremails_utm_analytics_disable', false ) ) {
-			Suremails_Utm_Analytics::instance();
+
+		if ( ! class_exists( 'Astra_Notices' ) ) {
+			require_once SUREMAILS_DIR . 'inc/lib/astra-notices/class-astra-notices.php';
 		}
+
+		if ( ! class_exists( 'BSF_Analytics_Loader' ) ) {
+			require_once SUREMAILS_DIR . 'inc/lib/bsf-analytics/class-bsf-analytics-loader.php';
+		}
+
+		if ( ! class_exists( '\BSF_UTM_Analytics' ) ) {
+			$utm_path = SUREMAILS_DIR . 'inc/lib/bsf-analytics/modules/utm-analytics.php';
+			if ( file_exists( $utm_path ) ) {
+				require_once $utm_path;
+			}
+		}
+
+		$srml_bsf_analytics = \BSF_Analytics_Loader::get_instance();
+
+		$srml_bsf_analytics->set_entity(
+			[
+				'suremails' => [
+					'product_name'    => 'SureMail',
+					'path'            => SUREMAILS_DIR . 'inc/lib/bsf-analytics',
+					'author'          => 'SureMail',
+					'time_to_display' => '+24 hours',
+				],
+			]
+		);
+
 		// load nps survey.
 		if ( class_exists( 'SureMails\Inc\Lib\Suremails_Nps_Survey' ) && ! apply_filters( 'suremails_disable_nps_survey', false ) ) {
 			Suremails_Nps_Survey::instance();

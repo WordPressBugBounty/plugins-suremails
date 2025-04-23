@@ -88,7 +88,7 @@ class RecommendedPlugin extends Api_Base {
 	}
 
 	/**
-	 * Get the list of installed and active plugins.
+	 * Get the list of installed and active plugins and themes.
 	 *
 	 * @return WP_REST_Response The REST API response.
 	 */
@@ -110,6 +110,29 @@ class RecommendedPlugin extends Api_Base {
 			if ( is_plugin_active( $plugin_file ) ) {
 				$active[] = $slug;
 			}
+		}
+
+		// Get installed themes and add their slugs to the installed list.
+		$all_themes       = wp_get_themes();
+		$installed_themes = [];
+		$active_theme     = get_stylesheet();
+		$active_themes    = [];
+
+		foreach ( $all_themes as $theme_slug => $theme_data ) {
+			$installed_themes[] = $theme_slug;
+
+			if ( $theme_slug === $active_theme ) {
+				$active_themes[] = $theme_slug;
+			}
+		}
+
+		// Add themes to the plugins installed and active lists for consistency.
+		foreach ( $installed_themes as $theme_slug ) {
+			$installed[] = $theme_slug;
+		}
+
+		foreach ( $active_themes as $theme_slug ) {
+			$active[] = $theme_slug;
 		}
 
 		return new WP_REST_Response(

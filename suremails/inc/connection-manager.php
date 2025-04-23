@@ -37,6 +37,14 @@ class ConnectionManager {
 	public $email_simulation = false;
 
 	/**
+	 * If no connection found from a from_email then this will be set to true to get from_email connections same a from_email of default connection.
+	 * The default connection will be the first connection in the fallback sequence of from_email connections.
+	 *
+	 * @var bool
+	 */
+	public $swap_default_connection = false;
+
+	/**
 	 * Global PHPMailer instance.
 	 *
 	 * @var PHPMailer|null
@@ -194,7 +202,7 @@ class ConnectionManager {
 	 * @return void
 	 */
 	public function set_from_email( string $from_email ) {
-		$this->from_email = $from_email;
+		$this->from_email = strtolower( $from_email );
 	}
 
 	/**
@@ -348,7 +356,8 @@ class ConnectionManager {
 		}
 		if ( $next_index >= count( $from_email_connections ) ) {
 
-			$this->is_last = true;
+			$this->is_last       = true;
+			$this->current_index = null;
 			return null;
 		}
 
@@ -385,26 +394,28 @@ class ConnectionManager {
 	 * @return void
 	 */
 	public function reset() {
-		$this->current_index          = null;
-		$this->is_fallback            = false;
-		$this->is_testing             = false;
-		$this->from_email_connections = [];
-		$this->current_connection     = null;
-		$this->from_email             = null;
-		$this->is_last                = false;
-		$this->is_first               = false;
-		$this->is_default             = false;
-		$this->is_resend              = false;
-		$this->is_retried             = false;
+		$this->current_index           = null;
+		$this->is_fallback             = false;
+		$this->is_testing              = false;
+		$this->from_email_connections  = [];
+		$this->current_connection      = null;
+		$this->from_email              = null;
+		$this->is_last                 = false;
+		$this->is_first                = false;
+		$this->is_default              = false;
+		$this->is_resend               = false;
+		$this->is_retried              = false;
+		$this->swap_default_connection = false;
 		Logger::instance()->set_id( null );
 	}
 
 	/**
 	 * Retrieves the default connection based on settings.
 	 *
+	 * @param bool $set_checks bool If set to true, it will set the is_default property.
 	 * @return array|null The default connection details or null if not found.
 	 */
-	public function get_default_connection() {
+	public function get_default_connection( $set_checks = true ) {
 		$settings    = $this->get_connections();
 		$connections = $settings['connections'] ?? null;
 
@@ -414,7 +425,7 @@ class ConnectionManager {
 
 		$default_connection_id = $settings['default_connection']['id'] ?? null;
 		$default_connection    = $connections[ $default_connection_id ] ?? null;
-		if ( $default_connection ) {
+		if ( $default_connection && $set_checks ) {
 			$this->is_default = true;
 		}
 		return $default_connection;
@@ -439,11 +450,8 @@ class ConnectionManager {
 		$from_email_connections = [];
 
 		foreach ( $connections as $connection ) {
-			if ( $connection['from_email'] === $this->from_email ) {
+			if ( strtolower( $connection['from_email'] ) === $this->from_email ) {
 				$send = $connection;
-				if ( isset( $send['password'] ) && ! empty( $send['password'] ) ) {
-					$send['password'] = $this->decrypt( $send['password'] );
-				}
 
 				$from_email_connections[] = $send;
 			}
@@ -457,19 +465,23 @@ class ConnectionManager {
 			}
 		);
 
+		// If no connection found from a from_email then this will be set to true to get from_email connections same a from_email of default connection.
+		// The default connection will be the first connection in the fallback sequence of from_email connections. This is to ensure that the default connection is always tried first. It will try with default connection then it will try with other from_email connections based on priority.
+		if ( $this->swap_default_connection ) {
+			$default_connection_id = $this->connections['default_connection']['id'] ?? null;
+			if ( $default_connection_id ) {
+				foreach ( $from_email_connections as $key => $from_email_connection ) {
+					if ( $from_email_connection['id'] === $default_connection_id ) {
+						$default_connection = $from_email_connections[ $key ];
+						unset( $from_email_connections[ $key ] );
+						array_unshift( $from_email_connections, $default_connection );
+					}
+				}
+			}
+		}
+
 		$this->from_email_connections = $from_email_connections;
 
 		return $from_email_connections;
-	}
-
-	/**
-	 * Decrypts data.
-	 *
-	 * @param string|null $data The data to decrypt.
-	 * @return string|null      The decrypted data or null if decryption fails.
-	 */
-	private function decrypt( ?string $data ) {
-		// Implement your decryption logic here if needed.
-		return $data;
 	}
 }

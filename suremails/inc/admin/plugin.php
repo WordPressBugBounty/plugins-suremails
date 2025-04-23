@@ -210,6 +210,8 @@ class Plugin {
 			true // Load in footer.
 		);
 
+		wp_enqueue_script( 'suremails-suretriggers-integration', 'https://app.ottokit.com/js/v2/embed.js', [], SUREMAILS_VERSION, true );
+
 		// RTL checks.
 		$rtl_suffix = is_rtl() ? '-rtl' : '';
 		$file_name  = 'main' . $rtl_suffix . '.css';
@@ -227,19 +229,22 @@ class Plugin {
 			'suremails-react-script',
 			'suremails',
 			[
-				'siteUrl'                  => esc_url( get_site_url( get_current_blog_id() ) ),
-				'attachmentUrl'            => $this->get_attachment_url(),
-				'userEmail'                => wp_get_current_user()->user_email,
-				'version'                  => SUREMAILS_VERSION,
-				'nonce'                    => current_user_can( 'manage_options' ) ? wp_create_nonce( 'wp_rest' ) : '',
-				'_ajax_nonce'              => current_user_can( 'manage_options' ) ? wp_create_nonce( 'suremails_plugin' ) : '',
-				'contentGuardPopupStatus'  => Settings::instance()->show_content_guard_lead_popup(),
-				'contentGuardActiveStatus' => get_option( 'suremails_content_guard_activated', 'no' ),
-				'termsURL'                 => 'https://suremails.com/terms?utm_campaign=suremails&utm_medium=suremails-dashboard',
-				'privacyPolicyURL'         => 'https://suremails.com/privacy-policy?utm_campaign=suremails&utm_medium=suremails-dashboard',
-				'docsURL'                  => 'https://suremails.com/docs?utm_campaign=suremails&utm_medium=suremails-dashboard',
-				'supportURL'               => 'https://suremails.com/contact/?utm_campaign=suremails&utm_medium=suremails-dashboard',
-				'adminURL'                 => admin_url( 'options-general.php?page=' . SUREMAILS ),
+				'siteUrl'                      => esc_url( get_site_url( get_current_blog_id() ) ),
+				'attachmentUrl'                => $this->get_attachment_url(),
+				'userEmail'                    => wp_get_current_user()->user_email,
+				'version'                      => SUREMAILS_VERSION,
+				'nonce'                        => current_user_can( 'manage_options' ) ? wp_create_nonce( 'wp_rest' ) : '',
+				'_ajax_nonce'                  => current_user_can( 'manage_options' ) ? wp_create_nonce( 'suremails_plugin' ) : '',
+				'contentGuardPopupStatus'      => Settings::instance()->show_content_guard_lead_popup(),
+				'contentGuardActiveStatus'     => get_option( 'suremails_content_guard_activated', 'no' ),
+				'termsURL'                     => 'https://suremails.com/terms?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'privacyPolicyURL'             => 'https://suremails.com/privacy-policy?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'docsURL'                      => 'https://suremails.com/docs?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'supportURL'                   => 'https://suremails.com/contact/?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'adminURL'                     => admin_url( 'options-general.php?page=' . SUREMAILS ),
+				'ottokit_connected'            => apply_filters( 'suretriggers_is_user_connected', '' ),
+				'ottokit_admin_url'            => admin_url( 'admin.php?page=suretriggers' ),
+				'pluginInstallationPermission' => current_user_can( 'install_plugins' ),
 			]
 		);
 

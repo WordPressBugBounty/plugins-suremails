@@ -14,6 +14,7 @@ const ContentArea = () => {
 				<Route path="/dashboard" element={ <Dashboard /> } />
 				<Route path="/settings" element={ <Settings /> } />
 				<Route path="/notifications" element={ <Notifications /> } />
+				<Route path="/add-ons" element={ <Dashboard /> } />
 				<Route
 					path="/"
 					element={ <Navigate to="/dashboard" replace /> }

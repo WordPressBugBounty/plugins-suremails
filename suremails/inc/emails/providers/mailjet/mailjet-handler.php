@@ -206,7 +206,7 @@ class MailjetHandler implements ConnectionHandler {
 			'display_name'      => __( 'Mailjet', 'suremails' ),
 			'provider_type'     => 'free',
 			'field_sequence'    => [ 'connection_title', 'api_key', 'secret_key', 'from_email', 'force_from_email', 'from_name', 'force_from_name', 'priority' ],
-			'provider_sequence' => 35,
+			'provider_sequence' => 36,
 		];
 	}
 

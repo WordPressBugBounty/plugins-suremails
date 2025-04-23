@@ -1,130 +1,132 @@
+// @components/EmptyNotifications.js
+import React, { useState, useEffect } from 'react';
 import { __ } from '@wordpress/i18n';
 import { Plus } from 'lucide-react';
 import { toast, Loader } from '@bsf/force-ui';
 import { NoNotifications } from 'assets/icons';
 import EmptyState from '@components/empty-state/empty-state';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 import apiFetch from '@wordpress/api-fetch';
-import { useState } from 'react';
+import { installAndActivatePlugin, activatePlugin } from 'utils/plugin-utils';
+import { pluginAddons } from 'utils/plugin-add-ons';
 
 const EmptyNotifications = ( {
 	isSureTriggersInstalled,
 	isSureTriggersActive,
 } ) => {
+	const isOttokitConnected = window.suremails?.ottokit_connected === '1';
+
 	const queryClient = useQueryClient();
+	const [ installingPlugins, setInstallingPlugins ] = useState( [] );
+	const [ activatingPlugins, setActivatingPlugins ] = useState( [] );
 	const [ isLoading, setIsLoading ] = useState( false );
+	const [ buttonText, setButtonText ] = useState(
+		__( 'Install and Activate', 'suremails' )
+	);
 
-	// Mutation for installing the SureTriggers plugin
-	const installMutation = useMutation( {
-		mutationFn: ( plugin ) =>
-			apiFetch( {
-				path: '/suremails/v1/install-plugin',
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-WP-Nonce': window.suremails?.nonce,
-				},
-				data: {
-					slug: plugin.slug,
-				},
-			} ),
-		onSuccess: ( response ) => {
-			if ( response.success ) {
-				toast.success( __( 'Installation Complete', 'suremails' ), {
-					description: __(
-						'Plugin installed successfully.',
-						'suremails'
-					),
-				} );
-
-				// Update the cache with the new installed plugins
-				if ( response.plugins ) {
-					queryClient.setQueryData( [ 'installed-plugins' ], {
-						installed: response.plugins.installed,
-						active: response.plugins.active,
-					} );
-				}
-			} else {
-				throw new Error(
-					response.message ||
-						__( 'Failed to install plugin.', 'suremails' )
-				);
-			}
-		},
-		onError: ( error ) => {
-			toast.error( __( 'Installation Failed', 'suremails' ), {
-				description:
-					__( 'Failed to install plugin: ', 'suremails' ) +
-					( error.message || '' ),
-			} );
-		},
-	} );
-
-	// Mutation for activating the SureTriggers plugin
-	const activateMutation = useMutation( {
-		mutationFn: ( plugin ) =>
-			apiFetch( {
-				path: '/suremails/v1/activate-plugin',
-				method: 'POST',
-				headers: {
-					'Content-Type': 'application/json',
-					'X-WP-Nonce': window.suremails?.nonce,
-				},
-				data: {
-					slug: plugin.slug,
-				},
-			} ),
-		onSuccess: ( response ) => {
-			if ( response.success ) {
-				toast.success( __( 'Activation Complete', 'suremails' ), {
-					description: __(
-						'Plugin activated successfully.',
-						'suremails'
-					),
-				} );
-
-				// Update the cache with the new active plugins
-				if ( response.plugins ) {
-					queryClient.setQueryData( [ 'installed-plugins' ], {
-						installed: response.plugins.installed,
-						active: response.plugins.active,
-					} );
-				}
-			} else {
-				throw new Error(
-					response.message ||
-						__( 'Failed to activate plugin.', 'suremails' )
-				);
-			}
-		},
-		onError: ( error ) => {
-			toast.error( __( 'Activation Failed', 'suremails' ), {
-				description:
-					__( 'Failed to activate plugin: ', 'suremails' ) +
-					( error.message || '' ),
-			} );
-		},
-	} );
+	const sureTriggersPlugin = pluginAddons.find(
+		( plugin ) => plugin.slug === 'suretriggers'
+	);
 
 	const handleAction = async () => {
-		setIsLoading( true ); // Start loading
+		setIsLoading( true );
 
 		try {
-			if ( ! isSureTriggersInstalled ) {
-				// Install the plugin
-				await installMutation.mutateAsync( { slug: 'suretriggers' } );
+			const pluginsData = queryClient.getQueryData( [
+				'installed-plugins',
+			] ) || {
+				installed: [],
+				active: [],
+			};
 
-				// After successful installation, activate the plugin
-				await activateMutation.mutateAsync( { slug: 'suretriggers' } );
+			if ( ! isSureTriggersInstalled ) {
+				await installAndActivatePlugin(
+					sureTriggersPlugin,
+					pluginsData,
+					installingPlugins,
+					activatingPlugins,
+					setInstallingPlugins,
+					setActivatingPlugins,
+					queryClient,
+					toast
+				);
 			} else if ( isSureTriggersInstalled && ! isSureTriggersActive ) {
-				// Activate the plugin
-				await activateMutation.mutateAsync( { slug: 'suretriggers' } );
+				await activatePlugin(
+					sureTriggersPlugin,
+					pluginsData,
+					installingPlugins,
+					activatingPlugins,
+					setActivatingPlugins,
+					queryClient,
+					toast
+				);
+			} else if (
+				isSureTriggersInstalled &&
+				isSureTriggersActive &&
+				! isOttokitConnected
+			) {
+				await handleConnectOttokit();
 			}
 		} catch ( error ) {
-			// Errors are handled in the mutation's onError callbacks
 		} finally {
-			setIsLoading( false ); // End loading
+			setIsLoading( false );
 		}
+	};
+
+	const handleConnectOttokit = async () => {
+		const connectionUrl = window?.suremails?.ottokit_admin_url;
+		const authWindow = window.open( connectionUrl, '_blank' );
+
+		let iterations = 0;
+		const maxIterations = 240;
+		let isConnected = false;
+
+		setButtonText( __( 'Connecting…', 'suremails' ) );
+
+		const pollInterval = setInterval( async () => {
+			iterations++;
+
+			try {
+				const response = await apiFetch( {
+					path: '/suremails/v1/ottokit-status',
+					method: 'GET',
+					headers: {
+						'X-WP-Nonce': window.suremails?.nonce,
+					},
+				} );
+
+				if ( response?.success && response.data?.ottokit_status ) {
+					isConnected = true;
+					clearInterval( pollInterval );
+					try {
+						if ( authWindow && ! authWindow.closed ) {
+							authWindow.close();
+						}
+					} catch ( e ) {}
+
+					setTimeout( () => {
+						window.location.reload();
+					}, 500 );
+				}
+			} catch ( err ) {}
+
+			if (
+				iterations >= maxIterations ||
+				( authWindow && authWindow.closed )
+			) {
+				clearInterval( pollInterval );
+			}
+		}, 500 );
+
+		// Ensure fallback cleanup in 2 minutes
+		setTimeout( () => {
+			if ( ! isConnected ) {
+				if ( authWindow && ! authWindow.closed ) {
+					authWindow.close();
+				}
+				setButtonText( __( 'Connect OttoKit', 'suremails' ) );
+			}
+		}, maxIterations * 500 );
 	};
 
 	const getActionIcon = () => {
@@ -140,27 +142,43 @@ const EmptyNotifications = ( {
 			);
 		}
 
-		if ( ! isSureTriggersInstalled || isSureTriggersActive ) {
-			return <Plus />;
+		// Hide icon if we’re in the process of connecting or asking to connect OttoKit
+		if (
+			buttonText === __( 'Connect OttoKit', 'suremails' ) ||
+			buttonText === __( 'Connecting…', 'suremails' )
+		) {
+			return null;
 		}
 
-		return null;
+		return <Plus />;
 	};
 
-	// Determine button text based on plugin status
-	let buttonText = __( 'Install and Activate', 'suremails' );
-	if ( isSureTriggersInstalled && ! isSureTriggersActive ) {
-		buttonText = __( 'Activate SureTriggers', 'suremails' );
-	} else if ( isSureTriggersInstalled && isSureTriggersActive ) {
-		buttonText = __( 'Active', 'suremails' );
-	}
+	useEffect( () => {
+		if ( isSureTriggersInstalled && ! isSureTriggersActive ) {
+			setButtonText( __( 'Activate OttoKit', 'suremails' ) );
+		} else if (
+			isSureTriggersInstalled &&
+			isSureTriggersActive &&
+			! isOttokitConnected
+		) {
+			setButtonText( __( 'Connect OttoKit', 'suremails' ) );
+		} else if (
+			isSureTriggersInstalled &&
+			isSureTriggersActive &&
+			isOttokitConnected
+		) {
+			setButtonText( __( 'Active', 'suremails' ) );
+		} else {
+			setButtonText( __( 'Install and Activate', 'suremails' ) );
+		}
+	}, [ isSureTriggersInstalled, isSureTriggersActive, isOttokitConnected ] );
 
 	return (
 		<EmptyState
 			image={ NoNotifications }
-			title={ __( 'Setup Notification via SureTriggers', 'suremails' ) }
+			title={ __( 'Setup Notifications via OttoKit', 'suremails' ) }
 			description={ __(
-				'SureTriggers integrates with SureMail, enabling real-time alerts and seamless app connections.',
+				'OttoKit integrates with SureMail, enabling real-time alerts and seamless app connections.',
 				'suremails'
 			) }
 			bulletPoints={ [

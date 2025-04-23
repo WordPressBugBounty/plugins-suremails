@@ -22,6 +22,7 @@ class Ajax {
 	 */
 	public function __construct() {
 		add_action( 'wp_ajax_suremails-activate_plugin', [ $this, 'handle_activate_plugin' ] );
+		add_action( 'wp_ajax_suremails-activate_theme', [ $this, 'activate_theme' ] );
 	}
 
 	/**
@@ -70,7 +71,7 @@ class Ajax {
 		add_filter( 'wp_redirect', '__return_false' );
 
 		// Activate the plugin.
-		$result = activate_plugin( $plugin_slug );
+		$result = activate_plugin( $plugin_slug, '', false, true );
 
 		// Check if activation was successful.
 		if ( is_wp_error( $result ) ) {
@@ -84,10 +85,9 @@ class Ajax {
 
 		// Clear plugins cache.
 		wp_clean_plugins_cache();
-
-		if ( class_exists( '\BSF_UTM_Analytics\Inc\Utils' ) && is_callable( '\BSF_UTM_Analytics\Inc\Utils::update_referer' ) ) {
+		if ( class_exists( '\BSF_UTM_Analytics' ) && is_callable( '\BSF_UTM_Analytics::update_referer' ) ) {
 			$plugin_slug = pathinfo( $plugin_slug, PATHINFO_FILENAME ); // Retrives the plugin slug from the init.
-			\BSF_UTM_Analytics\Inc\Utils::update_referer( 'suremails', $plugin_slug );
+			\BSF_UTM_Analytics::update_referer( 'suremails', $plugin_slug );
 		}
 
 		// Send success response.
@@ -95,7 +95,67 @@ class Ajax {
 			[
 				'success' => true,
 				'message' => __( 'Plugin activated successfully.', 'suremails' ),
-			],
+			]
+		);
+	}
+
+	/**
+	 * Handle theme activation.
+	 *
+	 * @return void
+	 * @since 1.6.0
+	 */
+	public function activate_theme() {
+		// Check ajax referer.
+		check_ajax_referer( 'suremails_plugin', '_ajax_nonce' );
+
+		// Ensure this is an ajax request.
+		if ( ! wp_doing_ajax() ) {
+			wp_send_json_error(
+				[
+					'success' => false,
+					'message' => __( 'Not an ajax request.', 'suremails' ),
+				]
+			);
+		}
+
+		// Check user capabilities – using 'switch_themes' which is standard for theme activation.
+		if ( ! current_user_can( 'switch_themes' ) ) {
+			wp_send_json_error(
+				[
+					'success' => false,
+					'message' => __( 'You do not have permission to activate themes.', 'suremails' ),
+				]
+			);
+		}
+
+		// Get theme slug from request.
+		$theme_stylesheet = isset( $_POST['slug'] ) ? sanitize_text_field( wp_unslash( $_POST['slug'] ) ) : '';
+
+		if ( empty( $theme_stylesheet ) ) {
+			wp_send_json_error(
+				[
+					'success' => false,
+					'message' => __( 'No theme specified.', 'suremails' ),
+				]
+			);
+		}
+
+		// Activate the theme.
+		switch_theme( $theme_stylesheet );
+
+		$theme_slug = pathinfo( $theme_stylesheet, PATHINFO_FILENAME ); // Retrieves the theme slug from the stylesheet.
+		if ( class_exists( '\BSF_UTM_Analytics' ) && is_callable( '\BSF_UTM_Analytics::update_referer' ) ) {
+			$theme_slug = pathinfo( $theme_stylesheet, PATHINFO_FILENAME ); // Retrieves the theme slug from the stylesheet.
+			\BSF_UTM_Analytics::update_referer( 'suremails', $theme_slug );
+		}
+
+		// Send success response.
+		wp_send_json_success(
+			[
+				'success' => true,
+				'message' => __( 'Theme activated successfully.', 'suremails' ),
+			]
 		);
 	}
 }
