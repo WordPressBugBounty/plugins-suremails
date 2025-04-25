@@ -62,21 +62,8 @@ class PhpmailHandler implements ConnectionHandler {
 			];
 		}
 
-		$to      = $from_email;
-		$subject = __( 'PHP mail() Function Test', 'suremails' );
-		$message = __( 'This is a test email to verify PHP mail() is working.', 'suremails' );
-		$headers = "From: {$from_email}";
-
-		if ( mail( $to, $subject, $message, $headers ) ) {  // phpcs:ignore WordPressVIPMinimum.Functions.RestrictedFunctions.wp_mail_mail
-			return [
-				'success'    => true,
-				'message'    => __( 'PHP Mail connection saved successfully.', 'suremails' ),
-				'error_code' => 200,
-			];
-		}
-
 		return [
-			'success'    => false,
+			'success'    => true,
 			'message'    => __( 'PHP Mail connection failed.', 'suremails' ),
 			'error_code' => 500,
 		];
@@ -100,7 +87,6 @@ class PhpmailHandler implements ConnectionHandler {
 		$phpmailer->setFrom( $from_email, $from_name );
 		$phpmailer->isMail();
 
-		// phpcs:disable
 		$content_type = $processed_data['headers']['content_type'];
 		if ( ! empty( $content_type ) && 'text/html' === strtolower( $content_type ) ) {
 			$phpmailer->msgHTML( $atts['message'] );
@@ -111,7 +97,7 @@ class PhpmailHandler implements ConnectionHandler {
 			if ( $phpmailer->Mailer !== 'mail' ) {
 				$phpmailer->Mailer = 'mail';
 			}
-			// phpcs:enable
+
 			$send = $phpmailer->send();
 			if ( ! $send ) {
 				return [

@@ -116,7 +116,7 @@ const EmptyNotifications = ( {
 			) {
 				clearInterval( pollInterval );
 			}
-		}, 500 );
+		}, 2000 );
 
 		// Ensure fallback cleanup in 2 minutes
 		setTimeout( () => {

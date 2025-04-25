@@ -385,7 +385,7 @@ class GmailHandler implements ConnectionHandler {
 			// Update stored tokens.
 			$this->connection_data['access_token']  = $new['access_token'];
 			$this->connection_data['expire_stamp']  = time() + $new['expires_in'];
-			$this->connection_data['expires_in']   = $new['expires_in'];
+			$this->connection_data['expires_in']    = $new['expires_in'];
 			$this->connection_data['refresh_token'] = $new['refresh_token'] ?? $this->connection_data['refresh_token'];
 			Settings::instance()->update_connection( $this->connection_data );
 		}

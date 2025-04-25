@@ -59,21 +59,19 @@ class SmtpHandler implements ConnectionHandler {
 			// Server settings.
 			$phpmailer->isSMTP(); // Set mailer to use SMTP.
 			// Disabled phpcs for the following lines to avoid false positive errors of snake casing.
-			// phpcs:disable
-			$phpmailer->Host       = $this->connection_data['host'] ?? 'smtp.example.com'; // Specify main SMTP server.
-			$phpmailer->SMTPAuth   = true; // Enable SMTP authentication.
-			$phpmailer->Username   = $this->connection_data['username'] ?? ''; // SMTP username.
-			$phpmailer->Password   = $this->connection_data['password'] ?? ''; // SMTP password.
+			$phpmailer->Host        = $this->connection_data['host'] ?? 'smtp.example.com'; // Specify main SMTP server.
+			$phpmailer->SMTPAuth    = true; // Enable SMTP authentication.
+			$phpmailer->Username    = $this->connection_data['username'] ?? ''; // SMTP username.
+			$phpmailer->Password    = $this->connection_data['password'] ?? ''; // SMTP password.
 			$phpmailer->SMTPAutoTLS = (bool) $this->connection_data['auto_tls'];
-			$encryption = strtolower(sanitize_text_field($this->connection_data['encryption']));
-			if ($encryption !== 'none') {
+			$encryption             = strtolower( sanitize_text_field( $this->connection_data['encryption'] ) );
+			if ( $encryption !== 'none' ) {
 				$phpmailer->SMTPSecure = $encryption;
 			}
 			$phpmailer->Port = $this->connection_data['port']; // TCP port to connect to.
 
 			// Attempt to connect to the SMTP server.
 			$phpmailer->Timeout = 5; // Set a timeout of 5 seconds.
-			// phpcs:enable
 
 			if ( $phpmailer->smtpConnect() ) {
 				$phpmailer->smtpClose();
@@ -107,28 +105,27 @@ class SmtpHandler implements ConnectionHandler {
 
 		try {
 			$phpmailer = ConnectionManager::instance()->get_phpmailer();
-			// phpcs:disable
 			// Server settings.
 			$phpmailer->isSMTP(); // Set mailer to use SMTP.
-			$phpmailer->Host       = sanitize_text_field( $connection['host'] ); // Specify main SMTP server.
-			$phpmailer->SMTPAuth   = true; // Enable SMTP authentication.
-			$phpmailer->Username   = sanitize_text_field( $connection['username'] ); // SMTP username.
-			$phpmailer->Password   = sanitize_text_field( $connection['password'] ); // SMTP password.
+			$phpmailer->Host        = sanitize_text_field( $connection['host'] ); // Specify main SMTP server.
+			$phpmailer->SMTPAuth    = true; // Enable SMTP authentication.
+			$phpmailer->Username    = sanitize_text_field( $connection['username'] ); // SMTP username.
+			$phpmailer->Password    = sanitize_text_field( $connection['password'] ); // SMTP password.
 			$phpmailer->SMTPAutoTLS = (bool) $connection['auto_tls'];
-			$encryption = strtolower(sanitize_text_field($connection['encryption']));
-			if($encryption !== 'none') {
+			$encryption             = strtolower( sanitize_text_field( $connection['encryption'] ) );
+			if ( $encryption !== 'none' ) {
 				$phpmailer->SMTPSecure = $encryption;
 			}
-			$phpmailer->Port       = intval( $connection['port'] ); // TCP port to connect to.
-			$phpmailer->Timeout    = 5; // Set a timeout of 4 seconds.
+			$phpmailer->Port    = intval( $connection['port'] ); // TCP port to connect to.
+			$phpmailer->Timeout = 5; // Set a timeout of 4 seconds.
 
 			$from_email = $connection['from_email'];
-			$from_name = ! empty($connection['from_name']) ? $connection['from_name'] : __('WordPress', 'suremails');
+			$from_name  = ! empty( $connection['from_name'] ) ? $connection['from_name'] : __( 'WordPress', 'suremails' );
 
-			$phpmailer->setFrom($from_email, $from_name);
+			$phpmailer->setFrom( $from_email, $from_name );
 
 			// Set Return-Path if provided.
-			if (  isset( $connection['return_path'] ) && $connection['return_path'] ) {
+			if ( isset( $connection['return_path'] ) && $connection['return_path'] ) {
 				$phpmailer->Sender = $phpmailer->From;
 			}
 
@@ -143,7 +140,6 @@ class SmtpHandler implements ConnectionHandler {
 				$result['message'] = 'Email sending failed via SMTP: ' . $phpmailer->ErrorInfo;
 				$result['retries'] = 1; // Increment retries if applicable.
 			}
-			// phpcs:enable
 		} catch ( Exception $e ) {
 			$result['success'] = false;
 			$result['message'] = 'Email sending failed via SMTP: ' . $e->getMessage();
