@@ -5,7 +5,7 @@
  * Description: WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes—no more lost messages or frustrated customers.
  * Author: SureMail
  * Author URI: https://suremails.com/
- * Version: 1.6.1
+ * Version: 1.7.0
  * License: GPLv2 or later
  * Text Domain: suremails
  * Requires at least: 5.4
@@ -23,7 +23,7 @@ define( 'SUREMAILS_BASE', plugin_basename( SUREMAILS_FILE ) );
 define( 'SUREMAILS_DIR', plugin_dir_path( SUREMAILS_FILE ) );
 define( 'SUREMAILS_PLUGIN_DIR', plugin_dir_path( __DIR__ ) );
 define( 'SUREMAILS_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
-define( 'SUREMAILS_VERSION', '1.6.1' );
+define( 'SUREMAILS_VERSION', '1.7.0' );
 define( 'SUREMAILS', 'suremail' );
 define( 'SUREMAILS_CONNECTIONS', 'suremails_connections' );
 

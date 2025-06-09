@@ -192,7 +192,11 @@ class SendgridHandler implements ConnectionHandler {
 			);
 
 			if ( is_wp_error( $response ) ) {
-				$result['message']    = __( 'SendGrid send failed: ', 'suremails' ) . $response->get_error_message();
+				$result['message'] = sprintf(
+					/* translators: %s: Error message from SendGrid */
+					__( 'Email sending failed via SendGrid. Error: %s', 'suremails' ),
+					$response->get_error_message()
+				);
 				$result['error_code'] = $response->get_error_code();
 				return $result;
 			}
@@ -204,14 +208,22 @@ class SendgridHandler implements ConnectionHandler {
 				$result['message'] = __( 'Email sent successfully via SendGrid.', 'suremails' );
 				$result['send']    = true;
 			} else {
-				$response_body        = wp_remote_retrieve_body( $response );
-				$decoded_body         = json_decode( $response_body, true );
-				$error_message        = $decoded_body['errors'][0]['message'] ?? __( 'Unknown error.', 'suremails' );
-				$result['message']    = __( 'SendGrid send failed: ', 'suremails' ) . $error_message;
+				$response_body     = wp_remote_retrieve_body( $response );
+				$decoded_body      = json_decode( $response_body, true );
+				$error_message     = $decoded_body['errors'][0]['message'] ?? __( 'Unknown error.', 'suremails' );
+				$result['message'] = sprintf(
+					/* translators: %s: Error message from SendGrid */
+					__( 'Email sending failed via SendGrid. Error: %s', 'suremails' ),
+					$error_message
+				);
 				$result['error_code'] = $response_code;
 			}
 		} catch ( \Exception $e ) {
-			$result['message']    = __( 'SendGrid send failed: ', 'suremails' ) . $e->getMessage();
+			$result['message'] = sprintf(
+				/* translators: %s: Exception message */
+				__( 'Email sending failed via SendGrid. Error: %s', 'suremails' ),
+				$e->getMessage()
+			);
 			$result['error_code'] = 500;
 		}
 

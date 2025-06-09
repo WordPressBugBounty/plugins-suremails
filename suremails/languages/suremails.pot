@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: SureMail 1.6.1\n"
+"Project-Id-Version: SureMail 1.7.0\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/suremails\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-04-25T06:05:39+00:00\n"
+"POT-Creation-Date: 2025-06-09T05:59:25+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: suremails\n"
@@ -17,7 +17,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: suremails.php
-#: inc/admin/plugin.php:171
+#: inc/admin/plugin.php:189
 #: inc/nps-notice.php:87
 msgid "SureMail"
 msgstr ""
@@ -37,11 +37,12 @@ msgstr ""
 msgid "https://suremails.com/"
 msgstr ""
 
-#: inc/admin/plugin.php:170
+#: inc/admin/plugin.php:188
 msgid "SureMail Settings"
 msgstr ""
 
-#: inc/admin/plugin.php:272
+#: inc/admin/plugin.php:291
+#: build/main.js:2
 msgid "Settings"
 msgstr ""
 
@@ -86,11 +87,20 @@ msgstr ""
 msgid "Nonce is invalid."
 msgstr ""
 
+#: inc/api/auth.php:74
+msgid "Unsupported provider."
+msgstr ""
+
+#: inc/api/auth.php:91
+msgid "Client ID and Client Secret are required."
+msgstr ""
+
 #: inc/api/delete-connection.php:86
 msgid "No connections found."
 msgstr ""
 
 #: inc/api/delete-connection.php:97
+#: inc/api/send-test-email.php:107
 msgid "Connection not found."
 msgstr ""
 
@@ -103,8 +113,34 @@ msgstr ""
 msgid "Connection deleted successfully."
 msgstr ""
 
+#: inc/api/delete-logs.php:93
+msgid "Failed to retrieve logs to delete."
+msgstr ""
+
+#: inc/api/delete-logs.php:141
+msgid "Failed to delete the provided log IDs."
+msgstr ""
+
+#. Translators: %d is the number of logs deleted.
+#: inc/api/delete-logs.php:151
+msgid "%d log(s) deleted successfully."
+msgstr ""
+
+#. Translators: %1$d is the number of logs deleted, %2$d is the number of logs that could not be deleted.
+#: inc/api/delete-logs.php:158
+msgid "%1$d log(s) deleted successfully. %2$d log(s) could not be deleted."
+msgstr ""
+
 #: inc/api/email-stats.php:102
 msgid "The start_date parameter is required."
+msgstr ""
+
+#: inc/api/logs.php:157
+msgid "Failed to retrieve email logs."
+msgstr ""
+
+#: inc/api/notice.php:69
+msgid "Notice disabled for 15 days."
 msgstr ""
 
 #: inc/api/provider.php:61
@@ -121,6 +157,23 @@ msgstr ""
 
 #: inc/api/recommended-plugin.php:82
 msgid "Invalid nonce."
+msgstr ""
+
+#: inc/api/resend-email.php:75
+msgid "Invalid log IDs provided."
+msgstr ""
+
+#: inc/api/resend-email.php:97
+msgid "Log not found."
+msgstr ""
+
+#: inc/api/resend-email.php:122
+#: build/main.js:2
+msgid "Email resent successfully."
+msgstr ""
+
+#: inc/api/resend-email.php:128
+msgid "Failed to resend email."
 msgstr ""
 
 #: inc/api/save-test-connection.php:95
@@ -145,11 +198,16 @@ msgid "An error occurred: "
 msgstr ""
 
 #: inc/api/save-test-connection.php:185
+#: inc/emails/handler/mail-handler.php:168
 msgid "Invalid connection type."
 msgstr ""
 
 #: inc/api/save-test-connection.php:310
 msgid "Missing required field."
+msgstr ""
+
+#: inc/api/send-test-email.php:129
+msgid "Failed to get email template."
 msgstr ""
 
 #. Translators: %s is the site name.
@@ -164,6 +222,10 @@ msgstr ""
 
 #: inc/api/send-test-email.php:148
 msgid "Failed to send test email"
+msgstr ""
+
+#: inc/api/set-settings.php:59
+msgid "Settings data to update."
 msgstr ""
 
 #: inc/api/set-settings.php:80
@@ -199,23 +261,135 @@ msgstr ""
 msgid "Reputation Shield"
 msgstr ""
 
+#. translators: %s is the error message.
+#: inc/controller/content-guard.php:354
+#: inc/emails/handler/mail-handler.php:310
+msgid "Failed to log email: %s"
+msgstr ""
+
 #. translators: %d is the log ID.
-#: inc/controller/content-guard.php:387
+#. translators: %d: Log ID.
+#. translators: %d is the log ID that failed to update.
+#: inc/controller/content-guard.php:388
+#: inc/controller/logger.php:563
+#: inc/controller/logger.php:565
+#: inc/emails/handler/mail-handler.php:360
 msgid "Failed to update log ID %d."
 msgstr ""
 
+#: inc/controller/logger.php:529
+msgid "Failed to insert email log. Database error."
+msgstr ""
+
+#: inc/controller/logger.php:537
+msgid "An exception occurred: "
+msgstr ""
+
+#. translators: 1: Log ID, 2: Exception message.
+#: inc/controller/logger.php:568
+msgid "Exception while updating log ID %1$d: %2$s"
+msgstr ""
+
+#. translators: %s: Exception message.
+#: inc/controller/logger.php:570
+#: inc/db/email-log.php:373
+msgid "An exception occurred: %s"
+msgstr ""
+
+#: inc/controller/logger.php:582
+msgid "Invalid log ID provided."
+msgstr ""
+
+#. translators: %d: Log ID.
+#: inc/controller/logger.php:596
+#: inc/controller/logger.php:598
+#: inc/db/email-log.php:400
+#: inc/db/email-log.php:402
+msgid "Failed to retrieve log ID %d."
+msgstr ""
+
+#. translators: %s: Database error message.
+#: inc/db/email-log.php:147
+#: inc/db/email-log.php:234
+msgid "Database error: "
+msgstr ""
+
+#. translators: %s: Error message.
+#: inc/db/email-log.php:152
+#: inc/db/email-log.php:154
+msgid "Error creating email log table: %s"
+msgstr ""
+
+#. translators: %s: The name of the missing required field.
+#: inc/db/email-log.php:193
+msgid "Missing required field: %s"
+msgstr ""
+
+#. translators: %s: Error message.
+#: inc/db/email-log.php:239
+msgid "Error inserting email log: %s"
+msgstr ""
+
+#. translators: %s: Database error message.
+#: inc/db/email-log.php:316
+msgid "Error retrieving email logs: %s"
+msgstr ""
+
+#. translators: %s: Error message for invalid ID or data.
+#: inc/db/email-log.php:341
+msgid "Invalid ID or data provided for update."
+msgstr ""
+
+#. translators: %d: Log ID, %s: Database error message.
+#: inc/db/email-log.php:364
+msgid "Error updating email log ID %1$d: %2$s"
+msgstr ""
+
+#. translators: %s: Exception message.
+#: inc/db/email-log.php:371
+msgid "Exception updating email log: %s"
+msgstr ""
+
+#. translators: %s: Provided log ID.
+#: inc/db/email-log.php:386
+msgid "Invalid log ID provided: %s"
+msgstr ""
+
+#. translators: %s: Database error message.
+#: inc/db/email-log.php:494
+msgid "Database error: %s"
+msgstr ""
+
+#. translators: %s: Error message.
+#: inc/db/email-log.php:501
+msgid "Error deleting email logs: %s"
+msgstr ""
+
 #: inc/emails/handler/mail-handler.php:145
-#: inc/emails/handler/mail-handler.php:470
-#: inc/emails/providers/aws/aws-handler.php:133
+#: inc/emails/handler/mail-handler.php:472
+#: inc/emails/providers/aws/aws-handler.php:134
 #: inc/emails/providers/brevo/brevo-handler.php:152
 #: inc/emails/providers/mailgun/mailgun-handler.php:98
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:107
-#: inc/emails/providers/smtp/smtp-handler.php:123
+#: inc/emails/providers/smtp/smtp-handler.php:127
 msgid "WordPress"
+msgstr ""
+
+#: inc/emails/handler/mail-handler.php:154
+msgid "Sent using Default WordPress Handler"
+msgstr ""
+
+#: inc/emails/handler/mail-handler.php:157
+msgid "Failed to send email using Default WordPress Handler"
 msgstr ""
 
 #: inc/emails/handler/mail-handler.php:183
 msgid "Failed to send email."
+msgstr ""
+
+#. translators: %s is the error message.
+#: inc/emails/handler/process-email-data.php:621
+msgid "PHPMailer Exception: %s"
 msgstr ""
 
 #: inc/emails/handler/uploads.php:75
@@ -237,80 +411,90 @@ msgstr ""
 msgid "Unable to remove attachment file: %s"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:83
-#: inc/emails/providers/aws/aws-handler.php:102
+#. translators: %s: AWS SES error message
+#: inc/emails/providers/aws/aws-handler.php:76
+msgid "AWS SES authentication failed: %s"
+msgstr ""
+
+#: inc/emails/providers/aws/aws-handler.php:84
+#: inc/emails/providers/aws/aws-handler.php:103
 msgid "AWS SES authentication successful."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:104
+#: inc/emails/providers/aws/aws-handler.php:105
 msgid "AWS SES authentication failed: The from_email or its domain is not a verified identity."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:107
+#: inc/emails/providers/aws/aws-handler.php:108
 msgid "AWS SES authentication failed: "
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:153
+#: inc/emails/providers/aws/aws-handler.php:154
 msgid "Email sent successfully via AWS SES."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:160
-msgid "Email sending failed via AWS SES: "
+#: inc/emails/providers/aws/aws-handler.php:157
+msgid "Failed to send email. No MessageId returned."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:172
-msgid "AWS Connection"
-msgstr ""
-
-#: inc/emails/providers/aws/aws-handler.php:173
-msgid "Amazon SES"
+#. translators: %s: AWS SES error message
+#: inc/emails/providers/aws/aws-handler.php:162
+msgid "Email sending failed via AWS SES: %s"
 msgstr ""
 
 #: inc/emails/providers/aws/aws-handler.php:174
+msgid "AWS Connection"
+msgstr ""
+
+#: inc/emails/providers/aws/aws-handler.php:175
+msgid "Amazon SES"
+msgstr ""
+
+#: inc/emails/providers/aws/aws-handler.php:176
 msgid "Enter the details below to connect with your Amazon SES account."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:194
+#: inc/emails/providers/aws/aws-handler.php:196
 msgid "Access Key"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:196
+#: inc/emails/providers/aws/aws-handler.php:198
 msgid "Enter your AWS access key"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:203
+#: inc/emails/providers/aws/aws-handler.php:205
 #: inc/emails/providers/mailjet/mailjet-handler.php:231
 msgid "Secret Key"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:205
+#: inc/emails/providers/aws/aws-handler.php:207
 msgid "Enter your AWS secret key"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:212
-#: inc/emails/providers/smtp/smtp-handler.php:213
+#: inc/emails/providers/aws/aws-handler.php:214
+#: inc/emails/providers/smtp/smtp-handler.php:225
 msgid "The Return Path is where bounce messages (failed delivery notices) are sent. If it’s off, you might not get these messages. Turn it on to receive bounce notifications at the \"From Email\" address if delivery fails."
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:213
+#: inc/emails/providers/aws/aws-handler.php:215
 #: inc/emails/providers/gmail/gmail-handler.php:292
-#: inc/emails/providers/smtp/smtp-handler.php:214
+#: inc/emails/providers/smtp/smtp-handler.php:226
 msgid "Return Path"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:215
+#: inc/emails/providers/aws/aws-handler.php:217
 #: inc/emails/providers/gmail/gmail-handler.php:294
 msgid "Enter Return Path"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:226
+#: inc/emails/providers/aws/aws-handler.php:228
 #: inc/emails/providers/mailgun/mailgun-handler.php:230
 #: inc/emails/providers/netcore/netcore-handler.php:225
 #: inc/emails/providers/sparkpost/sparkpost-handler.php:290
 msgid "Region"
 msgstr ""
 
-#: inc/emails/providers/aws/aws-handler.php:228
+#: inc/emails/providers/aws/aws-handler.php:230
 msgid "Select Region"
 msgstr ""
 
@@ -333,49 +517,51 @@ msgstr ""
 msgid "Failed to encode email payload to JSON."
 msgstr ""
 
-#: inc/emails/providers/brevo/brevo-handler.php:239
-#: inc/emails/providers/brevo/brevo-handler.php:255
-#: inc/emails/providers/brevo/brevo-handler.php:259
-msgid "Brevo send failed: "
+#. translators: %s: Error message from Brevo API
+#. translators: %s: Exception message
+#: inc/emails/providers/brevo/brevo-handler.php:241
+#: inc/emails/providers/brevo/brevo-handler.php:261
+#: inc/emails/providers/brevo/brevo-handler.php:269
+msgid "Email sending failed via Brevo. Error: %s"
 msgstr ""
 
-#: inc/emails/providers/brevo/brevo-handler.php:252
+#: inc/emails/providers/brevo/brevo-handler.php:256
 msgid "Email sent successfully via Brevo."
 msgstr ""
 
-#: inc/emails/providers/brevo/brevo-handler.php:254
+#: inc/emails/providers/brevo/brevo-handler.php:258
 #: inc/emails/providers/mailersend/mailersend-handler.php:196
 #: inc/emails/providers/mailgun/mailgun-handler.php:179
 #: inc/emails/providers/postmark/postmark-handler.php:168
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:209
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:213
 msgid "Unknown error."
 msgstr ""
 
-#: inc/emails/providers/brevo/brevo-handler.php:273
+#: inc/emails/providers/brevo/brevo-handler.php:285
 msgid "Brevo Connection"
 msgstr ""
 
-#: inc/emails/providers/brevo/brevo-handler.php:274
+#: inc/emails/providers/brevo/brevo-handler.php:286
 msgid "Enter the details below to connect with your Brevo account."
 msgstr ""
 
-#: inc/emails/providers/brevo/brevo-handler.php:276
+#: inc/emails/providers/brevo/brevo-handler.php:288
 msgid "Brevo (Sendinblue)"
 msgstr ""
 
-#: inc/emails/providers/brevo/brevo-handler.php:295
-#: inc/emails/providers/elastic/elastic-handler.php:464
+#: inc/emails/providers/brevo/brevo-handler.php:307
+#: inc/emails/providers/elastic/elastic-handler.php:478
 #: inc/emails/providers/mailersend/mailersend-handler.php:238
 #: inc/emails/providers/mailgun/mailgun-handler.php:215
 #: inc/emails/providers/mailjet/mailjet-handler.php:223
 #: inc/emails/providers/netcore/netcore-handler.php:217
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:250
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:215
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:262
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:227
 #: inc/emails/providers/sparkpost/sparkpost-handler.php:282
 msgid "API Key"
 msgstr ""
 
-#: inc/emails/providers/brevo/brevo-handler.php:297
+#: inc/emails/providers/brevo/brevo-handler.php:309
 msgid "Enter your Brevo API key"
 msgstr ""
 
@@ -383,53 +569,68 @@ msgstr ""
 msgid "Elastic Email connection authenticated successfully."
 msgstr ""
 
-#: inc/emails/providers/elastic/elastic-handler.php:180
+#. translators: %s: Error message from Elastic Email
+#: inc/emails/providers/elastic/elastic-handler.php:175
+#: inc/emails/providers/elastic/elastic-handler.php:192
+msgid "Email sending failed via Elastic Email. Error: %s"
+msgstr ""
+
+#: inc/emails/providers/elastic/elastic-handler.php:184
 msgid "Email sent successfully via Elastic Email."
 msgstr ""
 
-#: inc/emails/providers/elastic/elastic-handler.php:443
+#: inc/emails/providers/elastic/elastic-handler.php:457
 msgid "Elastic Email Connection"
 msgstr ""
 
-#: inc/emails/providers/elastic/elastic-handler.php:444
+#: inc/emails/providers/elastic/elastic-handler.php:458
 msgid "Enter the details below to connect with your Elastic Email account."
 msgstr ""
 
-#: inc/emails/providers/elastic/elastic-handler.php:447
+#: inc/emails/providers/elastic/elastic-handler.php:461
 msgid "Elastic Email"
 msgstr ""
 
-#: inc/emails/providers/elastic/elastic-handler.php:466
+#: inc/emails/providers/elastic/elastic-handler.php:480
 msgid "Enter your Elastic Email API key"
 msgstr ""
 
+#: inc/emails/providers/elastic/elastic-handler.php:485
+#: inc/emails/providers/elastic/elastic-handler.php:500
+msgid "Transactional Email"
+msgstr ""
+
 #. translators: %s: www.mailgun.com/about/regions/ URL.
-#: inc/emails/providers/elastic/elastic-handler.php:477
+#: inc/emails/providers/elastic/elastic-handler.php:491
 msgid "Select the type of email you will be sending using this connection. Choose Transactional Email for emails like password resets, order confirmations, etc. Select Marketing Email for sending bulk emails like newsletters, broadcasts, etc. %1$sLearn more%2$s"
 msgstr ""
 
-#: inc/emails/providers/elastic/elastic-handler.php:481
+#: inc/emails/providers/elastic/elastic-handler.php:495
 msgid "Email Type"
 msgstr ""
 
-#: inc/emails/providers/elastic/elastic-handler.php:483
+#: inc/emails/providers/elastic/elastic-handler.php:497
 msgid "Select Email Type"
 msgstr ""
 
-#: inc/emails/providers/elastic/elastic-handler.php:523
+#: inc/emails/providers/elastic/elastic-handler.php:504
+msgid "Marketing Email"
+msgstr ""
+
+#: inc/emails/providers/elastic/elastic-handler.php:537
 msgid "Email sending failed via Elastic Email. Failed to encode email payload to JSON."
 msgstr ""
 
-#: inc/emails/providers/elastic/elastic-handler.php:540
+#: inc/emails/providers/elastic/elastic-handler.php:554
 msgid "Email sending failed via Elastic Email. Unauthorized: API key invalid or insufficient permissions."
 msgstr ""
 
-#: inc/emails/providers/elastic/elastic-handler.php:547
+#: inc/emails/providers/elastic/elastic-handler.php:561
 msgid "Failed to decode JSON response from Elastic Email."
 msgstr ""
 
 #. translators: 1: Error log
-#: inc/emails/providers/elastic/elastic-handler.php:555
+#: inc/emails/providers/elastic/elastic-handler.php:569
 msgid "Email sending failed via Elastic Email. Error: %1$s"
 msgstr ""
 
@@ -488,6 +689,7 @@ msgstr ""
 msgid "Get Client ID and Secret ID from Google Cloud Platform. Follow the Gmail %s"
 msgstr ""
 
+#. translators: %s: Documentation link.
 #: inc/emails/providers/gmail/gmail-handler.php:243
 msgid "documentation."
 msgstr ""
@@ -850,29 +1052,31 @@ msgstr ""
 msgid "SendGrid connection saved successfully."
 msgstr ""
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:195
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:210
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:214
-msgid "SendGrid send failed: "
+#. translators: %s: Error message from SendGrid
+#. translators: %s: Exception message
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:197
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:216
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:224
+msgid "Email sending failed via SendGrid. Error: %s"
 msgstr ""
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:204
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:208
 msgid "Email sent successfully via SendGrid."
 msgstr ""
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:228
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:240
 msgid "SendGrid Connection"
 msgstr ""
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:229
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:241
 msgid "Enter the details below to connect with your SendGrid account."
 msgstr ""
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:231
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:243
 msgid "SendGrid"
 msgstr ""
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:252
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:264
 msgid "Enter your SendGrid API Key"
 msgstr ""
 
@@ -880,76 +1084,100 @@ msgstr ""
 msgid "Email sending was simulated, but no email was actually sent."
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:158
+#: inc/emails/providers/smtp/smtp-handler.php:79
+msgid "SMTP authentication successful."
+msgstr ""
+
+#: inc/emails/providers/smtp/smtp-handler.php:81
+msgid "SMTP authentication failed: Unable to connect to the SMTP server."
+msgstr ""
+
+#. translators: %s: The error message from PHPMailer.
+#: inc/emails/providers/smtp/smtp-handler.php:86
+msgid "SMTP authentication failed: %s"
+msgstr ""
+
+#: inc/emails/providers/smtp/smtp-handler.php:141
+msgid "Email sent successfully via SMTP."
+msgstr ""
+
+#. translators: %s: The error message from PHPMailer.
+#. translators: %s: The error message.
+#: inc/emails/providers/smtp/smtp-handler.php:146
+#: inc/emails/providers/smtp/smtp-handler.php:155
+msgid "Email sending failed via SMTP: %s"
+msgstr ""
+
+#: inc/emails/providers/smtp/smtp-handler.php:170
 msgid "SMTP Connection"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:159
+#: inc/emails/providers/smtp/smtp-handler.php:171
 msgid "Enter the details below to connect with your SMTP account."
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:161
+#: inc/emails/providers/smtp/smtp-handler.php:173
 msgid "Other SMTP Provider"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:180
+#: inc/emails/providers/smtp/smtp-handler.php:192
 msgid "Host"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:182
+#: inc/emails/providers/smtp/smtp-handler.php:194
 msgid "Enter the SMTP host"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:188
+#: inc/emails/providers/smtp/smtp-handler.php:200
 msgid "Port"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:190
+#: inc/emails/providers/smtp/smtp-handler.php:202
 msgid "Enter port"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:196
+#: inc/emails/providers/smtp/smtp-handler.php:208
 msgid "Username"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:198
+#: inc/emails/providers/smtp/smtp-handler.php:210
 msgid "Enter SMTP username"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:204
+#: inc/emails/providers/smtp/smtp-handler.php:216
 msgid "Password"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:206
+#: inc/emails/providers/smtp/smtp-handler.php:218
 msgid "Enter SMTP password"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:223
+#: inc/emails/providers/smtp/smtp-handler.php:235
 msgid "Choose SSL for port 465, or TLS for port 25 or 587"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:224
+#: inc/emails/providers/smtp/smtp-handler.php:236
 msgid "Encryption"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:227
+#: inc/emails/providers/smtp/smtp-handler.php:239
 #: build/main.js:2
 msgid "None"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:228
+#: inc/emails/providers/smtp/smtp-handler.php:240
 msgid "SSL"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:229
+#: inc/emails/providers/smtp/smtp-handler.php:241
 msgid "TLS"
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:236
+#: inc/emails/providers/smtp/smtp-handler.php:248
 msgid "Enable TLS automatically if the server supports it."
 msgstr ""
 
-#: inc/emails/providers/smtp/smtp-handler.php:237
+#: inc/emails/providers/smtp/smtp-handler.php:249
 msgid "Auto TLS"
 msgstr ""
 
@@ -957,38 +1185,40 @@ msgstr ""
 msgid "SMTP2GO connection saved successfully."
 msgstr ""
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:155
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:170
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:175
-msgid "Email sending failed via SMTP2GO. Error: "
-msgstr ""
-
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:165
-msgid "Email sent successfully via SMTP2GO."
+#. translators: %s: Error message from SMTP2GO
+#. translators: %s: Exception message
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:157
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:176
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:185
+msgid "Email sending failed via SMTP2GO. Error: %s"
 msgstr ""
 
 #: inc/emails/providers/smtp2go/smtp2go-handler.php:169
+msgid "Email sent successfully via SMTP2GO."
+msgstr ""
+
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:173
 msgid "SMTP2GO Server Error"
 msgstr ""
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:189
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:201
 msgid "SMTP2GO Connection"
 msgstr ""
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:190
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:202
 msgid "Enter the details below to connect with your SMTP2GO account."
 msgstr ""
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:192
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:204
 msgid "SMTP2GO"
 msgstr ""
 
 #. translators: %s: https://app.smtp2go.com/login/ URL.
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:211
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:223
 msgid "Click on this link to generate an API Key from SMTP2GO - %1$sCreate API Key%2$s"
 msgstr ""
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:217
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:229
 msgid "Enter your SMTP2GO API Key"
 msgstr ""
 
@@ -1129,12 +1359,12 @@ msgstr ""
 msgid "Enter priority"
 msgstr ""
 
-#: admin-notice/components/notice.js:26
+#: admin-notice/components/notice.js:36
 #: build/admin-notice.js:2
 msgid "Your website's emails may not be delivering! Create a connection with an SMTP service to ensure reliable email delivery."
 msgstr ""
 
-#: admin-notice/components/notice.js:43
+#: admin-notice/components/notice.js:53
 #: build/admin-notice.js:2
 msgid "Configure SureMail"
 msgstr ""
@@ -1188,6 +1418,14 @@ msgid "There was an issue deleting the connection."
 msgstr ""
 
 #: build/main.js:2
+msgid "Invalid payload for testing connection."
+msgstr ""
+
+#: build/main.js:2
+msgid "There was an issue testing the connection."
+msgstr ""
+
+#: build/main.js:2
 msgid "Show less"
 msgstr ""
 
@@ -1237,14 +1475,6 @@ msgstr ""
 
 #: build/main.js:2
 msgid "No changes to save."
-msgstr ""
-
-#: build/main.js:2
-msgid "Invalid payload for testing connection."
-msgstr ""
-
-#: build/main.js:2
-msgid "There was an issue testing the connection."
 msgstr ""
 
 #: build/main.js:2
@@ -1625,10 +1855,6 @@ msgstr ""
 
 #: build/main.js:2
 msgid "Attachments (%d)"
-msgstr ""
-
-#: build/main.js:2
-msgid "Email resent successfully."
 msgstr ""
 
 #: build/main.js:2
@@ -2265,6 +2491,170 @@ msgstr ""
 
 #: build/main.js:2
 msgid "Disable sending all emails. If you enable this, no email will be sent but the email logs will be recorded here."
+msgstr ""
+
+#: build/main.js:2
+msgid "Exit Guided Setup"
+msgstr ""
+
+#: build/main.js:2
+msgid "Reduce the chances of your emails getting lost in spam"
+msgstr ""
+
+#: build/main.js:2
+msgid "Quick and easy setup, no technical skills needed"
+msgstr ""
+
+#: build/main.js:2
+msgid "Track, log, and resend emails with ease"
+msgstr ""
+
+#: build/main.js:2
+msgid "Connect to multiple email providers"
+msgstr ""
+
+#: build/main.js:2
+msgid "Auto-retry failed emails"
+msgstr ""
+
+#: build/main.js:2
+msgid "Fail-Proof Email Delivery!"
+msgstr ""
+
+#: build/main.js:2
+msgid "Let's get started"
+msgstr ""
+
+#: build/main.js:2
+msgid "Continue Setup"
+msgstr ""
+
+#: build/main.js:2
+msgid "Skip"
+msgstr ""
+
+#: build/main.js:2
+msgid "Now, Let's Connect With %s"
+msgstr ""
+
+#: build/main.js:2
+msgid "Enter the details below to connect with your %s account."
+msgstr ""
+
+#: build/main.js:2
+msgid "Select Your Primary Email Sending Service"
+msgstr ""
+
+#: build/main.js:2
+msgid "First name"
+msgstr ""
+
+#: build/main.js:2
+msgid "Last name"
+msgstr ""
+
+#: build/main.js:2
+msgid "Enter Email Address"
+msgstr ""
+
+#: build/main.js:2
+msgid "Reputation Shield activated"
+msgstr ""
+
+#: build/main.js:2
+msgid "Reputation Shield activated successfully"
+msgstr ""
+
+#: build/main.js:2
+msgid "Add More Power to Your Website"
+msgstr ""
+
+#: build/main.js:2
+msgid "These tools can help you build your website faster and easier. Try them out and see how they can help your website grow."
+msgstr ""
+
+#: build/main.js:2
+msgid "Install"
+msgstr ""
+
+#: build/main.js:2
+msgid "Invalid JSON response"
+msgstr ""
+
+#: build/main.js:2
+msgid "Error setting onboarding completion status"
+msgstr ""
+
+#: build/main.js:2
+msgid "Something went wrong"
+msgstr ""
+
+#: build/main.js:2
+msgid "An error occurred while setting the onboarding status."
+msgstr ""
+
+#: build/main.js:2
+msgid "Inbox-ready emails:"
+msgstr ""
+
+#: build/main.js:2
+msgid "Reduce the chances of email getting lost in spam!"
+msgstr ""
+
+#: build/main.js:2
+msgid "Easy tracking:"
+msgstr ""
+
+#: build/main.js:2
+msgid "See every email you send in one place"
+msgstr ""
+
+#: build/main.js:2
+msgid "Peace of mind:"
+msgstr ""
+
+#: build/main.js:2
+msgid "If sending fails, SureMail will automatically retry"
+msgstr ""
+
+#: build/main.js:2
+msgid "You're Good to Go! 🚀"
+msgstr ""
+
+#: build/main.js:2
+msgid "You’ve successfully set up SureMail, and your site is ready to send emails without a hitch! Now you can focus on your business and let us handle the rest."
+msgstr ""
+
+#: build/main.js:2
+msgid "Here’s What SureMail Will Do for You Now:"
+msgstr ""
+
+#: build/main.js:2
+msgid "Go To Dashboard"
+msgstr ""
+
+#: build/main.js:2
+msgid "Documentation"
+msgstr ""
+
+#: build/main.js:2
+msgid "Add-ons"
+msgstr ""
+
+#: build/main.js:2
+msgid "Recommended Plugins"
+msgstr ""
+
+#: build/main.js:2
+msgid "Recommended Themes"
+msgstr ""
+
+#: build/main.js:2
+msgid "Dashboard"
+msgstr ""
+
+#: build/main.js:2
+msgid "Connections"
 msgstr ""
 
 #: build/main.js:2

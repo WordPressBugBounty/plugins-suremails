@@ -143,12 +143,15 @@ class EmailLog {
 			dbDelta( $sql );
 
 			if ( $wpdb->last_error ) {
-				throw new Exception( 'Database error: ' . $wpdb->last_error );
+				// translators: %s: Database error message.
+				throw new Exception( __( 'Database error: ', 'suremails' ) . $wpdb->last_error );
 			}
 		} catch ( Exception $e ) {
 			// Log the error for debugging purposes.
-			LogError::instance()->log_error( 'Error creating email log table: ' . $e->getMessage() );
-			return new WP_Error( 'db_error', 'Error creating email log table: ' . $e->getMessage() );
+			// translators: %s: Error message.
+			LogError::instance()->log_error( sprintf( __( 'Error creating email log table: %s', 'suremails' ), $e->getMessage() ) );
+			// translators: %s: Error message.
+			return new WP_Error( 'db_error', sprintf( __( 'Error creating email log table: %s', 'suremails' ), $e->getMessage() ) );
 		}
 
 		return true;
@@ -186,7 +189,8 @@ class EmailLog {
 			$required_fields = [ 'email_from', 'email_to', 'subject', 'body', 'status' ];
 			foreach ( $required_fields as $field ) {
 				if ( empty( $data[ $field ] ) ) {
-					throw new Exception( "Missing required field: {$field}" );
+					// translators: %s: The name of the missing required field.
+					throw new Exception( sprintf( __( 'Missing required field: %s', 'suremails' ), $field ) );
 				}
 			}
 
@@ -226,14 +230,15 @@ class EmailLog {
 			);
 
 			if ( $result === false ) {
-				throw new Exception( 'Database error: ' . $wpdb->last_error );
+				// translators: %s: Database error message.
+				throw new Exception( __( 'Database error: ', 'suremails' ) . $wpdb->last_error );
 			}
 		} catch ( Exception $e ) {
 			// Log the error for debugging purposes.
-			LogError::instance()->log_error( 'Error inserting email log: ' . $e->getMessage() );
+			// translators: %s: Error message.
+			LogError::instance()->log_error( sprintf( __( 'Error inserting email log: %s', 'suremails' ), $e->getMessage() ) );
 			return false;
 		}
-
 		return $wpdb->insert_id;
 	}
 
@@ -307,7 +312,8 @@ class EmailLog {
 			$results = $wpdb->get_results( $prepared_query, ARRAY_A );
 
 			if ( $results === false ) {
-				throw new Exception( 'Error retrieving email logs: ' . $wpdb->last_error );
+				// translators: %s: Database error message.
+				throw new Exception( sprintf( __( 'Error retrieving email logs: %s', 'suremails' ), $wpdb->last_error ) );
 			}
 
 			return apply_filters( 'suremails_process_get_logs', $results );
@@ -331,7 +337,8 @@ class EmailLog {
 		global $wpdb;
 
 		if ( empty( $id ) || empty( $data ) ) {
-			return new WP_Error( 'email_log_update_invalid', 'Invalid ID or data provided for update.' );
+			// translators: %s: Error message for invalid ID or data.
+			return new WP_Error( 'email_log_update_invalid', __( 'Invalid ID or data provided for update.', 'suremails' ) );
 		}
 
 		if ( isset( $data['meta'] ) ) {
@@ -353,16 +360,17 @@ class EmailLog {
 			);
 
 			if ( $result === false ) {
-				// Throw an exception if update failed.
-				throw new Exception( "Error updating email log ID {$id}: " . $wpdb->last_error );
+				// translators: %d: Log ID, %s: Database error message.
+				throw new Exception( sprintf( __( 'Error updating email log ID %1$d: %2$s', 'suremails' ), $id, $wpdb->last_error ) );
 			}
 
 			return $result;
 
 		} catch ( Exception $e ) {
-			// Log the error for debugging purposes.
-			LogError::instance()->log_error( $e->getMessage() );
-			return new WP_Error( 'email_log_update_exception', 'An exception occurred: ' . $e->getMessage() );
+			// translators: %s: Exception message.
+			LogError::instance()->log_error( sprintf( __( 'Exception updating email log: %s', 'suremails' ), $e->getMessage() ) );
+			// translators: %s: Exception message.
+			return new WP_Error( 'email_log_update_exception', sprintf( __( 'An exception occurred: %s', 'suremails' ), $e->getMessage() ) );
 		}
 	}
 
@@ -374,7 +382,8 @@ class EmailLog {
 	 */
 	public function get_log( int $log_id ) {
 		if ( empty( $log_id ) ) {
-			return new WP_Error( 'email_log_get_invalid_id', 'Invalid log ID provided.' );
+			// translators: %s: Provided log ID.
+			return new WP_Error( 'email_log_get_invalid_id', sprintf( __( 'Invalid log ID provided: %s', 'suremails' ), $log_id ) );
 		}
 
 		// Use the get method to retrieve the log entry.
@@ -387,8 +396,10 @@ class EmailLog {
 		);
 
 		if ( $logs === false ) {
-			LogError::instance()->log_error( "Failed to retrieve log ID {$log_id}." );
-			return new WP_Error( 'email_log_get_failed', "Failed to retrieve log ID {$log_id}." );
+			// translators: %d: Log ID.
+			LogError::instance()->log_error( sprintf( __( 'Failed to retrieve log ID %d.', 'suremails' ), $log_id ) );
+			// translators: %d: Log ID.
+			return new WP_Error( 'email_log_get_failed', sprintf( __( 'Failed to retrieve log ID %d.', 'suremails' ), $log_id ) );
 		}
 
 		if ( empty( $logs ) ) {
@@ -479,14 +490,15 @@ class EmailLog {
 			$result = $wpdb->query( $prepared_query );
 
 			if ( $result === false ) {
-				throw new Exception( 'Database error: ' . $wpdb->last_error );
+				// translators: %s: Database error message.
+				throw new Exception( sprintf( __( 'Database error: %s', 'suremails' ), $wpdb->last_error ) );
 			}
 
-			return $result; // Returns the number of rows deleted.
+						return $result; // Returns the number of rows deleted.
 
 		} catch ( Exception $e ) {
-			// Log the error for debugging purposes.
-			LogError::instance()->log_error( 'Error deleting email logs: ' . $e->getMessage() );
+			// translators: %s: Error message.
+			LogError::instance()->log_error( sprintf( __( 'Error deleting email logs: %s', 'suremails' ), $e->getMessage() ) );
 			return false;
 		}
 	}

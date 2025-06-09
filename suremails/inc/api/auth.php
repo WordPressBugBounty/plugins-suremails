@@ -71,7 +71,7 @@ class Auth extends Api_Base {
 			return new WP_REST_Response( $reponse, 200 );
 		}
 
-		return new WP_REST_Response( [ 'error' => 'Unsupported provider.' ], 400 );
+		return new WP_REST_Response( [ 'error' => __( 'Unsupported provider.', 'suremails' ) ], 400 );
 	}
 
 	/**
@@ -88,7 +88,7 @@ class Auth extends Api_Base {
 		$client_secret = isset( $params['client_secret'] ) ? sanitize_text_field( $params['client_secret'] ) : '';
 
 		if ( empty( $client_id ) || empty( $client_secret ) ) {
-			return new WP_REST_Response( [ 'error' => 'Client ID and Client Secret are required.' ], 400 );
+			return new WP_REST_Response( [ 'error' => __( 'Client ID and Client Secret are required.', 'suremails' ) ], 400 );
 		}
 
 		$redirect_uri = admin_url( 'options-general.php?page=suremail' );

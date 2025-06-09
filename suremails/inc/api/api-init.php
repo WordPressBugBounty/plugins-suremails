@@ -55,6 +55,8 @@ class Api_Init {
 			'SureMails\Inc\API\Provider',
 			'SureMails\Inc\API\Auth',
 			'SureMails\Inc\API\OttoKit',
+			'SureMails\Inc\API\Onboarding',
+			'SureMails\Inc\API\Notice',
 		];
 
 		foreach ( $controllers as $controller_class ) {

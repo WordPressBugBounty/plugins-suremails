@@ -154,7 +154,7 @@ class Logs extends Api_Base {
 			return new WP_REST_Response(
 				[
 					'success' => false,
-					'message' => 'Failed to retrieve email logs.',
+					'message' => __( 'Failed to retrieve email logs.', 'suremails' ),
 				],
 				500
 			);

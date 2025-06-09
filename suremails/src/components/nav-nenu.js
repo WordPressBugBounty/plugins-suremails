@@ -34,11 +34,11 @@ const NavMenu = () => {
 
 	// Define navigation items
 	const navItems = [
-		{ name: 'Dashboard', path: '/dashboard' },
-		{ name: 'Settings', path: '/settings' },
-		{ name: 'Connections', path: '/connections' },
-		{ name: 'Email Logs', path: '/logs' },
-		{ name: 'Notifications', path: '/notifications' },
+		{ name: __( 'Dashboard', 'suremails' ), path: '/dashboard' },
+		{ name: __( 'Settings', 'suremails' ), path: '/settings' },
+		{ name: __( 'Connections', 'suremails' ), path: '/connections' },
+		{ name: __( 'Email Logs', 'suremails' ), path: '/logs' },
+		{ name: __( 'Notifications', 'suremails' ), path: '/notifications' },
 	];
 
 	// Get the current active path

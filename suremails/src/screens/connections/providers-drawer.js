@@ -251,6 +251,22 @@ const ProvidersDrawer = ( {
 		} ) );
 	};
 
+	const handleClickAuthenticate = ( provider, formStateValues ) => {
+		const timestampOffset = 5 * 60 * 1000;
+		if ( provider?.toLowerCase() === 'gmail' ) {
+			localStorage.setItem(
+				'formStateValues',
+				JSON.stringify( {
+					...formStateValues,
+				} )
+			);
+			localStorage.setItem(
+				'formStateValuesTimestamp',
+				Date.now() + timestampOffset
+			);
+		}
+	};
+
 	// Define drawer title and description based on selected provider
 	const title = selectedProvider
 		? __( 'Connection Details', 'suremails' )
@@ -308,6 +324,9 @@ const ProvidersDrawer = ( {
 									connectionData={ formData }
 									errors={ errors }
 									inlineValidator={ handleOnBlurValidation }
+									onClickAuthenticate={
+										handleClickAuthenticate
+									}
 								/>
 							</div>
 						) }

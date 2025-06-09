@@ -56,8 +56,8 @@ export const getDatePlaceholder = () => {
 	const pastDate = new Date();
 	pastDate.setDate( currentDate.getDate() - 30 ); // Set to 30 days ago
 
-	const formattedPastDate = formatDate( pastDate, 'MM/dd/yyyy' );
-	const formattedCurrentDate = formatDate( currentDate, 'MM/dd/yyyy' );
+	const formattedPastDate = format( pastDate, 'MM/dd/yyyy' );
+	const formattedCurrentDate = format( currentDate, 'MM/dd/yyyy' );
 
 	return `${ formattedPastDate } - ${ formattedCurrentDate }`;
 };
@@ -70,35 +70,32 @@ export const getDatePlaceholder = () => {
 export const getLastNDays = ( days ) => {
 	if ( isNaN( days ) ) {
 		return {
-			from: '',
-			to: '',
+			from: null,
+			to: null,
 		};
 	}
 	const currentDate = new Date();
 	const pastDate = new Date();
 	pastDate.setDate( currentDate.getDate() - days ); // Set to 30 days ago
 
-	const formattedPastDate = formatDate( pastDate, 'MM/dd/yyyy' );
-	const formattedCurrentDate = formatDate( currentDate, 'MM/dd/yyyy' );
-
 	return {
-		from: formattedPastDate,
-		to: formattedCurrentDate,
+		from: pastDate,
+		to: currentDate,
 	};
 };
 
 /**
- * Returns selected date in string format
+ * Returns selected date in string format.
  *
- * @param {*} selectedDates
+ * @param {Object} selectedDates - Object containing `from` and `to` Date objects.
  * @return {string} - Formatted string.
  */
 export const getSelectedDate = ( selectedDates ) => {
-	if ( ! selectedDates.from ) {
+	if ( ! selectedDates.from || isNaN( selectedDates.from.getTime() ) ) {
 		return '';
 	}
-	if ( ! selectedDates.to ) {
-		return `${ format( selectedDates.from, 'MM/dd/yyyy' ) }`;
+	if ( ! selectedDates.to || isNaN( selectedDates.to.getTime() ) ) {
+		return format( selectedDates.from, 'MM/dd/yyyy' );
 	}
 	return `${ format( selectedDates.from, 'MM/dd/yyyy' ) } - ${ format(
 		selectedDates.to,

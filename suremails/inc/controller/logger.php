@@ -526,7 +526,7 @@ class Logger {
 
 			if ( ! $inserted_id ) {
 				// Capture and log the error.
-				LogError::instance()->log_error( 'Failed to insert email log. Database error.' );
+				LogError::instance()->log_error( __( 'Failed to insert email log. Database error.', 'suremails' ) );
 				return new WP_Error( 'logger_insert_failed', 'Failed to insert email log. Database error.' );
 			}
 
@@ -534,7 +534,7 @@ class Logger {
 		} catch ( \Exception $e ) {
 			// Log the exception for debugging purposes.
 			LogError::instance()->log_error( $e->getMessage() );
-			return new WP_Error( 'logger_insert_exception', 'An exception occurred: ' . $e->getMessage() );
+			return new WP_Error( 'logger_insert_exception', __( 'An exception occurred: ', 'suremails' ) . $e->getMessage() );
 		}
 	}
 
@@ -559,12 +559,15 @@ class Logger {
 			}
 
 			// If update_result is false, log the error.
-			LogError::instance()->log_error( "Failed to update log ID {$log_id}." );
-			return new WP_Error( 'logger_update_failed', "Failed to update log ID {$log_id}." );
+			// translators: %d: Log ID.
+			LogError::instance()->log_error( sprintf( __( 'Failed to update log ID %d.', 'suremails' ), $log_id ) );
+			// translators: %d: Log ID.
+			return new WP_Error( 'logger_update_failed', sprintf( __( 'Failed to update log ID %d.', 'suremails' ), $log_id ) );
 		} catch ( \Exception $e ) {
-			// Log the exception for debugging purposes.
-			LogError::instance()->log_error( "Exception while updating log ID {$log_id}: " . $e->getMessage() );
-			return new WP_Error( 'logger_update_exception', 'An exception occurred: ' . $e->getMessage() );
+			// translators: 1: Log ID, 2: Exception message.
+			LogError::instance()->log_error( sprintf( __( 'Exception while updating log ID %1$d: %2$s', 'suremails' ), $log_id, $e->getMessage() ) );
+			// translators: %s: Exception message.
+			return new WP_Error( 'logger_update_exception', sprintf( __( 'An exception occurred: %s', 'suremails' ), $e->getMessage() ) );
 		}
 	}
 
@@ -576,7 +579,7 @@ class Logger {
 	 */
 	public function get_log( int $log_id ) {
 		if ( empty( $log_id ) ) {
-			return new WP_Error( 'logger_get_invalid_id', 'Invalid log ID provided.' );
+			return new WP_Error( 'logger_get_invalid_id', __( 'Invalid log ID provided.', 'suremails' ) );
 		}
 
 		// Use the EmailLog class to retrieve the log entry.
@@ -589,8 +592,10 @@ class Logger {
 		);
 
 		if ( $logs === false ) {
-			LogError::instance()->log_error( "Failed to retrieve log ID {$log_id}." );
-			return new WP_Error( 'logger_get_failed', "Failed to retrieve log ID {$log_id}." );
+			// translators: %d: Log ID.
+			LogError::instance()->log_error( sprintf( __( 'Failed to retrieve log ID %d.', 'suremails' ), $log_id ) );
+			// translators: %d: Log ID.
+			return new WP_Error( 'logger_get_failed', sprintf( __( 'Failed to retrieve log ID %d.', 'suremails' ), $log_id ) );
 		}
 
 		if ( empty( $logs ) ) {

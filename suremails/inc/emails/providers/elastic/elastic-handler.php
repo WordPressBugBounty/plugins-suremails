@@ -170,7 +170,11 @@ class ElasticHandler implements ConnectionHandler {
 			if ( is_wp_error( $response ) ) {
 				return [
 					'success' => false,
-					'message' => $response->get_error_message(),
+					'message' => sprintf(
+						/* translators: %s: Error message from Elastic Email */
+						__( 'Email sending failed via Elastic Email. Error: %s', 'suremails' ),
+						$response->get_error_message()
+					),
 					'send'    => false,
 				];
 			}
@@ -183,7 +187,11 @@ class ElasticHandler implements ConnectionHandler {
 		} catch ( Exception $e ) {
 			return [
 				'success' => false,
-				'message' => $e->getMessage(),
+				'message' => sprintf(
+					/* translators: %s: Error message from Elastic Email */
+					__( 'Email sending failed via Elastic Email. Error: %s', 'suremails' ),
+					$e->getMessage()
+				),
 				'send'    => false,
 			];
 		}
@@ -323,7 +331,12 @@ class ElasticHandler implements ConnectionHandler {
 		$this->set_payload(
 			[
 				'Content' => [
-					'From' => ProviderHelper::address_format( [ $email, $name ] ),
+					'From' => ProviderHelper::address_format(
+						[
+							'email' => $email,
+							'name'  => $name,
+						]
+					),
 				],
 			]
 		);
@@ -385,7 +398,7 @@ class ElasticHandler implements ConnectionHandler {
 					continue;
 				}
 
-				$data[ $field ][] = ProviderHelper::address_format( [ $email['email'], $email['name'] ] );
+				$data[ $field ][] = ProviderHelper::address_format( $email );
 			}
 		}
 
@@ -415,7 +428,8 @@ class ElasticHandler implements ConnectionHandler {
 		$data = [];
 
 		foreach ( $emails as $email ) {
-			if ( ! isset( $email[0] ) || ! filter_var( $email[0], FILTER_VALIDATE_EMAIL ) ) {
+			// Expect $email to be an array with 'name' and 'email' keys.
+			if ( empty( $email['email'] ) || ! filter_var( $email['email'], FILTER_VALIDATE_EMAIL ) ) {
 				continue;
 			}
 
@@ -468,7 +482,7 @@ class ElasticHandler implements ConnectionHandler {
 			],
 			'mail_type' => [
 				'default'     => [
-					'label' => 'Transactional Email',
+					'label' => __( 'Transactional Email', 'suremails' ),
 					'value' => 'transactional',
 				],
 				'required'    => false,
@@ -483,11 +497,11 @@ class ElasticHandler implements ConnectionHandler {
 				'placeholder' => __( 'Select Email Type', 'suremails' ),
 				'options'     => [
 					[
-						'label' => 'Transactional Email',
+						'label' => __( 'Transactional Email', 'suremails' ),
 						'value' => 'transactional',
 					],
 					[
-						'label' => 'Marketing Email',
+						'label' => __( 'Marketing Email', 'suremails' ),
 						'value' => 'marketing',
 					],
 				],

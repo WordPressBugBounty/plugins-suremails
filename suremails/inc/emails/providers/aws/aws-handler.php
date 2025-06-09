@@ -72,7 +72,8 @@ class AwsHandler implements ConnectionHandler {
 			// Get all verified identities.
 			$response = $this->ses_client->listVerifiedEmailAddresses();
 			if ( is_wp_error( $response ) ) {
-				$result['message'] = 'AWS SES authentication failed: ' . $response->get_error_message();
+				/* translators: %s: AWS SES error message */
+				$result['message'] = sprintf( __( 'AWS SES authentication failed: %s', 'suremails' ), $response->get_error_message() );
 				return $result;
 			}
 
@@ -153,11 +154,12 @@ class AwsHandler implements ConnectionHandler {
 				$result['message'] = __( 'Email sent successfully via AWS SES.', 'suremails' );
 				$result['send']    = true;
 			} else {
-				throw new \Exception( 'Failed to send email. No MessageId returned.' );
+				throw new \Exception( __( 'Failed to send email. No MessageId returned.', 'suremails' ) );
 			}
 		} catch ( \Exception $e ) {
 			$result['success'] = false;
-			$result['message'] = __( 'Email sending failed via AWS SES: ', 'suremails' ) . $e->getMessage();
+			/* translators: %s: AWS SES error message */
+			$result['message'] = sprintf( __( 'Email sending failed via AWS SES: %s', 'suremails' ), $e->getMessage() );
 		}
 		return $result;
 	}

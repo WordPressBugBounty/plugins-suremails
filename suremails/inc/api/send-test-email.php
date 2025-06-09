@@ -104,7 +104,7 @@ class SendTestEmail extends Api_Base {
 				return new WP_REST_Response(
 					[
 						'success' => false,
-						'message' => 'Connection not found.',
+						'message' => __( 'Connection not found.', 'suremails' ),
 					],
 					404
 				);
@@ -126,7 +126,7 @@ class SendTestEmail extends Api_Base {
 				return new WP_REST_Response(
 					[
 						'success' => false,
-						'message' => 'Failed to get email template.',
+						'message' => __( 'Failed to get email template.', 'suremails' ),
 					],
 					404
 				);
@@ -150,7 +150,7 @@ class SendTestEmail extends Api_Base {
 			return new WP_REST_Response(
 				[
 					'success' => false,
-					'message' => 'An error occurred: ' . $e->getMessage(),
+					'message' => sprintf( 'An error occurred: %s', $e->getMessage() ),
 				],
 				500
 			);

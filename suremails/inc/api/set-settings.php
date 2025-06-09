@@ -56,7 +56,7 @@ class SetSettings extends Api_Base {
 						'settings' => [
 							'type'        => 'object',
 							'required'    => true,
-							'description' => 'Settings data to update.',
+							'description' => __( 'Settings data to update.', 'suremails' ),
 						],
 					],
 				],

@@ -9,6 +9,7 @@
 
 namespace SureMails\Inc\Admin;
 
+use SureMails\Inc\Onboarding;
 use SureMails\Inc\Settings;
 use SureMails\Inc\Traits\Instance;
 
@@ -62,13 +63,19 @@ class Plugin {
 			update_option( 'suremails_do_redirect', false );
 
 			if ( ! is_multisite() ) {
+				$page = SUREMAILS;
+
+				// Check if the user completed onboarding setup.
+				$done_onboarding_setup = Onboarding::instance()->get_onboarding_status();
+				// Check if the user has any connections (For old users).
+				$connections = Settings::instance()->get_settings( 'connections' );
+
+				if ( ! $done_onboarding_setup && ( empty( $connections ) || count( $connections ) === 0 ) ) {
+					$page = SUREMAILS . '#/onboarding';
+				}
+
 				wp_safe_redirect(
-					add_query_arg(
-						[
-							'page' => SUREMAILS,
-						],
-						admin_url( 'options-general.php' )
-					)
+					admin_url( 'options-general.php?page=' . $page )
 				);
 				exit;
 			}
@@ -86,6 +93,11 @@ class Plugin {
 		}
 
 		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// If notice is disabled (within expiry), do not show.
+		if ( $this->is_notice_disabled() ) {
 			return;
 		}
 
@@ -112,6 +124,11 @@ class Plugin {
 			return;
 		}
 
+		// If notice is disabled (within expiry), do not enqueue.
+		if ( $this->is_notice_disabled() ) {
+			return;
+		}
+
 		$current_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 		$options      = Settings::instance()->get_settings();
 		// If the user is on the SureMails settings page or there are connections, don't show the notice.
@@ -128,7 +145,7 @@ class Plugin {
 		wp_register_script(
 			'suremails-admin-notice',
 			SUREMAILS_PLUGIN_URL . 'build/admin-notice.js',
-			[ 'wp-element', 'wp-dom-ready', 'wp-i18n' ],
+			[ 'wp-element', 'wp-dom-ready', 'wp-i18n', 'wp-api-fetch' ],
 			$assets['version'],
 			true
 		);
@@ -153,6 +170,7 @@ class Plugin {
 			'suremailsNotice',
 			[
 				'dashboardUrl' => esc_url( admin_url( 'options-general.php?page=' . SUREMAILS . '#/dashboard' ) ),
+				'nonce'        => wp_create_nonce( 'wp_rest' ),
 			]
 		);
 
@@ -245,6 +263,7 @@ class Plugin {
 				'ottokit_connected'            => apply_filters( 'suretriggers_is_user_connected', '' ),
 				'ottokit_admin_url'            => admin_url( 'admin.php?page=suretriggers' ),
 				'pluginInstallationPermission' => current_user_can( 'install_plugins' ),
+				'onboardingCompleted'          => Onboarding::instance()->get_onboarding_status(),
 			]
 		);
 
@@ -292,6 +311,28 @@ class Plugin {
 			$attachment_base_url = esc_url( get_site_url() ) . '/wp-content/uploads/suremails/attachments/';
 		}
 		return $attachment_base_url;
+	}
+
+	/**
+	 * Check if the notice is currently disabled.
+	 *
+	 * @return bool True if notice is disabled (within expiry), false if notice should be shown.
+	 */
+	private function is_notice_disabled() {
+		$notice_expiry = get_option( 'suremails_notice_dismissal_time', 0 );
+		if ( ! $notice_expiry ) {
+			return false; // No expiry set, so notice is not disabled.
+		}
+
+		// Check if the current time is greater than or equal to the notice expiry time.
+		if ( time() >= $notice_expiry ) {
+			// Expired: remove the option so notice can be shown next time.
+			delete_option( 'suremails_notice_dismissal_time' );
+			return false; // Notice is NOT disabled anymore.
+		}
+
+		// Still within disabled period.
+		return true; // Notice is disabled.
 	}
 }
 

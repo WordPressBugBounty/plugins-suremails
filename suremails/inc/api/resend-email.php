@@ -72,7 +72,7 @@ class ResendEmail extends Api_Base {
 			return new WP_REST_Response(
 				[
 					'success' => false,
-					'message' => 'Invalid log IDs provided.',
+					'message' => __( 'Invalid log IDs provided.', 'suremails' ),
 				],
 				400
 			);
@@ -94,7 +94,7 @@ class ResendEmail extends Api_Base {
 				$results[] = [
 					'log_id'  => $log_id,
 					'success' => false,
-					'message' => 'Log not found.',
+					'message' => __( 'Log not found.', 'suremails' ),
 				];
 				continue;
 			}
@@ -119,13 +119,13 @@ class ResendEmail extends Api_Base {
 				$results[] = [
 					'log_id'  => $log_id,
 					'success' => true,
-					'message' => 'Email resent successfully.',
+					'message' => __( 'Email resent successfully.', 'suremails' ),
 				];
 			} else {
 				$results[] = [
 					'log_id'  => $log_id,
 					'success' => false,
-					'message' => 'Failed to resend email.',
+					'message' => __( 'Failed to resend email.', 'suremails' ),
 				];
 			}
 		}

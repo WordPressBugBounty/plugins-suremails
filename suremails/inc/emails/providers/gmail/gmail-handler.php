@@ -2,7 +2,7 @@
 /**
  * GmailHandler.php
  *
- * Handles sending emails using Gmail via direct API calls.
+ * Handles sending emails using Gmail via direct API call.
  *
  * @package SureMails\Inc\Emails\Providers\Gmail
  */

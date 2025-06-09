@@ -76,12 +76,16 @@ class SmtpHandler implements ConnectionHandler {
 			if ( $phpmailer->smtpConnect() ) {
 				$phpmailer->smtpClose();
 				$result['success'] = true;
-				$result['message'] = 'SMTP authentication successful.';
+				$result['message'] = __( 'SMTP authentication successful.', 'suremails' );
 			} else {
-				$result['message'] = 'SMTP authentication failed: Unable to connect to the SMTP server.';
+				$result['message'] = __( 'SMTP authentication failed: Unable to connect to the SMTP server.', 'suremails' );
 			}
 		} catch ( Exception $e ) {
-			$result['message'] = 'SMTP authentication failed: ' . $e->getMessage();
+			$result['message'] = sprintf(
+				// translators: %s: The error message from PHPMailer.
+				__( 'SMTP authentication failed: %s', 'suremails' ),
+				$e->getMessage()
+			);
 		}
 
 		return $result;
@@ -134,15 +138,23 @@ class SmtpHandler implements ConnectionHandler {
 
 			if ( $send ) {
 				$result['success'] = true;
-				$result['message'] = 'Email sent successfully via SMTP.';
+				$result['message'] = __( 'Email sent successfully via SMTP.', 'suremails' );
 				$result['send']    = true;
 			} else {
-				$result['message'] = 'Email sending failed via SMTP: ' . $phpmailer->ErrorInfo;
+				$result['message'] = sprintf(
+					// translators: %s: The error message from PHPMailer.
+					__( 'Email sending failed via SMTP: %s', 'suremails' ),
+					$phpmailer->ErrorInfo
+				);
 				$result['retries'] = 1; // Increment retries if applicable.
 			}
 		} catch ( Exception $e ) {
 			$result['success'] = false;
-			$result['message'] = 'Email sending failed via SMTP: ' . $e->getMessage();
+			$result['message'] = sprintf(
+				// translators: %s: The error message.
+				__( 'Email sending failed via SMTP: %s', 'suremails' ),
+				$e->getMessage()
+			);
 			$result['retries'] = 1; // Increment retries if applicable.
 		}
 

@@ -152,7 +152,11 @@ class Smtp2goHandler implements ConnectionHandler {
 			$response = wp_safe_remote_post( $this->api_url, $params );
 
 			if ( is_wp_error( $response ) ) {
-				$result['message']    = __( 'Email sending failed via SMTP2GO. Error: ', 'suremails' ) . $response->get_error_message();
+				$result['message'] = sprintf(
+					/* translators: %s: Error message from SMTP2GO */
+					__( 'Email sending failed via SMTP2GO. Error: %s', 'suremails' ),
+					$response->get_error_message()
+				);
 				$result['error_code'] = $response->get_error_code();
 				return $result;
 			}
@@ -167,12 +171,20 @@ class Smtp2goHandler implements ConnectionHandler {
 				$result['email_id'] = $server_response['email_id'] ?? '';
 			} else {
 				$error_message     = ! empty( $server_response['error'] ) ? $server_response['error'] : __( 'SMTP2GO Server Error', 'suremails' );
-				$result['message'] = __( 'Email sending failed via SMTP2GO. Error: ', 'suremails' ) . $error_message;
+				$result['message'] = sprintf(
+					/* translators: %s: Error message from SMTP2GO */
+					__( 'Email sending failed via SMTP2GO. Error: %s', 'suremails' ),
+					$error_message
+				);
 
 				$result['error_code'] = $response_code;
 			}
 		} catch ( Exception $e ) {
-			$result['message']    = __( 'Email sending failed via SMTP2GO. Error: ', 'suremails' ) . $e->getMessage();
+			$result['message'] = sprintf(
+				/* translators: %s: Exception message */
+				__( 'Email sending failed via SMTP2GO. Error: %s', 'suremails' ),
+				$e->getMessage()
+			);
 			$result['error_code'] = 500;
 		}
 

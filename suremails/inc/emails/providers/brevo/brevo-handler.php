@@ -236,7 +236,11 @@ class BrevoHandler implements ConnectionHandler {
 			);
 
 			if ( is_wp_error( $response ) ) {
-				$result['message']    = __( 'Brevo send failed: ', 'suremails' ) . $response->get_error_message();
+				$result['message'] = sprintf(
+				/* translators: %s: Error message from Brevo API */
+					__( 'Email sending failed via Brevo. Error: %s', 'suremails' ),
+					$response->get_error_message()
+				);
 				$result['error_code'] = $response->get_error_code();
 				return $result;
 			}
@@ -251,12 +255,20 @@ class BrevoHandler implements ConnectionHandler {
 				$result['send']    = true;
 				$result['message'] = __( 'Email sent successfully via Brevo.', 'suremails' );
 			} else {
-				$error_message        = $decoded_body['message'] ?? __( 'Unknown error.', 'suremails' );
-				$result['message']    = __( 'Brevo send failed: ', 'suremails' ) . $error_message;
+				$error_message     = $decoded_body['message'] ?? __( 'Unknown error.', 'suremails' );
+				$result['message'] = sprintf(
+				/* translators: %s: Error message from Brevo API */
+					__( 'Email sending failed via Brevo. Error: %s', 'suremails' ),
+					$error_message
+				);
 				$result['error_code'] = $response_code;
 			}
 		} catch ( \Exception $e ) {
-			$result['message']    = __( 'Brevo send failed: ', 'suremails' ) . $e->getMessage();
+			$result['message'] = sprintf(
+			/* translators: %s: Exception message */
+				__( 'Email sending failed via Brevo. Error: %s', 'suremails' ),
+				$e->getMessage()
+			);
 			$result['error_code'] = 500;
 		}
 

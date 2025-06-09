@@ -79,8 +79,8 @@ class ProviderHelper {
 	 * @return array|string
 	 */
 	public static function address_format( $address ) {
-		$email  = $address[0] ?? false;
-		$name   = $address[1] ?? false;
+		$email  = $address['email'] ?? '';
+		$name   = $address['name'] ?? '';
 		$result = $email;
 		if ( ! empty( $name ) ) {
 			$result = "{$name} <{$email}>";

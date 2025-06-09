@@ -151,10 +151,10 @@ class MailHandler {
 			$send = DefaultMailHandler::send_mail( $atts );
 			if ( $send ) {
 				$handler_response['status']  = Logger::STATUS_SENT;
-				$handler_response['message'] = 'Sent using Default WordPress Handler';
+				$handler_response['message'] = __( 'Sent using Default WordPress Handler', 'suremails' );
 				$handler_response['success'] = true;
 			} else {
-				$handler_response['message'] = 'Failed to send email using Default WordPress Handler';
+				$handler_response['message'] = __( 'Failed to send email using Default WordPress Handler', 'suremails' );
 				$handler_response['success'] = false;
 
 			}
@@ -165,7 +165,7 @@ class MailHandler {
 		// Use handler.
 		$handler = ConnectionHandlerFactory::create( $connection );
 		if ( ! $handler instanceof ConnectionHandler ) {
-			$handler_response['message'] = 'Invalid connection type.';
+			$handler_response['message'] = __( 'Invalid connection type.', 'suremails' );
 			$this->handle_response( $handler_response );
 			return false;
 		}
@@ -306,7 +306,8 @@ class MailHandler {
 			$log_id = $this->logger->log_email( $log_data );
 
 			if ( is_wp_error( $log_id ) ) {
-				LogError::instance()->log_error( 'Failed to log email: ' . $log_id->get_error_message() );
+				// translators: %s is the error message.
+				LogError::instance()->log_error( sprintf( __( 'Failed to log email: %s', 'suremails' ), $log_id->get_error_message() ) );
 				return null;
 			}
 			if ( is_int( $log_id ) && $log_data['status'] === Logger::STATUS_PENDING ) {
@@ -355,7 +356,8 @@ class MailHandler {
 		$update_result = $this->logger->update_log( $log_id, $update_data );
 		if ( is_wp_error( $update_result ) || ! $update_result ) {
 			// Handle update failure if necessary.
-			LogError::instance()->log_error( "Failed to update log ID {$log_id}." );
+			// translators: %d is the log ID that failed to update.
+			LogError::instance()->log_error( sprintf( __( 'Failed to update log ID %d.', 'suremails' ), $log_id ) );
 			return null;
 		}
 

@@ -68,13 +68,12 @@ const ProviderList = ( { onSelectProvider, providers } ) => {
 				{ providers.map( ( option ) => (
 					<RadioButton.Button
 						key={ option.value }
-						borderOn
 						value={ option.value }
 						icon={ option.icon }
 						badgeItem={ option.badge }
 						size="md"
 						inlineIcon
-						buttonWrapperClasses="bg-background-primary border-0"
+						buttonWrapperClasses="bg-background-primary rounded-lg shadow-sm"
 						label={ {
 							heading: option.display_name,
 						} }

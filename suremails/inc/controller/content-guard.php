@@ -350,7 +350,8 @@ class ContentGuard {
 			$log_id = $logger->log_email( $handler_response );
 
 			if ( is_wp_error( $log_id ) ) {
-				LogError::instance()->log_error( 'Failed to log email: ' . $log_id->get_error_message() );
+				// translators: %s is the error message.
+				LogError::instance()->log_error( sprintf( __( 'Failed to log email: %s', 'suremails' ), $log_id->get_error_message() ) );
 				return false;
 			}
 

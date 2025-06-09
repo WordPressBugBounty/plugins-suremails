@@ -39,6 +39,7 @@ const FormField = ( {
 	errors,
 	inlineValidator,
 	formStateValues,
+	onClickAuthenticate,
 } ) => {
 	const check_auth_code = () => {
 		if ( formStateValues?.refresh_token || formStateValues?.auth_code ) {
@@ -52,17 +53,12 @@ const FormField = ( {
 	}
 	const render_auth_code = check_auth_code();
 	const handleGmailAuth = async ( provider, client_id, client_secret ) => {
-		const timestampOffset = 5 * 60 * 1000;
-		if ( provider?.toLowerCase() === 'gmail' ) {
-			localStorage.setItem(
-				'formStateValues',
-				JSON.stringify( {
-					...formStateValues,
-				} )
-			);
-			localStorage.setItem(
-				'formStateValuesTimestamp',
-				Date.now() + timestampOffset
+		if ( typeof onClickAuthenticate === 'function' ) {
+			onClickAuthenticate(
+				provider,
+				formStateValues,
+				client_id,
+				client_secret
 			);
 		}
 
@@ -302,6 +298,7 @@ const FormGenerator = ( {
 	onChange,
 	errors,
 	inlineValidator,
+	onClickAuthenticate,
 } ) => {
 	const handleFieldChange = ( field, value ) => {
 		onChange?.( { [ field ]: value } );
@@ -318,6 +315,7 @@ const FormGenerator = ( {
 					onChange={ handleFieldChange }
 					errors={ errors }
 					inlineValidator={ inlineValidator }
+					onClickAuthenticate={ onClickAuthenticate }
 				/>
 			) ) }
 		</div>

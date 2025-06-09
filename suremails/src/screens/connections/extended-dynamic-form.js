@@ -6,6 +6,7 @@ const ExtendedDynamicForm = ( {
 	onChange,
 	errors,
 	inlineValidator,
+	onClickAuthenticate,
 } ) => {
 	const handleFieldChange = ( updates ) => {
 		if ( typeof onChange !== 'function' ) {
@@ -22,6 +23,7 @@ const ExtendedDynamicForm = ( {
 			onChange={ handleFieldChange }
 			errors={ errors }
 			inlineValidator={ inlineValidator }
+			onClickAuthenticate={ onClickAuthenticate }
 		/>
 	);
 };

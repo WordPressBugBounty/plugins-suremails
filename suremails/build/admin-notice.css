@@ -144,16 +144,6 @@
     white-space: nowrap;
     border-width: 0
 }
-:is(#suremails-root-app, #suremails-admin-notice) .not-sr-only{
-    position: static;
-    width: auto;
-    height: auto;
-    padding: 0;
-    margin: 0;
-    overflow: visible;
-    clip: auto;
-    white-space: normal
-}
 :is(#suremails-root-app, #suremails-admin-notice) .pointer-events-none{
     pointer-events: none
 }
@@ -162,12 +152,6 @@
 }
 :is(#suremails-root-app, #suremails-admin-notice) .visible{
     visibility: visible
-}
-:is(#suremails-root-app, #suremails-admin-notice) .invisible{
-    visibility: hidden
-}
-:is(#suremails-root-app, #suremails-admin-notice) .collapse{
-    visibility: collapse
 }
 :is(#suremails-root-app, #suremails-admin-notice) .static{
     position: static
@@ -180,9 +164,6 @@
 }
 :is(#suremails-root-app, #suremails-admin-notice) .relative{
     position: relative
-}
-:is(#suremails-root-app, #suremails-admin-notice) .sticky{
-    position: sticky
 }
 :is(#suremails-root-app, #suremails-admin-notice) .-inset-1{
     inset: -0.25rem
@@ -213,13 +194,7 @@
 :is(#suremails-root-app, #suremails-admin-notice) .left-0{
     left: 0px
 }
-:is(#suremails-root-app, #suremails-admin-notice) .left-1{
-    left: 0.25rem
-}
 :is(#suremails-root-app, #suremails-admin-notice) .left-1\/2{
-    left: 50%
-}
-:is(#suremails-root-app, #suremails-admin-notice) .left-2\/4{
     left: 50%
 }
 :is(#suremails-root-app, #suremails-admin-notice) .left-\[calc\(50\%\+10px\)\]{
@@ -272,12 +247,6 @@
 }
 :is(#suremails-root-app, #suremails-admin-notice) .top-full{
     top: 100%
-}
-:is(#suremails-root-app, #suremails-admin-notice) .isolate{
-    isolation: isolate
-}
-:is(#suremails-root-app, #suremails-admin-notice) .isolation-auto{
-    isolation: auto
 }
 :is(#suremails-root-app, #suremails-admin-notice) .-z-10{
     z-index: -10
@@ -530,9 +499,6 @@
 :is(#suremails-root-app, #suremails-admin-notice) .mt-0{
     margin-top: 0px
 }
-:is(#suremails-root-app, #suremails-admin-notice) .mt-0\.5{
-    margin-top: 0.125rem
-}
 :is(#suremails-root-app, #suremails-admin-notice) .mt-1{
     margin-top: 0.25rem
 }
@@ -560,17 +526,11 @@
 :is(#suremails-root-app, #suremails-admin-notice) .mt-4{
     margin-top: 1rem
 }
-:is(#suremails-root-app, #suremails-admin-notice) .mt-\[0\.5px\]{
-    margin-top: 0.5px
-}
 :is(#suremails-root-app, #suremails-admin-notice) .mt-\[2px\]{
     margin-top: 2px
 }
 :is(#suremails-root-app, #suremails-admin-notice) .mt-auto{
     margin-top: auto
-}
-:is(#suremails-root-app, #suremails-admin-notice) .mt-px{
-    margin-top: 1px
 }
 :is(#suremails-root-app, #suremails-admin-notice) .box-border{
     box-sizing: border-box
@@ -593,50 +553,20 @@
 :is(#suremails-root-app, #suremails-admin-notice) .table{
     display: table
 }
-:is(#suremails-root-app, #suremails-admin-notice) .inline-table{
-    display: inline-table
-}
-:is(#suremails-root-app, #suremails-admin-notice) .table-caption{
-    display: table-caption
-}
-:is(#suremails-root-app, #suremails-admin-notice) .table-cell{
-    display: table-cell
-}
-:is(#suremails-root-app, #suremails-admin-notice) .table-column{
-    display: table-column
-}
-:is(#suremails-root-app, #suremails-admin-notice) .table-column-group{
-    display: table-column-group
-}
-:is(#suremails-root-app, #suremails-admin-notice) .table-footer-group{
-    display: table-footer-group
-}
-:is(#suremails-root-app, #suremails-admin-notice) .table-header-group{
-    display: table-header-group
-}
-:is(#suremails-root-app, #suremails-admin-notice) .table-row-group{
-    display: table-row-group
-}
-:is(#suremails-root-app, #suremails-admin-notice) .table-row{
-    display: table-row
-}
 :is(#suremails-root-app, #suremails-admin-notice) .flow-root{
     display: flow-root
 }
 :is(#suremails-root-app, #suremails-admin-notice) .grid{
     display: grid
 }
-:is(#suremails-root-app, #suremails-admin-notice) .inline-grid{
-    display: inline-grid
-}
 :is(#suremails-root-app, #suremails-admin-notice) .contents{
     display: contents
 }
-:is(#suremails-root-app, #suremails-admin-notice) .list-item{
-    display: list-item
-}
 :is(#suremails-root-app, #suremails-admin-notice) .hidden{
     display: none
+}
+:is(#suremails-root-app, #suremails-admin-notice) .aspect-video{
+    aspect-ratio: 16 / 9
 }
 :is(#suremails-root-app, #suremails-admin-notice) .size-1\.5{
     width: 0.375rem;
@@ -783,6 +713,12 @@
 :is(#suremails-root-app, #suremails-admin-notice) .min-h-16{
     min-height: 4rem
 }
+:is(#suremails-root-app, #suremails-admin-notice) .min-h-5{
+    min-height: 1.25rem
+}
+:is(#suremails-root-app, #suremails-admin-notice) .min-h-6{
+    min-height: 1.5rem
+}
 :is(#suremails-root-app, #suremails-admin-notice) .min-h-\[135px\]{
     min-height: 135px
 }
@@ -810,8 +746,14 @@
 :is(#suremails-root-app, #suremails-admin-notice) .min-h-\[3rem\]{
     min-height: 3rem
 }
+:is(#suremails-root-app, #suremails-admin-notice) .min-h-\[calc\(100dvh-46px\)\]{
+    min-height: calc(100dvh - 46px)
+}
 :is(#suremails-root-app, #suremails-admin-notice) .min-h-\[calc\(100dvh_-_110px\)\]{
     min-height: calc(100dvh - 110px)
+}
+:is(#suremails-root-app, #suremails-admin-notice) .min-h-fit{
+    min-height: fit-content
 }
 :is(#suremails-root-app, #suremails-admin-notice) .min-h-full{
     min-height: 100%
@@ -882,8 +824,14 @@
 :is(#suremails-root-app, #suremails-admin-notice) .w-2\/3{
     width: 66.666667%
 }
+:is(#suremails-root-app, #suremails-admin-notice) .w-2\/5{
+    width: 40%
+}
 :is(#suremails-root-app, #suremails-admin-notice) .w-20{
     width: 5rem
+}
+:is(#suremails-root-app, #suremails-admin-notice) .w-28{
+    width: 7rem
 }
 :is(#suremails-root-app, #suremails-admin-notice) .w-3{
     width: 0.75rem
@@ -902,6 +850,9 @@
 }
 :is(#suremails-root-app, #suremails-admin-notice) .w-48{
     width: 12rem
+}
+:is(#suremails-root-app, #suremails-admin-notice) .w-5{
+    width: 1.25rem
 }
 :is(#suremails-root-app, #suremails-admin-notice) .w-52{
     width: 13rem
@@ -1047,6 +998,15 @@
 :is(#suremails-root-app, #suremails-admin-notice) .max-w-\[21\.875rem\]{
     max-width: 21.875rem
 }
+:is(#suremails-root-app, #suremails-admin-notice) .max-w-\[22\.5rem\]{
+    max-width: 22.5rem
+}
+:is(#suremails-root-app, #suremails-admin-notice) .max-w-\[35rem\]{
+    max-width: 35rem
+}
+:is(#suremails-root-app, #suremails-admin-notice) .max-w-\[46\.875rem\]{
+    max-width: 46.875rem
+}
 :is(#suremails-root-app, #suremails-admin-notice) .max-w-fit{
     max-width: fit-content
 }
@@ -1154,10 +1114,6 @@
 }
 :is(#suremails-root-app, #suremails-admin-notice) .cursor-pointer{
     cursor: pointer
-}
-:is(#suremails-root-app, #suremails-admin-notice) .touch-pinch-zoom{
-    --tw-pinch-zoom: pinch-zoom;
-    touch-action: var(--tw-pan-x) var(--tw-pan-y) var(--tw-pinch-zoom)
 }
 :is(#suremails-root-app, #suremails-admin-notice) .resize{
     resize: both
@@ -1434,17 +1390,6 @@
     margin-top: calc(2rem * calc(1 - var(--tw-space-y-reverse)));
     margin-bottom: calc(2rem * var(--tw-space-y-reverse))
 }
-:is(#suremails-root-app, #suremails-admin-notice) :is(.space-y-reverse > :not([hidden]) ~ :not([hidden])){
-    --tw-space-y-reverse: 1
-}
-:is(#suremails-root-app, #suremails-admin-notice) :is(.space-x-reverse > :not([hidden]) ~ :not([hidden])){
-    --tw-space-x-reverse: 1
-}
-:is(#suremails-root-app, #suremails-admin-notice) :is(.divide-x > :not([hidden]) ~ :not([hidden])){
-    --tw-divide-x-reverse: 0;
-    border-right-width: calc(1px * var(--tw-divide-x-reverse));
-    border-left-width: calc(1px * calc(1 - var(--tw-divide-x-reverse)))
-}
 :is(#suremails-root-app, #suremails-admin-notice) :is(.divide-x-0 > :not([hidden]) ~ :not([hidden])){
     --tw-divide-x-reverse: 0;
     border-right-width: calc(0px * var(--tw-divide-x-reverse));
@@ -1459,12 +1404,6 @@
     --tw-divide-y-reverse: 0;
     border-top-width: calc(0.5px * calc(1 - var(--tw-divide-y-reverse)));
     border-bottom-width: calc(0.5px * var(--tw-divide-y-reverse))
-}
-:is(#suremails-root-app, #suremails-admin-notice) :is(.divide-y-reverse > :not([hidden]) ~ :not([hidden])){
-    --tw-divide-y-reverse: 1
-}
-:is(#suremails-root-app, #suremails-admin-notice) :is(.divide-x-reverse > :not([hidden]) ~ :not([hidden])){
-    --tw-divide-x-reverse: 1
 }
 :is(#suremails-root-app, #suremails-admin-notice) :is(.divide-solid > :not([hidden]) ~ :not([hidden])){
     border-style: solid
@@ -1529,12 +1468,6 @@
     text-overflow: ellipsis;
     white-space: nowrap
 }
-:is(#suremails-root-app, #suremails-admin-notice) .text-ellipsis{
-    text-overflow: ellipsis
-}
-:is(#suremails-root-app, #suremails-admin-notice) .text-clip{
-    text-overflow: clip
-}
 :is(#suremails-root-app, #suremails-admin-notice) .whitespace-nowrap{
     white-space: nowrap
 }
@@ -1565,33 +1498,9 @@
 :is(#suremails-root-app, #suremails-admin-notice) .rounded-xl{
     border-radius: 0.75rem
 }
-:is(#suremails-root-app, #suremails-admin-notice) .rounded-b{
-    border-bottom-right-radius: 0.25rem;
-    border-bottom-left-radius: 0.25rem
-}
 :is(#suremails-root-app, #suremails-admin-notice) .rounded-b-none{
     border-bottom-right-radius: 0px;
     border-bottom-left-radius: 0px
-}
-:is(#suremails-root-app, #suremails-admin-notice) .rounded-e{
-    border-start-end-radius: 0.25rem;
-    border-end-end-radius: 0.25rem
-}
-:is(#suremails-root-app, #suremails-admin-notice) .rounded-l{
-    border-top-left-radius: 0.25rem;
-    border-bottom-left-radius: 0.25rem
-}
-:is(#suremails-root-app, #suremails-admin-notice) .rounded-r{
-    border-top-right-radius: 0.25rem;
-    border-bottom-right-radius: 0.25rem
-}
-:is(#suremails-root-app, #suremails-admin-notice) .rounded-s{
-    border-start-start-radius: 0.25rem;
-    border-end-start-radius: 0.25rem
-}
-:is(#suremails-root-app, #suremails-admin-notice) .rounded-t{
-    border-top-left-radius: 0.25rem;
-    border-top-right-radius: 0.25rem
 }
 :is(#suremails-root-app, #suremails-admin-notice) .rounded-bl{
     border-bottom-left-radius: 0.25rem
@@ -1607,18 +1516,6 @@
 }
 :is(#suremails-root-app, #suremails-admin-notice) .rounded-br-md{
     border-bottom-right-radius: 0.375rem
-}
-:is(#suremails-root-app, #suremails-admin-notice) .rounded-ee{
-    border-end-end-radius: 0.25rem
-}
-:is(#suremails-root-app, #suremails-admin-notice) .rounded-es{
-    border-end-start-radius: 0.25rem
-}
-:is(#suremails-root-app, #suremails-admin-notice) .rounded-se{
-    border-start-end-radius: 0.25rem
-}
-:is(#suremails-root-app, #suremails-admin-notice) .rounded-ss{
-    border-start-start-radius: 0.25rem
 }
 :is(#suremails-root-app, #suremails-admin-notice) .rounded-tl{
     border-top-left-radius: 0.25rem
@@ -1656,10 +1553,6 @@
 :is(#suremails-root-app, #suremails-admin-notice) .border-\[0\.5px\]{
     border-width: 0.5px
 }
-:is(#suremails-root-app, #suremails-admin-notice) .border-x{
-    border-left-width: 1px;
-    border-right-width: 1px
-}
 :is(#suremails-root-app, #suremails-admin-notice) .border-x-0{
     border-left-width: 0px;
     border-right-width: 0px
@@ -1681,9 +1574,6 @@
 :is(#suremails-root-app, #suremails-admin-notice) .border-b-0\.5{
     border-bottom-width: 0.5px
 }
-:is(#suremails-root-app, #suremails-admin-notice) .border-e{
-    border-inline-end-width: 1px
-}
 :is(#suremails-root-app, #suremails-admin-notice) .border-l{
     border-left-width: 1px
 }
@@ -1695,9 +1585,6 @@
 }
 :is(#suremails-root-app, #suremails-admin-notice) .border-r-0{
     border-right-width: 0px
-}
-:is(#suremails-root-app, #suremails-admin-notice) .border-s{
-    border-inline-start-width: 1px
 }
 :is(#suremails-root-app, #suremails-admin-notice) .border-t{
     border-top-width: 1px
@@ -1889,6 +1776,30 @@
     --tw-bg-opacity: 1;
     background-color: rgb(254 252 232 / var(--tw-bg-opacity, 1))
 }
+:is(#suremails-root-app, #suremails-admin-notice) .bg-badge-hover-disabled{
+    --tw-bg-opacity: 1;
+    background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1))
+}
+:is(#suremails-root-app, #suremails-admin-notice) .bg-badge-hover-gray{
+    --tw-bg-opacity: 1;
+    background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1))
+}
+:is(#suremails-root-app, #suremails-admin-notice) .bg-badge-hover-green{
+    --tw-bg-opacity: 1;
+    background-color: rgb(220 252 231 / var(--tw-bg-opacity, 1))
+}
+:is(#suremails-root-app, #suremails-admin-notice) .bg-badge-hover-red{
+    --tw-bg-opacity: 1;
+    background-color: rgb(254 226 226 / var(--tw-bg-opacity, 1))
+}
+:is(#suremails-root-app, #suremails-admin-notice) .bg-badge-hover-sky{
+    --tw-bg-opacity: 1;
+    background-color: rgb(224 242 254 / var(--tw-bg-opacity, 1))
+}
+:is(#suremails-root-app, #suremails-admin-notice) .bg-badge-hover-yellow{
+    --tw-bg-opacity: 1;
+    background-color: rgb(254 249 195 / var(--tw-bg-opacity, 1))
+}
 :is(#suremails-root-app, #suremails-admin-notice) .bg-border-interactive{
     --tw-bg-opacity: 1;
     background-color: rgb(13 126 232 / var(--tw-bg-opacity, 1))
@@ -1931,6 +1842,10 @@
 :is(#suremails-root-app, #suremails-admin-notice) .bg-field-background-disabled{
     --tw-bg-opacity: 1;
     background-color: rgb(249 250 251 / var(--tw-bg-opacity, 1))
+}
+:is(#suremails-root-app, #suremails-admin-notice) .bg-field-background-error{
+    --tw-bg-opacity: 1;
+    background-color: rgb(254 242 242 / var(--tw-bg-opacity, 1))
 }
 :is(#suremails-root-app, #suremails-admin-notice) .bg-field-dropzone-background-hover{
     --tw-bg-opacity: 1;
@@ -1997,9 +1912,6 @@
 }
 :is(#suremails-root-app, #suremails-admin-notice) .bg-opacity-30{
     --tw-bg-opacity: 0.3
-}
-:is(#suremails-root-app, #suremails-admin-notice) .bg-repeat{
-    background-repeat: repeat
 }
 :is(#suremails-root-app, #suremails-admin-notice) .fill-current{
     fill: currentColor
@@ -2194,6 +2106,12 @@
 :is(#suremails-root-app, #suremails-admin-notice) .pl-3{
     padding-left: 0.75rem
 }
+:is(#suremails-root-app, #suremails-admin-notice) .pl-3\.5{
+    padding-left: 0.875rem
+}
+:is(#suremails-root-app, #suremails-admin-notice) .pl-4{
+    padding-left: 1rem
+}
 :is(#suremails-root-app, #suremails-admin-notice) .pl-8{
     padding-left: 2rem
 }
@@ -2252,6 +2170,10 @@
     font-size: 1.5rem;
     line-height: 2rem
 }
+:is(#suremails-root-app, #suremails-admin-notice) .text-3xl{
+    font-size: 1.875rem;
+    line-height: 2.25rem
+}
 :is(#suremails-root-app, #suremails-admin-notice) .text-4xl{
     font-size: 2.25rem;
     line-height: 2.5rem
@@ -2294,51 +2216,14 @@
 :is(#suremails-root-app, #suremails-admin-notice) .uppercase{
     text-transform: uppercase
 }
-:is(#suremails-root-app, #suremails-admin-notice) .lowercase{
-    text-transform: lowercase
-}
 :is(#suremails-root-app, #suremails-admin-notice) .capitalize{
     text-transform: capitalize
-}
-:is(#suremails-root-app, #suremails-admin-notice) .normal-case{
-    text-transform: none
 }
 :is(#suremails-root-app, #suremails-admin-notice) .italic{
     font-style: italic
 }
-:is(#suremails-root-app, #suremails-admin-notice) .not-italic{
-    font-style: normal
-}
-:is(#suremails-root-app, #suremails-admin-notice) .normal-nums{
-    font-variant-numeric: normal
-}
-:is(#suremails-root-app, #suremails-admin-notice) .ordinal{
-    --tw-ordinal: ordinal;
-    font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .slashed-zero{
-    --tw-slashed-zero: slashed-zero;
-    font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .lining-nums{
-    --tw-numeric-figure: lining-nums;
-    font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .oldstyle-nums{
-    --tw-numeric-figure: oldstyle-nums;
-    font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .proportional-nums{
-    --tw-numeric-spacing: proportional-nums;
-    font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .tabular-nums{
-    --tw-numeric-spacing: tabular-nums;
-    font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .diagonal-fractions{
-    --tw-numeric-fraction: diagonal-fractions;
-    font-variant-numeric: var(--tw-ordinal) var(--tw-slashed-zero) var(--tw-numeric-figure) var(--tw-numeric-spacing) var(--tw-numeric-fraction)
+:is(#suremails-root-app, #suremails-admin-notice) .leading-11{
+    line-height: 2.75rem
 }
 :is(#suremails-root-app, #suremails-admin-notice) .leading-4{
     line-height: 1rem
@@ -2355,11 +2240,20 @@
 :is(#suremails-root-app, #suremails-admin-notice) .leading-7\.5{
     line-height: 1.875rem
 }
+:is(#suremails-root-app, #suremails-admin-notice) .leading-8{
+    line-height: 2rem
+}
+:is(#suremails-root-app, #suremails-admin-notice) .leading-9\.5{
+    line-height: 2.375rem
+}
 :is(#suremails-root-app, #suremails-admin-notice) .leading-\[44px\]{
     line-height: 44px
 }
 :is(#suremails-root-app, #suremails-admin-notice) .leading-none{
     line-height: 1
+}
+:is(#suremails-root-app, #suremails-admin-notice) .tracking-2{
+    letter-spacing: 0.125em
 }
 :is(#suremails-root-app, #suremails-admin-notice) .text-background-primary{
     --tw-text-opacity: 1;
@@ -2552,22 +2446,8 @@
 :is(#suremails-root-app, #suremails-admin-notice) .underline{
     text-decoration-line: underline
 }
-:is(#suremails-root-app, #suremails-admin-notice) .overline{
-    text-decoration-line: overline
-}
-:is(#suremails-root-app, #suremails-admin-notice) .line-through{
-    text-decoration-line: line-through
-}
 :is(#suremails-root-app, #suremails-admin-notice) .no-underline{
     text-decoration-line: none
-}
-:is(#suremails-root-app, #suremails-admin-notice) .antialiased{
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale
-}
-:is(#suremails-root-app, #suremails-admin-notice) .subpixel-antialiased{
-    -webkit-font-smoothing: auto;
-    -moz-osx-font-smoothing: auto
 }
 :is(#suremails-root-app, #suremails-admin-notice) .placeholder-text-tertiary::placeholder{
     --tw-placeholder-opacity: 1;
@@ -2635,6 +2515,11 @@
     --tw-shadow-colored: 0 20px 25px -5px var(--tw-shadow-color), 0 8px 10px -6px var(--tw-shadow-color);
     box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
 }
+:is(#suremails-root-app, #suremails-admin-notice) .shadow-xs{
+    --tw-shadow: 0px 1px 2px 0px rgba(16, 24, 40, 0.05);
+    --tw-shadow-colored: 0px 1px 2px 0px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+}
 :is(#suremails-root-app, #suremails-admin-notice) .outline-none{
     outline: 2px solid transparent;
     outline-offset: 2px
@@ -2648,11 +2533,20 @@
 :is(#suremails-root-app, #suremails-admin-notice) .outline-border-disabled{
     outline-color: #E5E7EB
 }
+:is(#suremails-root-app, #suremails-admin-notice) .outline-border-interactive{
+    outline-color: #0D7EE8
+}
 :is(#suremails-root-app, #suremails-admin-notice) .outline-border-subtle{
     outline-color: #E5E7EB
 }
 :is(#suremails-root-app, #suremails-admin-notice) .outline-button-danger{
     outline-color: #DC2626
+}
+:is(#suremails-root-app, #suremails-admin-notice) .outline-button-danger-hover{
+    outline-color: #B91C1C
+}
+:is(#suremails-root-app, #suremails-admin-notice) .outline-button-disabled{
+    outline-color: #F3F4F6
 }
 :is(#suremails-root-app, #suremails-admin-notice) .outline-button-primary{
     outline-color: #0D7EE8
@@ -2687,14 +2581,6 @@
     --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(1px + var(--tw-ring-offset-width)) var(--tw-ring-color);
     box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)
 }
-:is(#suremails-root-app, #suremails-admin-notice) .ring-2{
-    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .ring-inset{
-    --tw-ring-inset: inset
-}
 :is(#suremails-root-app, #suremails-admin-notice) .ring-alert-border-danger{
     --tw-ring-opacity: 1;
     --tw-ring-color: rgb(254 202 202 / var(--tw-ring-opacity, 1))
@@ -2719,10 +2605,6 @@
     --tw-ring-opacity: 1;
     --tw-ring-color: rgb(17 24 39 / var(--tw-ring-opacity, 1))
 }
-:is(#suremails-root-app, #suremails-admin-notice) .ring-border-interactive{
-    --tw-ring-opacity: 1;
-    --tw-ring-color: rgb(13 126 232 / var(--tw-ring-opacity, 1))
-}
 :is(#suremails-root-app, #suremails-admin-notice) .ring-border-subtle{
     --tw-ring-opacity: 1;
     --tw-ring-color: rgb(229 231 235 / var(--tw-ring-opacity, 1))
@@ -2733,6 +2615,10 @@
 :is(#suremails-root-app, #suremails-admin-notice) .ring-brand-primary-600{
     --tw-ring-opacity: 1;
     --tw-ring-color: rgb(37 99 235 / var(--tw-ring-opacity, 1))
+}
+:is(#suremails-root-app, #suremails-admin-notice) .ring-focus{
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(13 126 232 / var(--tw-ring-opacity, 1))
 }
 :is(#suremails-root-app, #suremails-admin-notice) .ring-tab-border{
     --tw-ring-opacity: 1;
@@ -2745,53 +2631,11 @@
     --tw-blur: blur(8px);
     filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)
 }
-:is(#suremails-root-app, #suremails-admin-notice) .drop-shadow{
-    --tw-drop-shadow: drop-shadow(0 1px 2px rgb(0 0 0 / 0.1)) drop-shadow(0 1px 1px rgb(0 0 0 / 0.06));
-    filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .grayscale{
-    --tw-grayscale: grayscale(100%);
-    filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .invert{
-    --tw-invert: invert(100%);
-    filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .sepia{
-    --tw-sepia: sepia(100%);
-    filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)
-}
 :is(#suremails-root-app, #suremails-admin-notice) .filter{
     filter: var(--tw-blur) var(--tw-brightness) var(--tw-contrast) var(--tw-grayscale) var(--tw-hue-rotate) var(--tw-invert) var(--tw-saturate) var(--tw-sepia) var(--tw-drop-shadow)
 }
-:is(#suremails-root-app, #suremails-admin-notice) .backdrop-blur{
-    --tw-backdrop-blur: blur(8px);
-    -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
-    backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .backdrop-grayscale{
-    --tw-backdrop-grayscale: grayscale(100%);
-    -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
-    backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .backdrop-invert{
-    --tw-backdrop-invert: invert(100%);
-    -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
-    backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .backdrop-sepia{
-    --tw-backdrop-sepia: sepia(100%);
-    -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
-    backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)
-}
-:is(#suremails-root-app, #suremails-admin-notice) .backdrop-filter{
-    -webkit-backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia);
-    backdrop-filter: var(--tw-backdrop-blur) var(--tw-backdrop-brightness) var(--tw-backdrop-contrast) var(--tw-backdrop-grayscale) var(--tw-backdrop-hue-rotate) var(--tw-backdrop-invert) var(--tw-backdrop-opacity) var(--tw-backdrop-saturate) var(--tw-backdrop-sepia)
-}
 :is(#suremails-root-app, #suremails-admin-notice) .transition{
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, -webkit-backdrop-filter;
     transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter;
-    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke, opacity, box-shadow, transform, filter, backdrop-filter, -webkit-backdrop-filter;
     transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
     transition-duration: 150ms
 }
@@ -2856,9 +2700,6 @@
 :is(#suremails-root-app, #suremails-admin-notice) .ease-linear{
     transition-timing-function: linear
 }
-:is(#suremails-root-app, #suremails-admin-notice) .ease-out{
-    transition-timing-function: cubic-bezier(0, 0, 0.2, 1)
-}
 :is(#suremails-root-app, #suremails-admin-notice)  h1,:is(
 	:is(#suremails-root-app, #suremails-admin-notice) h2),:is(
 	:is(#suremails-root-app, #suremails-admin-notice) h3),:is(
@@ -2917,6 +2758,9 @@
 :is(#suremails-root-app, #suremails-admin-notice) .\[grid-area\:1\/1\/2\/3\]{
     grid-area: 1/1/2/3
 }
+:is(#suremails-root-app, #suremails-admin-notice) .\[word-break\:break-word\]{
+    word-break: break-word
+}
 
 #suremails-admin-notice{
     overflow: hidden;
@@ -2962,11 +2806,6 @@
 :is(#suremails-root-app, #suremails-admin-notice) .before\:absolute::before{
     content: var(--tw-content);
     position: absolute
-}
-
-:is(#suremails-root-app, #suremails-admin-notice) .before\:left-2\/4::before{
-    content: var(--tw-content);
-    left: 50%
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) .before\:top-2\/4::before{
@@ -3037,6 +2876,11 @@
 :is(#suremails-root-app, #suremails-admin-notice) .after\:bottom-0::after{
     content: var(--tw-content);
     bottom: 0px
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) .after\:ml-0::after{
+    content: var(--tw-content);
+    margin-left: 0px
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) .after\:ml-0\.5::after{
@@ -3384,6 +3228,10 @@
     outline-color: #E5E7EB
 }
 
+:is(#suremails-root-app, #suremails-admin-notice) .hover\:outline-border-interactive:hover{
+    outline-color: #0D7EE8
+}
+
 :is(#suremails-root-app, #suremails-admin-notice) .hover\:outline-border-strong:hover{
     outline-color: #6B7280
 }
@@ -3412,17 +3260,6 @@
     outline-color: #F3F4F6
 }
 
-:is(#suremails-root-app, #suremails-admin-notice) .hover\:ring-2:hover{
-    --tw-ring-offset-shadow: var(--tw-ring-inset) 0 0 0 var(--tw-ring-offset-width) var(--tw-ring-offset-color);
-    --tw-ring-shadow: var(--tw-ring-inset) 0 0 0 calc(2px + var(--tw-ring-offset-width)) var(--tw-ring-color);
-    box-shadow: var(--tw-ring-offset-shadow), var(--tw-ring-shadow), var(--tw-shadow, 0 0 #0000)
-}
-
-:is(#suremails-root-app, #suremails-admin-notice) .hover\:ring-border-interactive:hover{
-    --tw-ring-opacity: 1;
-    --tw-ring-color: rgb(13 126 232 / var(--tw-ring-opacity, 1))
-}
-
 :is(#suremails-root-app, #suremails-admin-notice) .hover\:before\:opacity-10:hover::before{
     content: var(--tw-content);
     opacity: 0.1
@@ -3441,6 +3278,10 @@
 :is(#suremails-root-app, #suremails-admin-notice) .focus-within\:hover\:border-focus-border:hover:focus-within{
     --tw-border-opacity: 1;
     border-color: rgb(191 219 254 / var(--tw-border-opacity, 1))
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) .focus-within\:hover\:outline-focus-border:hover:focus-within{
+    outline-color: #BFDBFE
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) .hover\:focus-within\:outline-focus-border:focus-within:hover{
@@ -3551,6 +3392,11 @@
     --tw-ring-color: rgb(13 126 232 / var(--tw-ring-opacity, 1))
 }
 
+:is(#suremails-root-app, #suremails-admin-notice) .focus\:ring-focus-error:focus{
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(220 38 38 / var(--tw-ring-opacity, 1))
+}
+
 :is(#suremails-root-app, #suremails-admin-notice) .focus\:ring-toggle-on:focus{
     --tw-ring-opacity: 1;
     --tw-ring-color: rgb(13 126 232 / var(--tw-ring-opacity, 1))
@@ -3634,6 +3480,18 @@
     color: rgb(209 213 219 / var(--tw-text-opacity, 1))
 }
 
+:is(#suremails-root-app, #suremails-admin-notice) .disabled\:shadow-none:disabled{
+    --tw-shadow: 0 0 #0000;
+    --tw-shadow-colored: 0 0 #0000;
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) .disabled\:shadow-toggle-disabled:disabled{
+    --tw-shadow: 1px 1px 2px 0px rgba(0, 0, 0, 0.1) inset;
+    --tw-shadow-colored: inset 1px 1px 2px 0px var(--tw-shadow-color);
+    box-shadow: var(--tw-ring-offset-shadow, 0 0 #0000), var(--tw-ring-shadow, 0 0 #0000), var(--tw-shadow)
+}
+
 :is(#suremails-root-app, #suremails-admin-notice) .disabled\:outline-border-disabled:disabled{
     outline-color: #E5E7EB
 }
@@ -3661,8 +3519,9 @@
     background-color: rgb(255 255 255 / var(--tw-bg-opacity, 1))
 }
 
-:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:focus-within .group-focus-within\/switch\:left-0\.5){
-    left: 0.125rem
+:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:focus-within .group-focus-within\/switch\:size-3\.25){
+    width: 0.8125rem;
+    height: 0.8125rem
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:focus-within .group-focus-within\/switch\:size-4){
@@ -3680,8 +3539,13 @@
     color: rgb(17 24 39 / var(--tw-text-opacity, 1))
 }
 
-:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:hover .group-hover\/switch\:left-0\.5){
-    left: 0.125rem
+:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:hover .group-hover\/switch\:right-0\.5){
+    right: 0.125rem
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:hover .group-hover\/switch\:size-3\.25){
+    width: 0.8125rem;
+    height: 0.8125rem
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:hover .group-hover\/switch\:size-4){
@@ -3692,6 +3556,11 @@
 :is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:hover .group-hover\/switch\:size-5){
     width: 1.25rem;
     height: 1.25rem
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:hover .group-hover\/switch\:border-toggle-on-border){
+    --tw-border-opacity: 1;
+    border-color: rgb(59 130 246 / var(--tw-border-opacity, 1))
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:hover .group-hover\/switch\:bg-toggle-off-hover){
@@ -3705,16 +3574,6 @@
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) :is(.group:hover .group-hover\:text-icon-primary){
-    --tw-text-opacity: 1;
-    color: rgb(17 24 39 / var(--tw-text-opacity, 1))
-}
-
-:is(#suremails-root-app, #suremails-admin-notice) :is(.group:hover .group-hover\:text-text-disabled){
-    --tw-text-opacity: 1;
-    color: rgb(209 213 219 / var(--tw-text-opacity, 1))
-}
-
-:is(#suremails-root-app, #suremails-admin-notice) :is(.group:hover .group-hover\:text-text-primary){
     --tw-text-opacity: 1;
     color: rgb(17 24 39 / var(--tw-text-opacity, 1))
 }
@@ -3739,6 +3598,16 @@
     color: rgb(209 213 219 / var(--tw-text-opacity, 1))
 }
 
+:is(#suremails-root-app, #suremails-admin-notice) :is(.peer:checked ~ .peer-checked\:translate-x-3){
+    --tw-translate-x: 0.75rem;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.peer:checked ~ .peer-checked\:translate-x-3\.75){
+    --tw-translate-x: 0.9375rem;
+    transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
+}
+
 :is(#suremails-root-app, #suremails-admin-notice) :is(.peer:checked ~ .peer-checked\:translate-x-5){
     --tw-translate-x: 1.25rem;
     transform: translate(var(--tw-translate-x), var(--tw-translate-y)) rotate(var(--tw-rotate)) skewX(var(--tw-skew-x)) skewY(var(--tw-skew-y)) scaleX(var(--tw-scale-x)) scaleY(var(--tw-scale-y))
@@ -3755,6 +3624,27 @@
 :is(#suremails-root-app, #suremails-admin-notice) :is(.peer:disabled ~ .peer-disabled\:text-border-disabled){
     --tw-text-opacity: 1;
     color: rgb(229 231 235 / var(--tw-text-opacity, 1))
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) .not-rtl\:left-1:not([dir="rtl"], [dir="rtl"] *){
+    left: 0.25rem
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) .not-rtl\:left-2\/4:not([dir="rtl"], [dir="rtl"] *){
+    left: 50%
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) .not-rtl\:before\:left-2\/4:not([dir="rtl"], [dir="rtl"] *)::before{
+    content: var(--tw-content);
+    left: 50%
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:focus-within .not-rtl\:group-focus-within\/switch\:left-0\.5:not([dir="rtl"], [dir="rtl"] *)){
+    left: 0.125rem
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:hover .not-rtl\:group-hover\/switch\:left-0\.5:not([dir="rtl"], [dir="rtl"] *)){
+    left: 0.125rem
 }
 
 @media (min-width: 640px){
@@ -3880,6 +3770,12 @@
     }
     :is(#suremails-root-app, #suremails-admin-notice) .md\:col-start-9{
         grid-column-start: 9
+    }
+    :is(#suremails-root-app, #suremails-admin-notice) .md\:block{
+        display: block
+    }
+    :is(#suremails-root-app, #suremails-admin-notice) .md\:min-h-\[calc\(100dvh_-_32px\)\]{
+        min-height: calc(100dvh - 32px)
     }
     :is(#suremails-root-app, #suremails-admin-notice) .md\:min-h-\[calc\(100dvh_-_96px\)\]{
         min-height: calc(100dvh - 96px)
@@ -4255,6 +4151,9 @@
     :is(#suremails-root-app, #suremails-admin-notice) .lg\:hidden{
         display: none
     }
+    :is(#suremails-root-app, #suremails-admin-notice) .lg\:min-h-\[calc\(100vh_-_32px\)\]{
+        min-height: calc(100vh - 32px)
+    }
     :is(#suremails-root-app, #suremails-admin-notice) .lg\:min-h-\[calc\(100vh_-_96px\)\]{
         min-height: calc(100vh - 96px)
     }
@@ -4512,6 +4411,31 @@
     }
 }
 
+:is(#suremails-root-app, #suremails-admin-notice) .rtl\:right-1:where([dir="rtl"], [dir="rtl"] *){
+    right: 0.25rem
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) .rtl\:right-2\/4:where([dir="rtl"], [dir="rtl"] *){
+    right: 50%
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) .rtl\:before\:right-2\/4:where([dir="rtl"], [dir="rtl"] *)::before{
+    content: var(--tw-content);
+    right: 50%
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:focus-within .rtl\:group-focus-within\/switch\:right-0\.5:where([dir="rtl"], [dir="rtl"] *)){
+    right: 0.125rem
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:hover .rtl\:group-hover\/switch\:right-0:where([dir="rtl"], [dir="rtl"] *)){
+    right: 0px
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.group\/switch:hover .rtl\:group-hover\/switch\:right-0\.5:where([dir="rtl"], [dir="rtl"] *)){
+    right: 0.125rem
+}
+
 :is(#suremails-root-app, #suremails-admin-notice) .\[\&\:hover\:has\(\:disabled\)\]\:outline-field-border-disabled:hover:has(:disabled){
     outline-color: #F3F4F6
 }
@@ -4611,6 +4535,16 @@
 
 :is(#suremails-root-app, #suremails-admin-notice) :is(.\[\&\>input\]\:min-h-8>input){
     min-height: 2rem
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.\[\&\>label_p\]\:w-4\/5>label p){
+    width: 80%
+}
+
+:is(#suremails-root-app, #suremails-admin-notice) :is(.\[\&\>label_p\]\:truncate>label p){
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap
 }
 
 :is(#suremails-root-app, #suremails-admin-notice) :is(.\[\&\>li\]\:pointer-events-auto>li){

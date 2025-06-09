@@ -47,9 +47,14 @@ export const Chart = ( {
 			setFailed( 0 );
 			setDataToShow( [] );
 		} else {
-			const sortedChartData = [ ...chartData ].sort(
-				( a, b ) => new Date( a.created_at ) - new Date( b.created_at )
-			);
+			const sortedChartData = [ ...chartData ]
+				.filter(
+					( data ) => ! isNaN( new Date( data.created_at ).getTime() )
+				)
+				.sort(
+					( a, b ) =>
+						new Date( a.created_at ) - new Date( b.created_at )
+				);
 
 			const formattedInitialChartData = sortedChartData.map(
 				( data ) => ( {
@@ -69,17 +74,18 @@ export const Chart = ( {
 
 	// Function to fetch chart data based on selected dates
 	const fetchChartData = async ( dates ) => {
-		if ( ! dates.from ) {
+		if ( ! dates.from || isNaN( dates.from.getTime() ) ) {
+			setSent( 0 );
+			setFailed( 0 );
+			setDataToShow( [] );
 			return;
 		}
 
-		const formattedStartDate = format(
-			new Date( dates.from ),
-			'yyyy/MM/dd'
-		);
-		const formattedEndDate = dates.to
-			? format( new Date( dates.to ), 'yyyy/MM/dd' )
-			: formattedStartDate;
+		const formattedStartDate = format( dates.from, 'yyyy/MM/dd' );
+		const formattedEndDate =
+			dates.to && ! isNaN( dates.to.getTime() )
+				? format( dates.to, 'yyyy/MM/dd' )
+				: formattedStartDate;
 
 		try {
 			const response = await apiFetch( {
@@ -96,10 +102,15 @@ export const Chart = ( {
 			} );
 
 			if ( response.success ) {
-				const sortedNewChartData = [ ...response.data.chart_data ].sort(
-					( a, b ) =>
-						new Date( a.created_at ) - new Date( b.created_at )
-				);
+				const sortedNewChartData = [ ...response.data.chart_data ]
+					.filter(
+						( data ) =>
+							! isNaN( new Date( data.created_at ).getTime() )
+					) // Filter invalid dates
+					.sort(
+						( a, b ) =>
+							new Date( a.created_at ) - new Date( b.created_at )
+					);
 
 				const newChartData = sortedNewChartData.map( ( data ) => ( {
 					month: format(
@@ -127,7 +138,7 @@ export const Chart = ( {
 
 	// Effect to fetch chart data when selectedDates change
 	useEffect( () => {
-		if ( selectedDates.from ) {
+		if ( selectedDates.from && ! isNaN( selectedDates.from.getTime() ) ) {
 			fetchChartData( selectedDates );
 		}
 	}, [ selectedDates.from, selectedDates.to ] );
@@ -140,9 +151,14 @@ export const Chart = ( {
 		const dashboardData = queryClient.getQueryData( [ 'dashboard-data' ] );
 
 		if ( dashboardData ) {
-			const sortedChartData = [ ...dashboardData.chart_data ].sort(
-				( a, b ) => new Date( a.created_at ) - new Date( b.created_at )
-			);
+			const sortedChartData = [ ...dashboardData.chart_data ]
+				.filter(
+					( data ) => ! isNaN( new Date( data.created_at ).getTime() )
+				) // Filter invalid dates
+				.sort(
+					( a, b ) =>
+						new Date( a.created_at ) - new Date( b.created_at )
+				);
 
 			const formattedDefaultChartData = sortedChartData.map(
 				( data ) => ( {
@@ -159,7 +175,7 @@ export const Chart = ( {
 			setSent( dashboardData.total_sent || 0 );
 			setFailed( dashboardData.total_failed || 0 );
 		} else {
-			// If 'dashboard-data' is not available, reset to empty or default state
+			// If 'dashboard-data' is not available, reset to empty state
 			setSent( 0 );
 			setFailed( 0 );
 			setDataToShow( [] );
@@ -174,14 +190,26 @@ export const Chart = ( {
 			const fromDate = new Date( from );
 			const toDate = new Date( to );
 
+			if ( isNaN( fromDate.getTime() ) || isNaN( toDate.getTime() ) ) {
+				setSelectedDates( { from: null, to: null } );
+				setIsDatePickerOpen( false );
+				return;
+			}
+
 			if ( fromDate > toDate ) {
 				// Swap the dates to ensure 'from' is earlier than 'to'
-				setSelectedDates( { from: to, to: from } );
+				setSelectedDates( { from: toDate, to: fromDate } );
 			} else {
-				setSelectedDates( dates );
+				setSelectedDates( { from: fromDate, to: toDate } );
 			}
 		} else if ( from && ! to ) {
-			setSelectedDates( { from, to: from } );
+			const fromDate = new Date( from );
+			if ( isNaN( fromDate.getTime() ) ) {
+				setSelectedDates( { from: null, to: null } );
+				setIsDatePickerOpen( false );
+				return;
+			}
+			setSelectedDates( { from: fromDate, to: fromDate } );
 		} else {
 			setSelectedDates( { from: null, to: null } );
 		}
@@ -225,7 +253,11 @@ export const Chart = ( {
 			className="w-full h-full p-4 rounded-xl bg-background-primary border-border-subtle border-0.5"
 		>
 			<Container.Item className="flex items-center justify-between w-full p-1">
-				<Title title={ __( 'Overview', 'suremails' ) } tag="h3" />
+				<Title
+					title={ __( 'Overview', 'suremails' ) }
+					tag="h3"
+					size="xs"
+				/>
 
 				<div className="flex items-center gap-2">
 					{ selectedDates.from || selectedDates.to ? (

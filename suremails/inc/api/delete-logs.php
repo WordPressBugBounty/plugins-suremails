@@ -90,7 +90,7 @@ class DeleteLogs extends Api_Base {
 			return new WP_REST_Response(
 				[
 					'success' => false,
-					'message' => 'Failed to retrieve logs to delete.',
+					'message' => __( 'Failed to retrieve logs to delete.', 'suremails' ),
 				],
 				500
 			);
@@ -138,7 +138,7 @@ class DeleteLogs extends Api_Base {
 			return new WP_REST_Response(
 				[
 					'success' => false,
-					'message' => 'Failed to delete the provided log IDs.',
+					'message' => __( 'Failed to delete the provided log IDs.', 'suremails' ),
 				],
 				500
 			);
@@ -146,10 +146,19 @@ class DeleteLogs extends Api_Base {
 
 		// Construct the success message.
 		if ( count( $log_ids ) === $deleted_count ) {
-			$message = "{$deleted_count} log(s) deleted successfully.";
+			$message = sprintf(
+				// Translators: %d is the number of logs deleted.
+				__( '%d log(s) deleted successfully.', 'suremails' ),
+				$deleted_count
+			);
 		} else {
 			$remaining = count( $log_ids ) - $deleted_count;
-			$message   = "{$deleted_count} log(s) deleted successfully. {$remaining} log(s) could not be deleted.";
+			$message   = sprintf(
+				// Translators: %1$d is the number of logs deleted, %2$d is the number of logs that could not be deleted.
+				__( '%1$d log(s) deleted successfully. %2$d log(s) could not be deleted.', 'suremails' ),
+				$deleted_count,
+				$remaining
+			);
 		}
 
 		// Return the response.

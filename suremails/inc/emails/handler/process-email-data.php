@@ -617,7 +617,8 @@ class ProcessEmailData {
 
 		} catch ( Exception $e ) {
 			// Handle exceptions during PHPMailer setup.
-			LogError::instance()->log_error( 'PHPMailer Exception: ' . $e->getMessage() );
+			// translators: %s is the error message.
+			LogError::instance()->log_error( sprintf( __( 'PHPMailer Exception: %s', 'suremails' ), $e->getMessage() ) );
 			do_action( 'wp_mail_failed', new \WP_Error( 'phpmailer_exception', $e->getMessage(), $mail_data ) );
 		}
 

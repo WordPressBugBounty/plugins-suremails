@@ -48,6 +48,7 @@ const RecentLogs = ( { recentLogs, hasConnections = true } ) => {
 				<Title
 					title={ __( 'Recent Email Logs', 'suremails' ) }
 					tag="h3"
+					size="xs"
 				/>
 				{ recentLogs.length > 0 && (
 					<Button
