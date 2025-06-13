@@ -119,10 +119,11 @@ class Loader {
 		$srml_bsf_analytics->set_entity(
 			[
 				'suremails' => [
-					'product_name'    => 'SureMail',
-					'path'            => SUREMAILS_DIR . 'inc/lib/bsf-analytics',
-					'author'          => 'SureMail',
-					'time_to_display' => '+24 hours',
+					'product_name'        => 'SureMail',
+					'path'                => SUREMAILS_DIR . 'inc/lib/bsf-analytics',
+					'author'              => 'SureMail',
+					'time_to_display'     => '+24 hours',
+					'hide_optin_checkbox' => true,
 				],
 			]
 		);

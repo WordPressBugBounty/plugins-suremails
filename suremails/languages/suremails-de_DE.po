@@ -16,7 +16,6 @@ msgstr ""
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: suremails.php
-#: inc/admin/plugin.php:189
 #: inc/nps-notice.php:87
 msgid "SureMail"
 msgstr "SureMail"
@@ -36,11 +35,11 @@ msgstr "WordPress-E-Mails gehen oft verloren oder landen im Spam, weil Webhostin
 msgid "https://suremails.com/"
 msgstr "https://suremails.com/"
 
-#: inc/admin/plugin.php:188
+#: inc/admin/plugin.php:189
 msgid "SureMail Settings"
 msgstr "SureMail-Einstellungen"
 
-#: inc/admin/plugin.php:291
+#: inc/admin/plugin.php:293
 #: build/main.js:2
 msgid "Settings"
 msgstr "Einstellungen"
@@ -168,23 +167,19 @@ msgstr "E-Mail erfolgreich gesendet."
 msgid "Failed to send test email"
 msgstr "Test-E-Mail konnte nicht gesendet werden"
 
-#: inc/api/set-settings.php:80
+#: inc/api/set-settings.php:85
 msgid "Settings data is missing or invalid."
 msgstr "Einstellungsdaten fehlen oder sind ungültig."
 
-#: inc/api/set-settings.php:99
+#: inc/api/set-settings.php:104
 msgid "Invalid or missing default connection data."
 msgstr "Ungültige oder fehlende Standardverbindungsdaten."
 
-#: inc/api/set-settings.php:157
+#: inc/api/set-settings.php:169
 msgid "Settings updated successfully."
 msgstr "Einstellungen erfolgreich aktualisiert."
 
-#: inc/api/set-settings.php:166
-msgid "Failed to update settings."
-msgstr "Aktualisierung der Einstellungen fehlgeschlagen."
-
-#: inc/api/set-settings.php:177
+#: inc/api/set-settings.php:180
 msgid "No changes made to the settings."
 msgstr "Es wurden keine Änderungen an den Einstellungen vorgenommen."
 
@@ -2460,7 +2455,7 @@ msgstr "Fehler beim erneuten Senden der E-Mail."
 msgid "Failed to get email template."
 msgstr "Fehler beim Abrufen der E-Mail-Vorlage."
 
-#: inc/api/set-settings.php:59
+#: inc/api/set-settings.php:64
 msgid "Settings data to update."
 msgstr "Einstellungsdaten zum Aktualisieren."
 
@@ -2663,3 +2658,31 @@ msgstr "Benachrichtigung für 15 Tage deaktiviert."
 #: build/main.js:2
 msgid "Let's get started"
 msgstr "Lass uns anfangen"
+
+#: inc/admin/plugin.php:190
+msgid "SureMail SMTP"
+msgstr "SureMail SMTP"
+
+#: inc/admin/plugin.php:296
+msgid "Setup Wizard"
+msgstr "Setup-Assistent"
+
+#: build/main.js:2
+msgid "Enable Anonymous Analytics"
+msgstr "Anonyme Analysen aktivieren"
+
+#: build/main.js:2
+msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
+msgstr "Sammeln Sie nicht sensible Informationen von Ihrer Website, wie z. B. die PHP-Version und verwendete Funktionen, um uns zu helfen, Fehler schneller zu beheben, klügere Entscheidungen zu treffen und Funktionen zu entwickeln, die für Sie wirklich wichtig sind. "
+
+#: build/main.js:2
+msgid "Learn More"
+msgstr "Mehr erfahren"
+
+#: build/main.js:2
+msgid "Complete previous steps first"
+msgstr "Zuerst die vorherigen Schritte abschließen"
+
+#: build/main.js:2
+msgid "You need to complete the previous steps before accessing this step."
+msgstr "Sie müssen die vorherigen Schritte abschließen, bevor Sie auf diesen Schritt zugreifen können."

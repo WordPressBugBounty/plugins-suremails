@@ -5,7 +5,7 @@ Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.7.0
+Stable tag: 1.7.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -240,6 +240,8 @@ Yes, SureMail uses secure encryption methods like TLS/SSL to protect your email 
 5. Email Logs – Monitor your email activity with detailed logs to track successful, failed, in progress, and blocked emails easily.
 
 == Changelog ==
+v1.7.1 - 13-June-2025
+- Improvements: Improved the UI for a better user experience.
 
 v1.7.0 - 09-June-2025
 - New: Introduced an Onboarding process to help users get started quickly.

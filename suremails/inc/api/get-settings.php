@@ -65,6 +65,8 @@ class GetSettings extends Api_Base {
 
 		$options = Settings::instance()->get_settings();
 
+		$options['analytics'] = get_option( SetSettings::SUREMAILS_ANALYTICS, 'no' );
+
 		return new WP_REST_Response(
 			[
 				'success' => true,

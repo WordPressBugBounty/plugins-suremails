@@ -16,7 +16,6 @@ msgstr ""
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: suremails.php
-#: inc/admin/plugin.php:189
 #: inc/nps-notice.php:87
 msgid "SureMail"
 msgstr "SureMail"
@@ -36,11 +35,11 @@ msgstr "Os e-mails do WordPress frequentemente desaparecem ou vão para o spam p
 msgid "https://suremails.com/"
 msgstr "https://suremails.com/"
 
-#: inc/admin/plugin.php:188
+#: inc/admin/plugin.php:189
 msgid "SureMail Settings"
 msgstr "Configurações do SureMail"
 
-#: inc/admin/plugin.php:291
+#: inc/admin/plugin.php:293
 #: build/main.js:2
 msgid "Settings"
 msgstr "Configurações"
@@ -168,23 +167,19 @@ msgstr "E-mail enviado com sucesso."
 msgid "Failed to send test email"
 msgstr "Falha ao enviar e-mail de teste"
 
-#: inc/api/set-settings.php:80
+#: inc/api/set-settings.php:85
 msgid "Settings data is missing or invalid."
 msgstr "Os dados das configurações estão ausentes ou inválidos."
 
-#: inc/api/set-settings.php:99
+#: inc/api/set-settings.php:104
 msgid "Invalid or missing default connection data."
 msgstr "Dados de conexão padrão inválidos ou ausentes."
 
-#: inc/api/set-settings.php:157
+#: inc/api/set-settings.php:169
 msgid "Settings updated successfully."
 msgstr "Configurações atualizadas com sucesso."
 
-#: inc/api/set-settings.php:166
-msgid "Failed to update settings."
-msgstr "Falha ao atualizar as configurações."
-
-#: inc/api/set-settings.php:177
+#: inc/api/set-settings.php:180
 msgid "No changes made to the settings."
 msgstr "Nenhuma alteração feita nas configurações."
 
@@ -2460,7 +2455,7 @@ msgstr "Falha ao reenviar email."
 msgid "Failed to get email template."
 msgstr "Falha ao obter modelo de email."
 
-#: inc/api/set-settings.php:59
+#: inc/api/set-settings.php:64
 msgid "Settings data to update."
 msgstr "Dados de configurações a serem atualizados."
 
@@ -2663,3 +2658,31 @@ msgstr "Aviso desativado por 15 dias."
 #: build/main.js:2
 msgid "Let's get started"
 msgstr "Vamos começar"
+
+#: inc/admin/plugin.php:190
+msgid "SureMail SMTP"
+msgstr "SureMail SMTP"
+
+#: inc/admin/plugin.php:296
+msgid "Setup Wizard"
+msgstr "Assistente de Configuração"
+
+#: build/main.js:2
+msgid "Enable Anonymous Analytics"
+msgstr "Ativar Análise Anônima"
+
+#: build/main.js:2
+msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
+msgstr "Coletar informações não sensíveis do seu site, como a versão do PHP e recursos usados, para nos ajudar a corrigir bugs mais rapidamente, tomar decisões mais inteligentes e criar recursos que realmente importam para você. "
+
+#: build/main.js:2
+msgid "Learn More"
+msgstr "Saiba Mais"
+
+#: build/main.js:2
+msgid "Complete previous steps first"
+msgstr "Complete os passos anteriores primeiro"
+
+#: build/main.js:2
+msgid "You need to complete the previous steps before accessing this step."
+msgstr "Você precisa completar os passos anteriores antes de acessar esta etapa."

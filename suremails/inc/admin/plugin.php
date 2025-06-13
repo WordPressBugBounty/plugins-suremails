@@ -37,7 +37,7 @@ class Plugin {
 		add_action( 'admin_notices', [ $this, 'check_configuration' ] );
 
 		// Add settings link to the plugin action links.
-		add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), [ $this, 'add_settings_link' ] );
+		add_filter( 'plugin_action_links_' . SUREMAILS_BASE, [ $this, 'add_settings_link' ] );
 	}
 
 	/**
@@ -169,8 +169,9 @@ class Plugin {
 			'suremails-admin-notice',
 			'suremailsNotice',
 			[
-				'dashboardUrl' => esc_url( admin_url( 'options-general.php?page=' . SUREMAILS . '#/dashboard' ) ),
-				'nonce'        => wp_create_nonce( 'wp_rest' ),
+				'dashboardUrl'  => esc_url( admin_url( 'options-general.php?page=' . SUREMAILS . '#/dashboard' ) ),
+				'nonce'         => wp_create_nonce( 'wp_rest' ),
+				'onboardingURL' => admin_url( 'options-general.php?page=' . SUREMAILS . '#/onboarding/welcome' ),
 			]
 		);
 
@@ -186,7 +187,7 @@ class Plugin {
 	public function add_admin_menu() {
 		add_options_page(
 			__( 'SureMail Settings', 'suremails' ),
-			__( 'SureMail', 'suremails' ),
+			__( 'SureMail SMTP', 'suremails' ),
 			'manage_options',
 			SUREMAILS,
 			[ $this, 'render_suremails_frontend' ]
@@ -281,15 +282,18 @@ class Plugin {
 	}
 
 	/**
-	 * Add a "Settings" link on the Plugins page.
+	 * Add a "Settings" and a "Setup Wizard" link on the Plugins page.
 	 *
 	 * @param array $links Existing plugin action links.
-	 * @return array Updated plugin action links with the "Settings" link.
+	 * @return array Updated plugin action links.
 	 */
 	public function add_settings_link( array $links ) {
-		$url           = admin_url( 'options-general.php?page=' . SUREMAILS );
-		$settings_link = '<a href="' . esc_url( $url ) . '">' . __( 'Settings', 'suremails' ) . '</a>';
-		$links[]       = $settings_link;
+
+		$settings_url = admin_url( 'options-general.php?page=' . SUREMAILS . '#settings' );
+		$links[]      = '<a href="' . esc_url( $settings_url ) . '">' . __( 'Settings', 'suremails' ) . '</a>';
+
+		$wizard_url = admin_url( 'options-general.php?page=' . SUREMAILS . '#/onboarding/welcome' );
+		$links[]    = '<a href="' . esc_url( $wizard_url ) . '">' . __( 'Setup Wizard', 'suremails' ) . '</a>';
 
 		return $links;
 	}

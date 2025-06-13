@@ -14,7 +14,7 @@ import './styles.css';
 /* global sessionStorage */
 
 const NavBar = () => {
-	const { getCurrentStepNumber } = useOnboardingNavigation();
+	const { getCurrentStepNumber, navigateToStep } = useOnboardingNavigation();
 
 	return (
 		<Topbar className="p-5 bg-background-secondary">
@@ -33,7 +33,12 @@ const NavBar = () => {
 						variant="number"
 					>
 						{ Array.from( { length: 4 }, ( _, index ) => (
-							<ProgressSteps.Step key={ index } size="md" />
+							<ProgressSteps.Step
+								key={ index }
+								size="md"
+								onClick={ () => navigateToStep( index + 1 ) }
+								className="cursor-pointer hover:bg-background-secondary transition-colors duration-200"
+							/>
 						) ) }
 					</ProgressSteps>
 				</Topbar.Item>

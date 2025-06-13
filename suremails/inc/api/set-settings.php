@@ -29,6 +29,11 @@ class SetSettings extends Api_Base {
 	use Instance;
 
 	/**
+	 * Option name for storing SureMails connections.
+	 */
+	public const SUREMAILS_ANALYTICS = 'suremails_analytics_optin';
+
+	/**
 	 * Route base.
 	 *
 	 * @var string
@@ -146,11 +151,18 @@ class SetSettings extends Api_Base {
 			}
 		}
 
+		if ( isset( $settings['analytics'] ) && ! empty( $settings['analytics'] ) ) {
+			$analytics = $settings['analytics'];
+
+			update_option( self::SUREMAILS_ANALYTICS, $analytics );
+			$is_updated = true;
+		}
+
 		// Update the option in the database if any changes were made.
 		if ( $is_updated ) {
-			$update_result = update_option( SUREMAILS_CONNECTIONS, $options );
+			$update_result        = update_option( SUREMAILS_CONNECTIONS, $options );
+			$options['analytics'] = $analytics ?? get_option( self::SUREMAILS_ANALYTICS, 'no' );
 
-			if ( $update_result !== false ) {
 				return new WP_REST_Response(
 					[
 						'success' => true,
@@ -158,15 +170,6 @@ class SetSettings extends Api_Base {
 						'data'    => $options,
 					],
 					200
-				);
-			}
-				return new WP_REST_Response(
-					[
-						'success' => false,
-						'message' => __( 'Failed to update settings.', 'suremails' ),
-						'data'    => $options,
-					],
-					500
 				);
 
 		}

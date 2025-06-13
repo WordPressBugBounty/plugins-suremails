@@ -2,14 +2,14 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: SureMail 1.7.0\n"
+"Project-Id-Version: SureMail 1.7.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/suremails\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"POT-Creation-Date: 2025-06-09T05:59:25+00:00\n"
+"POT-Creation-Date: 2025-06-13T09:51:36+00:00\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "X-Generator: WP-CLI 2.11.0\n"
 "X-Domain: suremails\n"
@@ -17,7 +17,6 @@ msgstr ""
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: suremails.php
-#: inc/admin/plugin.php:189
 #: inc/nps-notice.php:87
 msgid "SureMail"
 msgstr ""
@@ -37,13 +36,21 @@ msgstr ""
 msgid "https://suremails.com/"
 msgstr ""
 
-#: inc/admin/plugin.php:188
+#: inc/admin/plugin.php:189
 msgid "SureMail Settings"
 msgstr ""
 
-#: inc/admin/plugin.php:291
+#: inc/admin/plugin.php:190
+msgid "SureMail SMTP"
+msgstr ""
+
+#: inc/admin/plugin.php:293
 #: build/main.js:2
 msgid "Settings"
+msgstr ""
+
+#: inc/admin/plugin.php:296
+msgid "Setup Wizard"
 msgstr ""
 
 #: inc/ajax/ajax.php:43
@@ -224,27 +231,23 @@ msgstr ""
 msgid "Failed to send test email"
 msgstr ""
 
-#: inc/api/set-settings.php:59
+#: inc/api/set-settings.php:64
 msgid "Settings data to update."
 msgstr ""
 
-#: inc/api/set-settings.php:80
+#: inc/api/set-settings.php:85
 msgid "Settings data is missing or invalid."
 msgstr ""
 
-#: inc/api/set-settings.php:99
+#: inc/api/set-settings.php:104
 msgid "Invalid or missing default connection data."
 msgstr ""
 
-#: inc/api/set-settings.php:157
+#: inc/api/set-settings.php:169
 msgid "Settings updated successfully."
 msgstr ""
 
-#: inc/api/set-settings.php:166
-msgid "Failed to update settings."
-msgstr ""
-
-#: inc/api/set-settings.php:177
+#: inc/api/set-settings.php:180
 msgid "No changes made to the settings."
 msgstr ""
 
@@ -2491,6 +2494,26 @@ msgstr ""
 
 #: build/main.js:2
 msgid "Disable sending all emails. If you enable this, no email will be sent but the email logs will be recorded here."
+msgstr ""
+
+#: build/main.js:2
+msgid "Enable Anonymous Analytics"
+msgstr ""
+
+#: build/main.js:2
+msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
+msgstr ""
+
+#: build/main.js:2
+msgid "Learn More"
+msgstr ""
+
+#: build/main.js:2
+msgid "Complete previous steps first"
+msgstr ""
+
+#: build/main.js:2
+msgid "You need to complete the previous steps before accessing this step."
 msgstr ""
 
 #: build/main.js:2

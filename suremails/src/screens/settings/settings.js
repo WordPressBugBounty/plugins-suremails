@@ -60,6 +60,7 @@ const Settings = () => {
 			connection_title: '',
 		},
 		emailSimulation: false,
+		analytics: false,
 	} );
 
 	useLayoutEffect( () => {
@@ -80,6 +81,7 @@ const Settings = () => {
 						'',
 				},
 				emailSimulation: settingsData.email_simulation === 'yes',
+				analytics: settingsData.analytics === 'yes',
 			} );
 		}
 	}, [ settingsData ] );
@@ -109,7 +111,8 @@ const Settings = () => {
 			formState.defaultConnection.id !==
 				settingsData?.default_connection?.id ||
 			formState.emailSimulation !==
-				( settingsData?.email_simulation === 'yes' )
+				( settingsData?.email_simulation === 'yes' ) ||
+			formState.analytics !== ( settingsData?.analytics === 'yes' )
 		);
 	};
 
@@ -124,6 +127,7 @@ const Settings = () => {
 				delete_email_logs_after: formState.deleteEmailLogsAfter,
 				email_simulation: formState.emailSimulation ? 'yes' : 'no',
 				log_emails: formState.logEmails ? 'yes' : 'no',
+				analytics: formState.analytics ? 'yes' : 'no',
 				default_connection: formState.defaultConnection.email
 					? formState.defaultConnection
 					: {
@@ -350,6 +354,39 @@ const Settings = () => {
 								description: __(
 									'Disable sending all emails. If you enable this, no email will be sent but the email logs will be recorded here.',
 									'suremails'
+								),
+							} }
+						/>
+					</div>
+					<div className="flex w-[648px] gap-3">
+						<Switch
+							checked={ formState.analytics }
+							onChange={ ( value ) => {
+								handleChange( 'analytics', value );
+							} }
+							size="sm"
+							label={ {
+								heading: __(
+									'Enable Anonymous Analytics',
+									'suremails'
+								),
+								description: (
+									<span>
+										<span>
+											{ __(
+												'Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. ',
+												'suremails'
+											) }
+										</span>
+										<a
+											href="https://suremails.com/share-usage-data/"
+											target="_blank"
+											rel="noopener noreferrer"
+											className="no-underline hover:no-underline ring-0"
+										>
+											{ __( 'Learn More', 'suremails' ) }
+										</a>
+									</span>
 								),
 							} }
 						/>

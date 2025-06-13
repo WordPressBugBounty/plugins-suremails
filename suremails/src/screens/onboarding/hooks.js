@@ -4,6 +4,8 @@ import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSettings } from '@api/connections';
 import { useOnboardingState } from './onboarding-state';
+import { toast } from '@bsf/force-ui';
+import { __ } from '@wordpress/i18n';
 
 /**
  * This hook will return functions that will handle the navigation of the onboarding process.
@@ -47,6 +49,56 @@ export const useOnboardingNavigation = () => {
 		);
 
 		return currentIndex + 1;
+	};
+
+	const navigateToStep = ( stepNumber ) => {
+		// Convert step number to index (stepNumber is 1-based, array is 0-based)
+		const targetIndex = stepNumber - 1;
+
+		// Check if step number is valid
+		if (
+			targetIndex < 0 ||
+			targetIndex >= ONBOARDING_ROUTES_CONFIG.length
+		) {
+			return;
+		}
+
+		const targetRoute = ONBOARDING_ROUTES_CONFIG[ targetIndex ];
+
+		// Check if we can navigate to this step by checking requirements
+		for ( let i = 0; i <= targetIndex; i++ ) {
+			const route = ONBOARDING_ROUTES_CONFIG[ i ];
+
+			// Skip routes without requirements
+			if (
+				! route?.requires?.stateKeys ||
+				route?.requires?.stateKeys?.length === 0
+			) {
+				continue;
+			}
+
+			// Check if any required state for this route is not met
+			const missingRequirement = route.requires.stateKeys.find(
+				( requirement ) => ! onboardingState[ requirement ]
+			);
+
+			// If we found a missing requirement, don't allow navigation beyond this point
+			if ( missingRequirement && i <= targetIndex ) {
+				toast.info(
+					__( 'Complete previous steps first', 'suremails' ),
+					{
+						description: __(
+							'You need to complete the previous steps before accessing this step.',
+							'suremails'
+						),
+					}
+				);
+				return;
+			}
+		}
+
+		// If all requirements are met, navigate to the target step
+		navigate( targetRoute.url );
 	};
 
 	/**
@@ -99,6 +151,7 @@ export const useOnboardingNavigation = () => {
 		navigateToNextRoute,
 		navigateToPreviousRoute,
 		getCurrentStepNumber,
+		navigateToStep,
 		checkRequiredStep,
 	};
 };

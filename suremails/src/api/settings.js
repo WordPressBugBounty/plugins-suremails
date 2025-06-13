@@ -39,6 +39,7 @@ export const saveSettings = async ( updatedSettings ) => {
 					email_simulation: updatedSettings.settings.email_simulation,
 					default_connection:
 						updatedSettings.settings.default_connection,
+					analytics: updatedSettings.settings.analytics,
 				},
 			} ),
 		} );

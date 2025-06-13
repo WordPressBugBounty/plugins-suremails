@@ -16,7 +16,6 @@ msgstr ""
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: suremails.php
-#: inc/admin/plugin.php:189
 #: inc/nps-notice.php:87
 msgid "SureMail"
 msgstr "SureMail"
@@ -36,11 +35,11 @@ msgstr "WordPress-e-mails gaan vaak verloren of belanden in de spam omdat webhos
 msgid "https://suremails.com/"
 msgstr "https://suremails.com/"
 
-#: inc/admin/plugin.php:188
+#: inc/admin/plugin.php:189
 msgid "SureMail Settings"
 msgstr "SureMail-instellingen"
 
-#: inc/admin/plugin.php:291
+#: inc/admin/plugin.php:293
 #: build/main.js:2
 msgid "Settings"
 msgstr "Instellingen"
@@ -168,23 +167,19 @@ msgstr "E-mail succesvol verzonden."
 msgid "Failed to send test email"
 msgstr "Verzenden van test-e-mail mislukt"
 
-#: inc/api/set-settings.php:80
+#: inc/api/set-settings.php:85
 msgid "Settings data is missing or invalid."
 msgstr "Instellingsgegevens ontbreken of zijn ongeldig."
 
-#: inc/api/set-settings.php:99
+#: inc/api/set-settings.php:104
 msgid "Invalid or missing default connection data."
 msgstr "Ongeldige of ontbrekende standaard verbindingsgegevens."
 
-#: inc/api/set-settings.php:157
+#: inc/api/set-settings.php:169
 msgid "Settings updated successfully."
 msgstr "Instellingen succesvol bijgewerkt."
 
-#: inc/api/set-settings.php:166
-msgid "Failed to update settings."
-msgstr "Bijwerken van instellingen mislukt."
-
-#: inc/api/set-settings.php:177
+#: inc/api/set-settings.php:180
 msgid "No changes made to the settings."
 msgstr "Geen wijzigingen aangebracht in de instellingen."
 
@@ -2460,7 +2455,7 @@ msgstr "Kon e-mail niet opnieuw verzenden."
 msgid "Failed to get email template."
 msgstr "Kon e-mailtemplate niet ophalen."
 
-#: inc/api/set-settings.php:59
+#: inc/api/set-settings.php:64
 msgid "Settings data to update."
 msgstr "Instellingen gegevens om bij te werken."
 
@@ -2663,3 +2658,31 @@ msgstr "Kennisgeving is 15 dagen uitgeschakeld."
 #: build/main.js:2
 msgid "Let's get started"
 msgstr "Laten we beginnen"
+
+#: inc/admin/plugin.php:190
+msgid "SureMail SMTP"
+msgstr "SureMail SMTP"
+
+#: inc/admin/plugin.php:296
+msgid "Setup Wizard"
+msgstr "Installatiewizard"
+
+#: build/main.js:2
+msgid "Enable Anonymous Analytics"
+msgstr "Anonieme analyse inschakelen"
+
+#: build/main.js:2
+msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
+msgstr "Verzamel niet-gevoelige informatie van uw website, zoals de PHP-versie en gebruikte functies, om ons te helpen bugs sneller op te lossen, slimmere beslissingen te nemen en functies te bouwen die er echt toe doen voor u. "
+
+#: build/main.js:2
+msgid "Learn More"
+msgstr "Meer informatie"
+
+#: build/main.js:2
+msgid "Complete previous steps first"
+msgstr "Voltooi eerst de vorige stappen"
+
+#: build/main.js:2
+msgid "You need to complete the previous steps before accessing this step."
+msgstr "U moet de vorige stappen voltooien voordat u toegang krijgt tot deze stap."
