@@ -151,6 +151,8 @@ class SetSettings extends Api_Base {
 			}
 		}
 
+		$this->update_misc_settings( $settings );
+
 		if ( isset( $settings['analytics'] ) && ! empty( $settings['analytics'] ) ) {
 			$analytics = $settings['analytics'];
 
@@ -163,6 +165,11 @@ class SetSettings extends Api_Base {
 			$update_result        = update_option( SUREMAILS_CONNECTIONS, $options );
 			$options['analytics'] = $analytics ?? get_option( self::SUREMAILS_ANALYTICS, 'no' );
 
+			// Get the updated misc settings to include email summary data.
+			$misc                       = Settings::instance()->get_misc_settings();
+			$options['emailSummary']    = $misc['email_summary_active'] ?? 'yes';
+			$options['emailSummaryDay'] = $misc['email_summary_day'] ?? 'monday';
+
 				return new WP_REST_Response(
 					[
 						'success' => true,
@@ -174,6 +181,11 @@ class SetSettings extends Api_Base {
 
 		}
 
+		// Get the misc settings to include email summary data.
+		$misc                       = Settings::instance()->get_misc_settings();
+		$options['emailSummary']    = $misc['email_summary_active'] ?? 'no';
+		$options['emailSummaryDay'] = $misc['email_summary_day'] ?? 'monday';
+
 		return new WP_REST_Response(
 			[
 				'success' => true,
@@ -182,6 +194,30 @@ class SetSettings extends Api_Base {
 			],
 			200
 		);
+	}
+
+	/**
+	 * Updates the miscellaneous settings.
+	 *
+	 * @param array $settings The settings to update.
+	 * @return void
+	 */
+	private function update_misc_settings( $settings ) {
+		$misc_settings = Settings::instance()->get_misc_settings();
+
+		// Update flat array values.
+		if ( isset( $settings['emailSummary'] ) ) {
+			Settings::instance()->update_misc_settings( 'email_summary', $settings['emailSummary'] );
+			Settings::instance()->update_misc_settings( 'email_summary_active', $settings['emailSummary'] );
+		}
+
+		if ( isset( $settings['emailSummaryDay'] ) ) {
+			Settings::instance()->update_misc_settings( 'email_summary_day', $settings['emailSummaryDay'] );
+		}
+
+		// Keep the index value from existing settings.
+		$current_index = $misc_settings['email_summary_index'] ?? 1;
+		Settings::instance()->update_misc_settings( 'email_summary_index', $current_index );
 	}
 }
 

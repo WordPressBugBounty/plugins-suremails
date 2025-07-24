@@ -13,6 +13,7 @@ use SureMails\Inc\ConnectionManager;
 use SureMails\Inc\Controller\ContentGuard;
 use SureMails\Inc\Controller\Emails;
 use SureMails\Inc\Controller\Logger;
+use SureMails\Inc\Controller\WeeklySummary;
 use SureMails\Inc\Traits\Instance;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -32,11 +33,17 @@ class Crons {
 	 */
 	protected function __construct() {
 		add_action( 'suremails_cleanup_cron', [ $this, 'delete_old_email_logs' ] );
+		add_action( 'suremails_weekly_summary', [ $this, 'handle_weekly_summary' ] );
 
 		if ( ! wp_next_scheduled( 'suremails_cleanup_cron' ) ) {
 			wp_schedule_event( time(), 'daily', 'suremails_cleanup_cron' ); // Schedule cleanup daily.
 		}
-		// Add the action hook for retrying failed emails.
+
+		if ( ! wp_next_scheduled( 'suremails_weekly_summary' ) ) {
+			wp_schedule_event( time(), 'daily', 'suremails_weekly_summary' ); // Daily check for weekly summary.
+		}
+
+		// Hook to retry failed emails.
 		add_action( 'suremails_retry_failed_email', [ 'SureMails\Inc\Controller\Emails', 'retry_failed_email' ], 10, 1 );
 	}
 
@@ -53,6 +60,17 @@ class Crons {
 
 		if ( class_exists( 'SureMails\Inc\Controller\ContentGuard' ) ) {
 			ContentGuard::flush_hashes();
+		}
+	}
+
+	/**
+	 * Handle sending of weekly summary emails (runs daily, internally checks if it's the correct day).
+	 *
+	 * @return void
+	 */
+	public function handle_weekly_summary() {
+		if ( class_exists( 'SureMails\Inc\Controller\WeeklySummary' ) ) {
+			WeeklySummary::instance()->maybe_send_summary();
 		}
 	}
 

@@ -36,6 +36,13 @@ const DEFAULT_CONNECTION_DETAILS = [
 	'email_simulation'        => 'no',
 ];
 
+const MISC_SETTINGS = [
+	'email_summary'        => 'yes',
+	'email_summary_active' => 'yes',
+	'email_summary_day'    => 'monday',
+	'email_summary_index'  => '1',
+];
+
 /**
  * Class Settings
  *
@@ -288,5 +295,46 @@ class Settings {
 			return true;
 		}
 		return false;
+	}
+
+	/**
+	 * Get the value of a specific key from the 'suremails_settings' option.
+	 *
+	 * @return array|mixed|null The value of the specified key or null if not found.
+	 * @param string $key The key to retrieve from the settings.
+	 */
+	public function get_misc_settings( $key = null ) {
+		$settings = get_option( 'suremails_settings', MISC_SETTINGS );
+
+		if ( $key === null ) {
+			return $settings;
+		}
+
+		if ( is_array( $settings ) && array_key_exists( $key, $settings ) ) {
+			return $settings[ $key ];
+		}
+
+		return null;
+	}
+
+	/**
+	 * Update the value of a specific key in the 'suremails_settings' option.
+	 *
+	 * @param string $key The key to update in the settings.
+	 * @param mixed  $value The new value to set for the specified key.
+	 * @return void
+	 */
+	public function update_misc_settings( $key, $value ) {
+		$settings = get_option( 'suremails_settings', MISC_SETTINGS );
+
+		if ( empty( $key ) ) {
+			return;
+		}
+
+		if ( is_array( $settings ) && array_key_exists( $key, $settings ) ) {
+			$settings[ $key ] = $value;
+		}
+
+		update_option( 'suremails_settings', $settings );
 	}
 }

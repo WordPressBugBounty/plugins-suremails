@@ -5,7 +5,7 @@ Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
 Tested up to: 6.8
 Requires PHP: 7.4
-Stable tag: 1.7.1
+Stable tag: 1.8.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -231,6 +231,10 @@ SureMail comes with a built-in email testing feature. You can send a test email 
 = Does SureMail support secure email sending? =
 Yes, SureMail uses secure encryption methods like TLS/SSL to protect your email data. This ensures that your communications remain safe and private throughout the entire email delivery process.
 
+= How can I report a security bug? =
+We take plugin security extremely seriously. If you discover a security vulnerability, please report it in a safe and responsible manner.
+You can report the issue through our [Bug Bounty Program](https://brainstormforce.com/bug-bounty-program/).
+
 == Screenshots ==
 
 1. Detailed Dashboard – Monitor your email performance at a glance with real-time insights, delivery stats, and recent email logs—all in one intuitive interface.
@@ -240,6 +244,12 @@ Yes, SureMail uses secure encryption methods like TLS/SSL to protect your email 
 5. Email Logs – Monitor your email activity with detailed logs to track successful, failed, in progress, and blocked emails easily.
 
 == Changelog ==
+
+v1.8.0 - 24-July-2025
+- New: Added Emailit email service provider.
+- New: Introduced a "Weekly Email Summary" feature to send a weekly email statistics report.
+- Fix: Postmark Connection: Fixed an issue with sender and recipient name handling.
+
 v1.7.1 - 13-June-2025
 - Improvements: Improved the UI for a better user experience.
 

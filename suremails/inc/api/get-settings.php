@@ -64,6 +64,10 @@ class GetSettings extends Api_Base {
 	public function get_settings() {
 
 		$options = Settings::instance()->get_settings();
+		$misc    = Settings::instance()->get_misc_settings();
+
+			$options['emailSummaryDay'] = $misc['email_summary_day'] ?? 'monday';
+			$options['emailSummary']    = $misc['email_summary_active'] ?? 'yes';
 
 		$options['analytics'] = get_option( SetSettings::SUREMAILS_ANALYTICS, 'no' );
 

@@ -73,6 +73,45 @@ const Logs = () => {
 	} );
 	const containerRef = useRef( null );
 
+	// Check for URL parameter on component mount
+	useEffect( () => {
+		// Parse parameters from hash
+		const hash = window.location.hash;
+		const hashMatch = hash.match( /\/logs\?(.+)/ );
+
+		if ( hashMatch && hashMatch[ 1 ] ) {
+			const hashParams = new URLSearchParams( hashMatch[ 1 ] );
+			const fromParam = hashParams.get( 'from' );
+			const toParam = hashParams.get( 'to' );
+			const pageParam = hashParams.get( 'page' );
+
+			// Set date range if both from and to are provided
+			if ( fromParam && toParam ) {
+				const fromDate = new Date( fromParam );
+				const toDate = new Date( toParam );
+
+				// Validate that the dates are valid
+				if (
+					! isNaN( fromDate.getTime() ) &&
+					! isNaN( toDate.getTime() )
+				) {
+					setSelectedDates( {
+						from: fromDate,
+						to: toDate,
+					} );
+				}
+			}
+
+			// Set page if provided
+			if ( pageParam ) {
+				const pageNumber = parseInt( pageParam, 10 );
+				if ( ! isNaN( pageNumber ) && pageNumber > 0 ) {
+					setPage( pageNumber );
+				}
+			}
+		}
+	}, [] );
+
 	const useDebounce = ( value, delay = 500, callback ) => {
 		const [ debouncedValue, setDebouncedValue ] = useState( value );
 		useEffect( () => {

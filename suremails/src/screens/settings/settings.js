@@ -60,6 +60,8 @@ const Settings = () => {
 			connection_title: '',
 		},
 		emailSimulation: false,
+		emailSummary: false,
+		emailSummaryDay: 'monday',
 		analytics: false,
 	} );
 
@@ -81,6 +83,8 @@ const Settings = () => {
 						'',
 				},
 				emailSimulation: settingsData.email_simulation === 'yes',
+				emailSummary: settingsData?.emailSummary === 'yes',
+				emailSummaryDay: settingsData?.emailSummaryDay || 'monday',
 				analytics: settingsData.analytics === 'yes',
 			} );
 		}
@@ -94,6 +98,19 @@ const Settings = () => {
 		{ label: __( 'Delete after 60 days', 'suremails' ), value: '60_days' },
 		{ label: __( 'Delete after 90 days', 'suremails' ), value: '90_days' },
 		{ label: __( 'Never', 'suremails' ), value: 'none' },
+	];
+
+	/**
+	 * Summary Schedule Options
+	 */
+	const SUMMARY_DAYS = [
+		{ label: __( 'Monday', 'suremails' ), value: 'monday' },
+		{ label: __( 'Tuesday', 'suremails' ), value: 'tuesday' },
+		{ label: __( 'Wednesday', 'suremails' ), value: 'wednesday' },
+		{ label: __( 'Thursday', 'suremails' ), value: 'thursday' },
+		{ label: __( 'Friday', 'suremails' ), value: 'friday' },
+		{ label: __( 'Saturday', 'suremails' ), value: 'saturday' },
+		{ label: __( 'Sunday', 'suremails' ), value: 'sunday' },
 	];
 
 	const handleChange = ( field, value ) => {
@@ -112,7 +129,10 @@ const Settings = () => {
 				settingsData?.default_connection?.id ||
 			formState.emailSimulation !==
 				( settingsData?.email_simulation === 'yes' ) ||
-			formState.analytics !== ( settingsData?.analytics === 'yes' )
+			formState.analytics !== ( settingsData?.analytics === 'yes' ) ||
+			formState.emailSummary !==
+				( settingsData?.emailSummary === 'yes' ) ||
+			formState.emailSummaryDay !== settingsData?.emailSummaryDay
 		);
 	};
 
@@ -128,6 +148,8 @@ const Settings = () => {
 				email_simulation: formState.emailSimulation ? 'yes' : 'no',
 				log_emails: formState.logEmails ? 'yes' : 'no',
 				analytics: formState.analytics ? 'yes' : 'no',
+				emailSummary: formState.emailSummary ? 'yes' : 'no',
+				emailSummaryDay: formState.emailSummaryDay,
 				default_connection: formState.defaultConnection.email
 					? formState.defaultConnection
 					: {
@@ -167,6 +189,9 @@ const Settings = () => {
 		);
 		return label ? label.label : '';
 	};
+
+	const getemailSummaryDayLabel = ( value ) =>
+		SUMMARY_DAYS.find( ( d ) => d.value === value )?.label || '';
 	// Handle loading state
 	if ( isSettingsLoading ) {
 		return <SettingsSkeleton />;
@@ -340,6 +365,65 @@ const Settings = () => {
 					</div>
 
 					<LineSkeleton />
+
+					{ /* Email Summary  */ }
+					<div className="flex w-[648px] gap-3">
+						<Switch
+							checked={ formState.emailSummary }
+							onChange={ ( value ) => {
+								handleChange( 'emailSummary', value );
+							} }
+							size="sm"
+							label={ {
+								heading: __(
+									'Enable Email Summary',
+									'suremails'
+								),
+								description: __(
+									'Get a weekly summary of emails sent from your site.',
+									'suremails'
+								),
+							} }
+						/>
+					</div>
+					{ formState.emailSummary && (
+						<div className="flex flex-col w-full h-auto gap-1.5">
+							<Select
+								value={ formState.emailSummaryDay }
+								onChange={ ( v ) =>
+									handleChange( 'emailSummaryDay', v )
+								}
+								className="w-full h-auto"
+							>
+								<Select.Button
+									label={ __(
+										'Schedule Reports',
+										'suremails'
+									) }
+								>
+									{ getemailSummaryDayLabel(
+										formState.emailSummaryDay
+									) }
+								</Select.Button>
+								<Select.Options className="z-999999">
+									{ SUMMARY_DAYS.map( ( opt ) => (
+										<Select.Option
+											key={ opt.value }
+											value={ opt.value }
+										>
+											{ opt.label }
+										</Select.Option>
+									) ) }
+								</Select.Options>
+							</Select>
+							<Label tag="p" size="sm" variant="help">
+								{ __(
+									'Choose the day of the week to receive your summary email.',
+									'suremails'
+								) }
+							</Label>
+						</div>
+					) }
 
 					{ /* Email Simulation  */ }
 					<div className="flex w-[648px] gap-3">

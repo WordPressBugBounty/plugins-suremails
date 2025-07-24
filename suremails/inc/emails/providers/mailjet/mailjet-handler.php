@@ -116,7 +116,7 @@ class MailjetHandler implements ConnectionHandler {
 		];
 
 		$content_type = $processed_data['headers']['content_type'];
-		if ( ! empty( $content_type ) && 'text/html' === strtolower( $content_type ) ) {
+		if ( ! empty( $content_type ) && ProviderHelper::is_html( $content_type ) ) {
 			$email_payload['Messages'][0]['HTMLPart'] = $atts['message'];
 		}
 

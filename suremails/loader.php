@@ -17,6 +17,7 @@ use SureMails\Inc\Ajax\Ajax;
 use SureMails\Inc\Analytics\Analytics;
 use SureMails\Inc\API\Api_Init;
 use SureMails\Inc\Controller\ContentGuard;
+use SureMails\Inc\Controller\WeeklySummary;
 use SureMails\Inc\Lib\Suremails_Nps_Survey;
 use SureMails\Inc\Nps_Notice;
 
@@ -90,6 +91,7 @@ class Loader {
 		Crons::instance();
 		Api_Init::instance();
 		Analytics::instance();
+		WeeklySummary::instance();
 	}
 
 	/**

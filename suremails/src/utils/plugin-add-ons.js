@@ -18,6 +18,7 @@ import {
 	CartFlowsLogo,
 	SureDashLogo,
 	AstraThemeLogo,
+	AbandonedCartsLogo,
 } from 'assets/icons';
 
 export const recommendedPluginsData = {
@@ -123,17 +124,17 @@ export const pluginAddons = [
 		id: '5',
 		badgeText: __( 'Free', 'suremails' ),
 		svg: <CartFlowsLogo />,
-		title: __( 'Cartflows', 'suremails' ),
+		title: __( 'CartFlows', 'suremails' ),
 		long_description: __(
 			'A sales funnel builder for WordPress to boost conversions and optimize checkout flows.',
 			'suremails'
 		),
 		short_description: __(
-			'Boost conversions with Cartflows.',
+			'Boost conversions with CartFlows.',
 			'suremails'
 		),
 		slug: 'cartflows',
-		name: __( 'Cartflows', 'suremails' ),
+		name: __( 'CartFlows', 'suremails' ),
 		type: 'plugin',
 		init: 'cartflows/cartflows.php',
 	},
@@ -243,5 +244,24 @@ export const pluginAddons = [
 		name: __( 'Spectra One', 'suremails' ),
 		type: 'theme',
 		init: 'spectra-one',
+	},
+
+	{
+		id: '12',
+		badgeText: __( 'Free', 'suremails' ),
+		svg: <AbandonedCartsLogo />,
+		title: __( 'Cart Abandonment Recovery', 'suremails' ),
+		long_description: __(
+			'Recover lost sales by automatically emailing customers who abandon their carts. Set up takes less than 10 minutes - no coding required.',
+			'suremails'
+		),
+		short_description: __(
+			'Recover lost sales with automated abandoned cart emails - no coding needed.',
+			'suremails'
+		),
+		slug: 'woo-cart-abandonment-recovery',
+		name: __( 'Cart Abandonment Recovery', 'suremails' ),
+		type: 'plugin',
+		init: 'woo-cart-abandonment-recovery/woo-cart-abandonment-recovery.php',
 	},
 ];

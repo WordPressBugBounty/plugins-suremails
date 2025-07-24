@@ -129,6 +129,7 @@ msgstr "Niet-ondersteund verbindings type."
 
 #. translators: %s: Connection priority
 #: inc/api/save-test-connection.php:125
+#, php-format
 msgid "Connection Sequence %1$s is already assigned to another connection. Please choose a different sequence."
 msgstr "Verbindingsvolgorde %1$s is al toegewezen aan een andere verbinding. Kies een andere volgorde."
 
@@ -155,6 +156,7 @@ msgstr "Vereist veld ontbreekt."
 
 #. Translators: %s is the site name.
 #: inc/api/send-test-email.php:136
+#, php-format
 msgid "SureMail: Test Email - %s"
 msgstr "SureMail: Test-e-mail - %s"
 
@@ -175,11 +177,11 @@ msgstr "Instellingsgegevens ontbreken of zijn ongeldig."
 msgid "Invalid or missing default connection data."
 msgstr "Ongeldige of ontbrekende standaard verbindingsgegevens."
 
-#: inc/api/set-settings.php:169
+#: inc/api/set-settings.php:176
 msgid "Settings updated successfully."
 msgstr "Instellingen succesvol bijgewerkt."
 
-#: inc/api/set-settings.php:180
+#: inc/api/set-settings.php:192
 msgid "No changes made to the settings."
 msgstr "Geen wijzigingen aangebracht in de instellingen."
 
@@ -203,6 +205,7 @@ msgstr "Reputatie Schild"
 #: inc/controller/logger.php:563
 #: inc/controller/logger.php:565
 #: inc/emails/handler/mail-handler.php:360
+#, php-format
 msgid "Failed to update log ID %d."
 msgstr "Bijwerken van log-ID %d mislukt."
 
@@ -210,6 +213,7 @@ msgstr "Bijwerken van log-ID %d mislukt."
 #: inc/emails/handler/mail-handler.php:472
 #: inc/emails/providers/aws/aws-handler.php:134
 #: inc/emails/providers/brevo/brevo-handler.php:152
+#: inc/emails/providers/emailit/emailit-handler.php:95
 #: inc/emails/providers/mailgun/mailgun-handler.php:98
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:107
 #: inc/emails/providers/smtp/smtp-handler.php:127
@@ -226,16 +230,19 @@ msgstr "Ongeldige upload basisdirectory."
 
 #. translators: %s is the directory path.
 #: inc/emails/handler/uploads.php:88
+#, php-format
 msgid "Cannot create directory %s. Check parent directory permissions."
 msgstr "Kan directory %s niet aanmaken. Controleer de machtigingen van de bovenliggende directory."
 
 #. translators: %s is the directory path.
 #: inc/emails/handler/uploads.php:96
+#, php-format
 msgid "Directory %s is not writable."
 msgstr "Directory %s is niet beschrijfbaar."
 
 #. translators: %s is the file path.
 #: inc/emails/provider-helper.php:147
+#, php-format
 msgid "Unable to remove attachment file: %s"
 msgstr "Kan bijlagebestand niet verwijderen: %s"
 
@@ -324,6 +331,7 @@ msgid "Brevo Connection saved successfully."
 msgstr "Brevo-verbinding succesvol opgeslagen."
 
 #: inc/emails/providers/brevo/brevo-handler.php:227
+#: inc/emails/providers/emailit/emailit-handler.php:187
 #: inc/emails/providers/mailjet/mailjet-handler.php:147
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:184
 #: inc/emails/providers/smtp2go/smtp2go-handler.php:139
@@ -338,7 +346,7 @@ msgstr "E-mail succesvol verzonden via Brevo."
 #: inc/emails/providers/brevo/brevo-handler.php:258
 #: inc/emails/providers/mailersend/mailersend-handler.php:196
 #: inc/emails/providers/mailgun/mailgun-handler.php:179
-#: inc/emails/providers/postmark/postmark-handler.php:168
+#: inc/emails/providers/postmark/postmark-handler.php:175
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:213
 msgid "Unknown error."
 msgstr "Onbekende fout."
@@ -357,6 +365,7 @@ msgstr "Brevo (Sendinblue)"
 
 #: inc/emails/providers/brevo/brevo-handler.php:307
 #: inc/emails/providers/elastic/elastic-handler.php:478
+#: inc/emails/providers/emailit/emailit-handler.php:270
 #: inc/emails/providers/mailersend/mailersend-handler.php:238
 #: inc/emails/providers/mailgun/mailgun-handler.php:215
 #: inc/emails/providers/mailjet/mailjet-handler.php:223
@@ -397,6 +406,7 @@ msgstr "Voer uw Elastic Email API-sleutel in"
 
 #. translators: %s: www.mailgun.com/about/regions/ URL.
 #: inc/emails/providers/elastic/elastic-handler.php:491
+#, php-format
 msgid "Select the type of email you will be sending using this connection. Choose Transactional Email for emails like password resets, order confirmations, etc. Select Marketing Email for sending bulk emails like newsletters, broadcasts, etc. %1$sLearn more%2$s"
 msgstr "Selecteer het type e-mail dat u met deze verbinding zult verzenden. Kies Transactionele E-mail voor e-mails zoals wachtwoordreset, orderbevestigingen, enz. Selecteer Marketing E-mail voor het verzenden van bulk-e-mails zoals nieuwsbrieven, uitzendingen, enz. %1$sLeer meer%2$s"
 
@@ -422,6 +432,7 @@ msgstr "Mislukt om JSON-reactie van Elastic Email te decoderen."
 
 #. translators: 1: Error log
 #: inc/emails/providers/elastic/elastic-handler.php:569
+#, php-format
 msgid "Email sending failed via Elastic Email. Error: %1$s"
 msgstr "E-mail verzenden mislukt via Elastic Email. Fout: %1$s"
 
@@ -477,6 +488,7 @@ msgstr "Voer uw Gmail Client-ID in"
 
 #. translators: %s: Documentation link.
 #: inc/emails/providers/gmail/gmail-handler.php:242
+#, php-format
 msgid "Get Client ID and Secret ID from Google Cloud Platform. Follow the Gmail %s"
 msgstr "Haal Client-ID en Secret ID op van Google Cloud Platform. Volg de Gmail %s"
 
@@ -533,6 +545,7 @@ msgstr "Het is niet gelukt om een nieuw token van de Gmail API te krijgen."
 
 #. translators: %s: Error message.
 #: inc/emails/providers/gmail/gmail-handler.php:379
+#, php-format
 msgid "Email sending failed via Gmail. Failed to refresh Gmail token: %s"
 msgstr "E-mail verzenden via Gmail is mislukt. Het is niet gelukt om het Gmail-token te vernieuwen: %s"
 
@@ -558,6 +571,7 @@ msgstr "E-mail succesvol verzonden via MailerSend."
 
 #. translators: %s: Error message
 #: inc/emails/providers/mailersend/mailersend-handler.php:201
+#, php-format
 msgid "Email sending failed via MailerSend. Error: %s"
 msgstr "E-mail verzenden via MailerSend is mislukt. Fout: %s"
 
@@ -634,6 +648,7 @@ msgstr "Selecteer uw Mailgun-regio"
 
 #. translators: %s: www.mailgun.com/about/regions/ URL.
 #: inc/emails/providers/mailgun/mailgun-handler.php:239
+#, php-format
 msgid "Select the endpoint you want to use for sending messages. If you are subject to EU laws, you may need to use the EU region. %1$sLearn more at Mailgun.com%2$s"
 msgstr "Selecteer de eindpunt die u wilt gebruiken voor het verzenden van berichten. Als u onderworpen bent aan EU-wetgeving, moet u mogelijk de EU-regio gebruiken. %1$sLeer meer op Mailgun.com%2$s"
 
@@ -652,6 +667,7 @@ msgstr "Mailjet API-sleutel en geheime sleutel zijn vereist."
 #. translators: %s: Error message.
 #: inc/emails/providers/mailjet/mailjet-handler.php:168
 #: inc/emails/providers/mailjet/mailjet-handler.php:188
+#, php-format
 msgid "Email sending failed via Mailjet. %s"
 msgstr "E-mail verzenden via Mailjet is mislukt. %s"
 
@@ -752,36 +768,37 @@ msgstr "Voer uw Outlook Client Secret in"
 msgid "Enter your Outlook Redirect URI"
 msgstr "Voer uw Outlook Redirect URI in"
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:60
+#: inc/emails/providers/phpmail/phpmail-handler.php:61
 msgid "From Email is missing in the connection data."
 msgstr "E-mailadres ontbreekt in de verbindingsgegevens."
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:67
+#: inc/emails/providers/phpmail/phpmail-handler.php:68
 msgid "PHP Mail connection failed."
 msgstr "PHP Mail-verbinding mislukt."
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:105
+#: inc/emails/providers/phpmail/phpmail-handler.php:106
 msgid "Email sending failed via PHP Mail."
 msgstr "E-mail verzenden via PHP Mail mislukt."
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:111
+#: inc/emails/providers/phpmail/phpmail-handler.php:112
 msgid "Email sent successfully via PHP Mail."
 msgstr "E-mail succesvol verzonden via PHP Mail."
 
 #. translators: %s: The error message.
-#: inc/emails/providers/phpmail/phpmail-handler.php:120
+#: inc/emails/providers/phpmail/phpmail-handler.php:121
+#, php-format
 msgid "Email sending failed via PHP Mail: %s"
 msgstr "E-mail verzenden via PHP Mail mislukt: %s"
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:133
+#: inc/emails/providers/phpmail/phpmail-handler.php:134
 msgid "PHP Mail Connection"
 msgstr "PHP Mail-verbinding"
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:134
+#: inc/emails/providers/phpmail/phpmail-handler.php:135
 msgid "Enter the details below to connect with your PHP Mail account."
 msgstr "Voer de onderstaande gegevens in om verbinding te maken met uw PHP Mail-account."
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:137
+#: inc/emails/providers/phpmail/phpmail-handler.php:138
 msgid "PHP Mail"
 msgstr "PHP Mail"
 
@@ -793,49 +810,50 @@ msgstr "Postmark-verbinding succesvol opgeslagen."
 msgid "Email sending failed via Postmark. Failed to encode email payload to JSON."
 msgstr "E-mail verzenden via Postmark mislukt. Mislukt om e-mailpayload naar JSON te coderen."
 
-#: inc/emails/providers/postmark/postmark-handler.php:153
-#: inc/emails/providers/postmark/postmark-handler.php:169
+#: inc/emails/providers/postmark/postmark-handler.php:160
+#: inc/emails/providers/postmark/postmark-handler.php:176
 msgid "Email sending failed via Postmark. "
 msgstr "E-mail verzenden via Postmark mislukt."
 
-#: inc/emails/providers/postmark/postmark-handler.php:164
+#: inc/emails/providers/postmark/postmark-handler.php:171
 msgid "Email sent successfully via Postmark."
 msgstr "E-mail succesvol verzonden via Postmark."
 
-#: inc/emails/providers/postmark/postmark-handler.php:183
+#: inc/emails/providers/postmark/postmark-handler.php:190
 msgid "Postmark Connection"
 msgstr "Postmark-verbinding"
 
-#: inc/emails/providers/postmark/postmark-handler.php:184
+#: inc/emails/providers/postmark/postmark-handler.php:191
 msgid "Enter the details below to connect with your Postmark account."
 msgstr "Voer de onderstaande gegevens in om verbinding te maken met uw Postmark-account."
 
-#: inc/emails/providers/postmark/postmark-handler.php:187
+#: inc/emails/providers/postmark/postmark-handler.php:194
 msgid "Postmark"
 msgstr "Postmark"
 
-#: inc/emails/providers/postmark/postmark-handler.php:204
+#: inc/emails/providers/postmark/postmark-handler.php:211
 msgid "Server Token"
 msgstr "Server Token"
 
-#: inc/emails/providers/postmark/postmark-handler.php:206
+#: inc/emails/providers/postmark/postmark-handler.php:213
 msgid "Enter your Postmark Server Token"
 msgstr "Voer uw Postmark Server Token in"
 
 #. translators: %s: postmark URL.
-#: inc/emails/providers/postmark/postmark-handler.php:210
+#: inc/emails/providers/postmark/postmark-handler.php:217
+#, php-format
 msgid "Obtain your API key from Postmark. You can find your API key under the API Tokens tab in your account. %1$sClick here%2$s"
 msgstr "Verkrijg uw API-sleutel van Postmark. U kunt uw API-sleutel vinden onder het tabblad API-tokens in uw account. %1$sKlik hier%2$s"
 
-#: inc/emails/providers/postmark/postmark-handler.php:219
+#: inc/emails/providers/postmark/postmark-handler.php:226
 msgid "Message Stream ID"
 msgstr "Berichtstream-ID"
 
-#: inc/emails/providers/postmark/postmark-handler.php:222
+#: inc/emails/providers/postmark/postmark-handler.php:229
 msgid "The Message Stream ID is optional. If not provided, the default outbound stream (Transactional Stream) will be used."
 msgstr "De Berichtstream-ID is optioneel. Als deze niet wordt opgegeven, wordt de standaard uitgaande stream (Transactionele Stream) gebruikt."
 
-#: inc/emails/providers/postmark/postmark-handler.php:223
+#: inc/emails/providers/postmark/postmark-handler.php:230
 msgid "Enter your Postmark Message Stream"
 msgstr "Voer uw Postmark Berichtstream in"
 
@@ -966,6 +984,7 @@ msgstr "SMTP2GO"
 
 #. translators: %s: https://app.smtp2go.com/login/ URL.
 #: inc/emails/providers/smtp2go/smtp2go-handler.php:223
+#, php-format
 msgid "Click on this link to generate an API Key from SMTP2GO - %1$sCreate API Key%2$s"
 msgstr "Klik op deze link om een API-sleutel te genereren van SMTP2GO - %1$sAPI-sleutel genereren%2$s"
 
@@ -991,6 +1010,7 @@ msgstr "API-sleutel ontbreekt in de verbindingsgegevens."
 
 #. translators: %s: Error message.
 #: inc/emails/providers/sparkpost/sparkpost-handler.php:177
+#, php-format
 msgid "Error: %s"
 msgstr "Fout: %s"
 
@@ -998,12 +1018,15 @@ msgstr "Fout: %s"
 msgid "Email sent successfully via SparkPost."
 msgstr "E-mail succesvol verzonden via SparkPost."
 
+#: inc/emails/providers/emailit/emailit-handler.php:306
+#: inc/emails/providers/emailit/emailit-handler.php:311
 #: inc/emails/providers/sparkpost/sparkpost-handler.php:195
 msgid "Unknown error"
 msgstr "Onbekende fout"
 
 #. translators: %s: Error message.
 #: inc/emails/providers/sparkpost/sparkpost-handler.php:200
+#, php-format
 msgid "Email sending failed via SparkPost. Error: %s"
 msgstr "E-mail verzenden mislukt via SparkPost. Fout: %s"
 
@@ -1029,6 +1052,7 @@ msgstr "Selecteer uw SparkPost-regio"
 
 #. translators: %s: www.mailgun.com/about/regions/ URL.
 #: inc/emails/providers/sparkpost/sparkpost-handler.php:299
+#, php-format
 msgid "Select the endpoint you want to use for sending messages. If you are subject to EU laws, you may need to use the EU region. %1$sLearn more at SparkPost.com%2$s"
 msgstr "Selecteer de eindpunt die u wilt gebruiken voor het verzenden van berichten. Als u onder de EU-wetgeving valt, moet u mogelijk de EU-regio gebruiken. %1$sLeer meer op SparkPost.com%2$s"
 
@@ -1099,6 +1123,7 @@ msgstr "Forceer Van Naam"
 
 #. translators: %s: https://suremails.com/docs/multiple-backup-connections?utm_campaign=suremails&utm_medium=suremails-dashboard URL.
 #: inc/providers.php:119
+#, php-format
 msgid "Set the order in which connections should be used to send emails. The connection for the \"From Email\" specified above and the lowest sequence number will be used first. If that connection fails, the next connection with the same \"From Email\" and the following lowest sequence number will be used. %1$sMore Information here%2$s"
 msgstr "Stel de volgorde in waarin verbindingen moeten worden gebruikt om e-mails te verzenden. De verbinding voor het \"Van E-mailadres\" dat hierboven is opgegeven en het laagste volgnummer zal als eerste worden gebruikt. Als die verbinding mislukt, wordt de volgende verbinding met hetzelfde \"Van E-mailadres\" en het volgende laagste volgnummer gebruikt. %1$sMeer informatie hier%2$s"
 
@@ -1153,6 +1178,7 @@ msgid "Unknown"
 msgstr "Onbekend"
 
 #: build/main.js:2
+#, js-format
 msgid "This provider isn't compatible. For help, contact us %1$shere%2$s."
 msgstr "Deze provider is niet compatibel. Voor hulp, neem contact met ons op %1$shere%2$s."
 
@@ -1361,6 +1387,7 @@ msgid "delete"
 msgstr "verwijderen"
 
 #: build/main.js:2
+#, js-format
 msgid "Please type \"%s\" in the input box"
 msgstr "Typ \"%s\" in het invoerveld"
 
@@ -1373,6 +1400,7 @@ msgid "To confirm, type delete in the box below:"
 msgstr "Typ ter bevestiging verwijderen in het onderstaande vak:"
 
 #: build/main.js:2
+#, js-format
 msgid "Type \"%s\""
 msgstr "Typ \"%s\""
 
@@ -1605,6 +1633,7 @@ msgid "X-Mailer:"
 msgstr "X-Mailer:"
 
 #: build/main.js:2
+#, js-format
 msgid "Attachments (%d)"
 msgstr "Bijlagen (%d)"
 
@@ -1802,16 +1831,8 @@ msgid "Control user access with SureMembers."
 msgstr "Beheer gebruikers toegang met SureMembers."
 
 #: build/main.js:2
-msgid "Cartflows"
-msgstr "Cartflows"
-
-#: build/main.js:2
 msgid "A sales funnel builder for WordPress to boost conversions and optimize checkout flows."
 msgstr "Een verkoopfunnelbouwer voor WordPress om conversies te verhogen en afrekenstromen te optimaliseren."
-
-#: build/main.js:2
-msgid "Boost conversions with Cartflows."
-msgstr "Verhoog conversies met Cartflows."
 
 #: build/main.js:2
 msgid "SureCart"
@@ -1902,30 +1923,37 @@ msgid "Plugin"
 msgstr "Plugin"
 
 #: build/main.js:2
+#, js-format
 msgid "%s is already installed."
 msgstr "%s is al geïnstalleerd."
 
 #: build/main.js:2
+#, js-format
 msgid "Another %s operation is in progress. Please wait."
 msgstr "Een andere %s operatie is bezig. Even geduld alstublieft."
 
 #: build/main.js:2
+#, js-format
 msgid "%s installed successfully."
 msgstr "%s succesvol geïnstalleerd."
 
 #: build/main.js:2
+#, js-format
 msgid "Failed to install %s."
 msgstr "Installatie van %s is mislukt."
 
 #: build/main.js:2
+#, js-format
 msgid "%s is already activated."
 msgstr "%s is al geactiveerd."
 
 #: build/main.js:2
+#, js-format
 msgid "%s activated successfully."
 msgstr "%s succesvol geactiveerd."
 
 #: build/main.js:2
+#, js-format
 msgid "Failed to activate %s."
 msgstr "Activatie van %s is mislukt."
 
@@ -2118,6 +2146,7 @@ msgid "Skip & Activate"
 msgstr "Overslaan en activeren"
 
 #: build/main.js:2
+#, js-format
 msgid "By activating you agree to our %1$s and %2$s."
 msgstr "Door te activeren gaat u akkoord met onze %1$s en %2$s."
 
@@ -2134,6 +2163,7 @@ msgid "Reputation Shield identifies potentially problematic content in your emai
 msgstr "Reputation Shield identificeert potentieel problematische inhoud in uw e-mails en blokkeert deze voordat ze naar uw SMTP-service worden verzonden."
 
 #: build/main.js:2
+#, js-format
 msgid "Reputation Shield %s successfully"
 msgstr "Reputation Shield %s succesvol"
 
@@ -2286,10 +2316,12 @@ msgid "Skip"
 msgstr "Overslaan"
 
 #: build/main.js:2
+#, js-format
 msgid "Now, Let's Connect With %s"
 msgstr "Laten we nu verbinden met %s"
 
 #: build/main.js:2
+#, js-format
 msgid "Enter the details below to connect with your %s account."
 msgstr "Voer de onderstaande gegevens in om verbinding te maken met je %s-account."
 
@@ -2427,11 +2459,13 @@ msgstr "Kon de opgegeven log-ID's niet verwijderen."
 
 #. Translators: %d is the number of logs deleted.
 #: inc/api/delete-logs.php:151
+#, php-format
 msgid "%d log(s) deleted successfully."
 msgstr "%d log(s) succesvol verwijderd."
 
 #. Translators: %1$d is the number of logs deleted, %2$d is the number of logs that could not be deleted.
 #: inc/api/delete-logs.php:158
+#, php-format
 msgid "%1$d log(s) deleted successfully. %2$d log(s) could not be deleted."
 msgstr "%1$d log(s) succesvol verwijderd. %2$d log(s) konden niet worden verwijderd."
 
@@ -2462,6 +2496,7 @@ msgstr "Instellingen gegevens om bij te werken."
 #. translators: %s is the error message.
 #: inc/controller/content-guard.php:354
 #: inc/emails/handler/mail-handler.php:310
+#, php-format
 msgid "Failed to log email: %s"
 msgstr "Kon e-mail niet loggen: %s"
 
@@ -2475,12 +2510,14 @@ msgstr "Er is een uitzondering opgetreden:"
 
 #. translators: 1: Log ID, 2: Exception message.
 #: inc/controller/logger.php:568
+#, php-format
 msgid "Exception while updating log ID %1$d: %2$s"
 msgstr "Uitzondering bij het bijwerken van log-ID %1$d: %2$s"
 
 #. translators: %s: Exception message.
 #: inc/controller/logger.php:570
 #: inc/db/email-log.php:373
+#, php-format
 msgid "An exception occurred: %s"
 msgstr "Er is een uitzondering opgetreden: %s"
 
@@ -2493,6 +2530,7 @@ msgstr "Ongeldige log-ID opgegeven."
 #: inc/controller/logger.php:598
 #: inc/db/email-log.php:400
 #: inc/db/email-log.php:402
+#, php-format
 msgid "Failed to retrieve log ID %d."
 msgstr "Kon log-ID %d niet ophalen."
 
@@ -2505,21 +2543,25 @@ msgstr "Databasefout:"
 #. translators: %s: Error message.
 #: inc/db/email-log.php:152
 #: inc/db/email-log.php:154
+#, php-format
 msgid "Error creating email log table: %s"
 msgstr "Fout bij het maken van e-maillogtabel: %s"
 
 #. translators: %s: The name of the missing required field.
 #: inc/db/email-log.php:193
+#, php-format
 msgid "Missing required field: %s"
 msgstr "Vereist veld ontbreekt: %s"
 
 #. translators: %s: Error message.
 #: inc/db/email-log.php:239
+#, php-format
 msgid "Error inserting email log: %s"
 msgstr "Fout bij het invoegen van e-maillog: %s"
 
 #. translators: %s: Database error message.
 #: inc/db/email-log.php:316
+#, php-format
 msgid "Error retrieving email logs: %s"
 msgstr "Fout bij het ophalen van e-maillogs: %s"
 
@@ -2530,26 +2572,31 @@ msgstr "Ongeldige ID of gegevens opgegeven voor update."
 
 #. translators: %d: Log ID, %s: Database error message.
 #: inc/db/email-log.php:364
+#, php-format
 msgid "Error updating email log ID %1$d: %2$s"
 msgstr "Fout bij het bijwerken van e-maillog-ID %1$d: %2$s"
 
 #. translators: %s: Exception message.
 #: inc/db/email-log.php:371
+#, php-format
 msgid "Exception updating email log: %s"
 msgstr "Uitzondering bij het bijwerken van e-maillog: %s"
 
 #. translators: %s: Provided log ID.
 #: inc/db/email-log.php:386
+#, php-format
 msgid "Invalid log ID provided: %s"
 msgstr "Ongeldige log-ID opgegeven: %s"
 
 #. translators: %s: Database error message.
 #: inc/db/email-log.php:494
+#, php-format
 msgid "Database error: %s"
 msgstr "Databasefout: %s"
 
 #. translators: %s: Error message.
 #: inc/db/email-log.php:501
+#, php-format
 msgid "Error deleting email logs: %s"
 msgstr "Fout bij het verwijderen van e-maillogs: %s"
 
@@ -2562,12 +2609,14 @@ msgid "Failed to send email using Default WordPress Handler"
 msgstr "Kon e-mail niet verzenden met de standaard WordPress-handler"
 
 #. translators: %s is the error message.
-#: inc/emails/handler/process-email-data.php:621
+#: inc/emails/handler/process-email-data.php:623
+#, php-format
 msgid "PHPMailer Exception: %s"
 msgstr "PHPMailer Uitzondering: %s"
 
 #. translators: %s: AWS SES error message
 #: inc/emails/providers/aws/aws-handler.php:76
+#, php-format
 msgid "AWS SES authentication failed: %s"
 msgstr "AWS SES-authenticatie mislukt: %s"
 
@@ -2577,6 +2626,7 @@ msgstr "E-mail verzenden mislukt. Geen MessageId geretourneerd."
 
 #. translators: %s: AWS SES error message
 #: inc/emails/providers/aws/aws-handler.php:162
+#, php-format
 msgid "Email sending failed via AWS SES: %s"
 msgstr "E-mail verzenden mislukt via AWS SES: %s"
 
@@ -2585,12 +2635,14 @@ msgstr "E-mail verzenden mislukt via AWS SES: %s"
 #: inc/emails/providers/brevo/brevo-handler.php:241
 #: inc/emails/providers/brevo/brevo-handler.php:261
 #: inc/emails/providers/brevo/brevo-handler.php:269
+#, php-format
 msgid "Email sending failed via Brevo. Error: %s"
 msgstr "E-mail verzenden mislukt via Brevo. Fout: %s"
 
 #. translators: %s: Error message from Elastic Email
 #: inc/emails/providers/elastic/elastic-handler.php:175
 #: inc/emails/providers/elastic/elastic-handler.php:192
+#, php-format
 msgid "Email sending failed via Elastic Email. Error: %s"
 msgstr "E-mail verzenden mislukt via Elastic Email. Fout: %s"
 
@@ -2608,6 +2660,7 @@ msgstr "Marketing E-mail"
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:197
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:216
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:224
+#, php-format
 msgid "Email sending failed via SendGrid. Error: %s"
 msgstr "E-mail verzenden mislukt via SendGrid. Fout: %s"
 
@@ -2621,6 +2674,7 @@ msgstr "SMTP-authenticatie mislukt: Kan geen verbinding maken met de SMTP-server
 
 #. translators: %s: The error message from PHPMailer.
 #: inc/emails/providers/smtp/smtp-handler.php:86
+#, php-format
 msgid "SMTP authentication failed: %s"
 msgstr "SMTP-authenticatie mislukt: %s"
 
@@ -2632,6 +2686,7 @@ msgstr "E-mail succesvol verzonden via SMTP."
 #. translators: %s: The error message.
 #: inc/emails/providers/smtp/smtp-handler.php:146
 #: inc/emails/providers/smtp/smtp-handler.php:155
+#, php-format
 msgid "Email sending failed via SMTP: %s"
 msgstr "E-mail verzenden mislukt via SMTP: %s"
 
@@ -2640,6 +2695,7 @@ msgstr "E-mail verzenden mislukt via SMTP: %s"
 #: inc/emails/providers/smtp2go/smtp2go-handler.php:157
 #: inc/emails/providers/smtp2go/smtp2go-handler.php:176
 #: inc/emails/providers/smtp2go/smtp2go-handler.php:185
+#, php-format
 msgid "Email sending failed via SMTP2GO. Error: %s"
 msgstr "E-mail verzenden mislukt via SMTP2GO. Fout: %s"
 
@@ -2673,7 +2729,7 @@ msgstr "Anonieme analyse inschakelen"
 
 #: build/main.js:2
 msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
-msgstr "Verzamel niet-gevoelige informatie van uw website, zoals de PHP-versie en gebruikte functies, om ons te helpen bugs sneller op te lossen, slimmere beslissingen te nemen en functies te bouwen die er echt toe doen voor u. "
+msgstr "Verzamel niet-gevoelige informatie van uw website, zoals de PHP-versie en gebruikte functies, om ons te helpen bugs sneller op te lossen, slimmere beslissingen te nemen en functies te bouwen die er echt toe doen voor u."
 
 #: build/main.js:2
 msgid "Learn More"
@@ -2686,3 +2742,210 @@ msgstr "Voltooi eerst de vorige stappen"
 #: build/main.js:2
 msgid "You need to complete the previous steps before accessing this step."
 msgstr "U moet de vorige stappen voltooien voordat u toegang krijgt tot deze stap."
+
+#. translators: 1: From date, 2: To date
+#: inc/controller/weekly-summary.php:93
+#, php-format
+msgid "Email summary of your last week — %1$s to %2$s"
+msgstr "E-mailsamenvatting van je afgelopen week — %1$s tot %2$s"
+
+#: inc/controller/weekly-summary.php:167
+msgid "Weekly Summary"
+msgstr "Wekelijkse samenvatting"
+
+#: inc/controller/weekly-summary.php:174
+#: inc/controller/weekly-summary.php:368
+msgid "SureMail Logo"
+msgstr "SureMail-logo"
+
+#: inc/controller/weekly-summary.php:214
+msgid "Hey There,"
+msgstr "Hallo,"
+
+#. translators: %s: Number of days
+#: inc/controller/weekly-summary.php:220
+#, php-format
+msgid "Here's your SureMail report for the last %s"
+msgstr "Hier is je SureMail-rapport voor de afgelopen %s"
+
+#: inc/controller/weekly-summary.php:230
+msgid "View Email Logs"
+msgstr "Bekijk e-maillogs"
+
+#: inc/controller/weekly-summary.php:246
+msgid "Emails Sent Successfully"
+msgstr "E-mails succesvol verzonden"
+
+#: inc/controller/weekly-summary.php:247
+msgid "Emails Failed to Send"
+msgstr "E-mails konden niet worden verzonden"
+
+#: inc/controller/weekly-summary.php:248
+msgid "Emails Blocked by Reputation Shield"
+msgstr "E-mails geblokkeerd door Reputation Shield"
+
+#: inc/controller/weekly-summary.php:257
+msgid "Emails"
+msgstr "E-mails"
+
+#: inc/controller/weekly-summary.php:260
+msgid "Last Week"
+msgstr "Afgelopen week"
+
+#: inc/controller/weekly-summary.php:325
+msgid "Learn more about our other products"
+msgstr "Meer weten over onze andere producten"
+
+#. translators: %s: Product name
+#: inc/controller/weekly-summary.php:336
+#, php-format
+msgid "%s logo"
+msgstr "%s-logo"
+
+#: inc/controller/weekly-summary.php:361
+msgid "Manage Email Summaries from your website settings"
+msgstr "Beheer e-mailsamenvattingen via je website-instellingen"
+
+#: inc/emails/providers/emailit/emailit-handler.php:200
+#: inc/emails/providers/emailit/emailit-handler.php:228
+msgid "Emailit send failed: "
+msgstr "E-mailverzending via Emailit mislukt: "
+
+#: inc/emails/providers/emailit/emailit-handler.php:210
+msgid "Email sent successfully via Emailit."
+msgstr "E-mail succesvol verzonden via Emailit."
+
+#. translators: %s is the error message from Emailit API.
+#: inc/emails/providers/emailit/emailit-handler.php:223
+#, php-format
+msgid "Email sending failed via Emailit: %s"
+msgstr "E-mailverzending via Emailit mislukt: %s"
+
+#: inc/emails/providers/emailit/emailit-handler.php:243
+msgid "Emailit Connection"
+msgstr "Emailit-verbinding"
+
+#: inc/emails/providers/emailit/emailit-handler.php:244
+msgid "Enter the details below to connect with your Emailit account. Important: Your sending domain must be verified in Emailit before you can send emails."
+msgstr "Voer hieronder de gegevens in om verbinding te maken met je Emailit-account. Belangrijk: je verzenddomein moet worden geverifieerd in Emailit voordat je e-mails kunt verzenden."
+
+#: inc/emails/providers/emailit/emailit-handler.php:246
+msgid "Emailit"
+msgstr "Emailit"
+
+#. translators: %1$s: API key link, %2$s: domain verification link.
+#: inc/emails/providers/emailit/emailit-handler.php:266
+#, php-format
+msgid "Get your API key from your Emailit dashboard. %1$s. Important: Before sending emails, you must %2$s in your Emailit account."
+msgstr "Haal je API-sleutel op via je Emailit-dashboard. %1$s. Belangrijk: voordat je e-mails verzendt, moet je %2$s in je Emailit-account."
+
+#. translators: %1$s: API key link, %2$s: domain verification link.
+#: inc/emails/providers/emailit/emailit-handler.php:267
+msgid "Get API Key"
+msgstr "API-sleutel ophalen"
+
+#: inc/emails/providers/emailit/emailit-handler.php:268
+msgid "verify your sending domain"
+msgstr "verifieer je verzenddomein"
+
+#: inc/emails/providers/emailit/emailit-handler.php:272
+msgid "Enter your Emailit API Key"
+msgstr "Voer je Emailit API-sleutel in"
+
+#: inc/emails/providers/emailit/emailit-handler.php:318
+msgid "Bad request. Please check your email data."
+msgstr "Ongeldig verzoek. Controleer je e-mailgegevens."
+
+#: inc/emails/providers/emailit/emailit-handler.php:320
+msgid "Unauthorized. Please check your API key."
+msgstr "Niet geautoriseerd. Controleer je API-sleutel."
+
+#: inc/emails/providers/emailit/emailit-handler.php:322
+msgid "Forbidden. Access denied."
+msgstr "Verboden. Toegang geweigerd."
+
+#: inc/emails/providers/emailit/emailit-handler.php:324
+msgid "Not found. Please check the API endpoint."
+msgstr "Niet gevonden. Controleer het API-eindpunt."
+
+#: inc/emails/providers/emailit/emailit-handler.php:326
+msgid "Domain verification required. Your sending domain must be verified in Emailit before you can send emails. Please verify your domain in your Emailit dashboard at https://app.emailit.com/domains"
+msgstr "Domeinverificatie vereist. Je verzenddomein moet worden geverifieerd in Emailit voordat je e-mails kunt verzenden. Verifieer je domein in je Emailit-dashboard op https://app.emailit.com/domains"
+
+#: inc/emails/providers/emailit/emailit-handler.php:328
+msgid "Rate limit exceeded. Please try again later."
+msgstr "Snelheidslimiet overschreden. Probeer het later opnieuw."
+
+#: inc/emails/providers/emailit/emailit-handler.php:330
+msgid "Internal server error. Please try again later."
+msgstr "Interne serverfout. Probeer het later opnieuw."
+
+#. translators: %d is the HTTP error code.
+#: inc/emails/providers/emailit/emailit-handler.php:333
+#, php-format
+msgid "HTTP error %d occurred."
+msgstr "HTTP-fout %d opgetreden."
+
+#: build/main.js:2
+msgid "CartFlows"
+msgstr "CartFlows"
+
+#: build/main.js:2
+msgid "Boost conversions with CartFlows."
+msgstr "Verhoog conversies met CartFlows."
+
+#: build/main.js:2
+msgid "Cart Abandonment Recovery"
+msgstr "Herstel verlaten winkelwagen"
+
+#: build/main.js:2
+msgid "Recover lost sales by automatically emailing customers who abandon their carts. Set up takes less than 10 minutes - no coding required."
+msgstr "Herstel verloren verkopen door automatisch klanten te e-mailen die hun winkelwagen verlaten. De installatie duurt minder dan 10 minuten - geen codering nodig."
+
+#: build/main.js:2
+msgid "Recover lost sales with automated abandoned cart emails - no coding needed."
+msgstr "Herstel verloren verkopen met geautomatiseerde e-mails voor verlaten winkelwagens - geen codering nodig."
+
+#: build/main.js:2
+msgid "Monday"
+msgstr "Maandag"
+
+#: build/main.js:2
+msgid "Tuesday"
+msgstr "Dinsdag"
+
+#: build/main.js:2
+msgid "Wednesday"
+msgstr "Woensdag"
+
+#: build/main.js:2
+msgid "Thursday"
+msgstr "Donderdag"
+
+#: build/main.js:2
+msgid "Friday"
+msgstr "Vrijdag"
+
+#: build/main.js:2
+msgid "Saturday"
+msgstr "Zaterdag"
+
+#: build/main.js:2
+msgid "Sunday"
+msgstr "Zondag"
+
+#: build/main.js:2
+msgid "Enable Email Summary"
+msgstr "E-mailsamenvatting inschakelen"
+
+#: build/main.js:2
+msgid "Get a weekly summary of emails sent from your site."
+msgstr "Ontvang een wekelijkse samenvatting van e-mails die vanaf je site zijn verzonden."
+
+#: build/main.js:2
+msgid "Schedule Reports"
+msgstr "Rapporten plannen"
+
+#: build/main.js:2
+msgid "Choose the day of the week to receive your summary email."
+msgstr "Kies de dag van de week waarop je je samenvattingsmail wilt ontvangen."

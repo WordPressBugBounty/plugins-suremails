@@ -145,8 +145,15 @@ class PostmarkHandler implements ConnectionHandler {
 			return $result;
 		}
 
-		// Add the payload as the body field to the protected $params property.
-		$this->params['body'] = $json_payload;
+		$from_regex      = "/(\"From\": \"[a-zA-Z\\d]+)*[\\\\]{2,}'/";
+		$cleaned_payload = preg_replace( $from_regex, "'", $json_payload, 1 );
+
+		// Ensure cleaned_payload is always a string (preg_replace can return null on error).
+		if ( $cleaned_payload === null ) {
+			$cleaned_payload = $json_payload;
+		}
+
+		$this->params['body'] = $cleaned_payload;
 
 		$response = wp_safe_remote_post( $this->api_url, $this->params );
 		if ( is_wp_error( $response ) ) {

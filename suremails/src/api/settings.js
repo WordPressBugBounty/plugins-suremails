@@ -39,6 +39,8 @@ export const saveSettings = async ( updatedSettings ) => {
 					email_simulation: updatedSettings.settings.email_simulation,
 					default_connection:
 						updatedSettings.settings.default_connection,
+					emailSummary: updatedSettings.settings.emailSummary,
+					emailSummaryDay: updatedSettings.settings.emailSummaryDay,
 					analytics: updatedSettings.settings.analytics,
 				},
 			} ),

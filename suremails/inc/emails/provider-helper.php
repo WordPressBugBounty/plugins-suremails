@@ -213,4 +213,19 @@ class ProviderHelper {
 			'attachments' => array_unique( $attachments ),
 		];
 	}
+
+	/**
+	 * Check if the content type is HTML.
+	 *
+	 * This function checks if the provided content type indicates that the email
+	 * is in HTML format.
+	 *
+	 * @param string $content_type The content type to check.
+	 * @since 1.8.0
+	 * @return bool True if the content type is HTML, false otherwise.
+	 */
+	public static function is_html( $content_type ) {
+		// Check if the content type is HTML.
+		return strpos( strtolower( $content_type ), 'text/html' ) !== false;
+	}
 }

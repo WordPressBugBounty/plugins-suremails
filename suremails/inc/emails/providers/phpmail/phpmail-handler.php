@@ -12,6 +12,7 @@ namespace SureMails\Inc\Emails\Providers\Phpmail;
 use Exception;
 use SureMails\Inc\ConnectionManager;
 use SureMails\Inc\Emails\Handler\ConnectionHandler;
+use SureMails\Inc\Emails\ProviderHelper;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -88,7 +89,7 @@ class PhpmailHandler implements ConnectionHandler {
 		$phpmailer->isMail();
 
 		$content_type = $processed_data['headers']['content_type'];
-		if ( ! empty( $content_type ) && 'text/html' === strtolower( $content_type ) ) {
+		if ( ! empty( $content_type ) && ProviderHelper::is_html( $content_type ) ) {
 			$phpmailer->msgHTML( $atts['message'] );
 			$phpmailer->AltBody = wp_strip_all_tags( $atts['message'] );
 		}
