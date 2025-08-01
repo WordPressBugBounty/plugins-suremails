@@ -2809,7 +2809,7 @@ msgstr "Verwalten Sie E-Mail-Zusammenfassungen in Ihren Website-Einstellungen"
 #: inc/emails/providers/emailit/emailit-handler.php:200
 #: inc/emails/providers/emailit/emailit-handler.php:228
 msgid "Emailit send failed: "
-msgstr "Emailit-Sendung fehlgeschlagen: "
+msgstr "Emailit-Sendung fehlgeschlagen:"
 
 #: inc/emails/providers/emailit/emailit-handler.php:210
 msgid "Email sent successfully via Emailit."

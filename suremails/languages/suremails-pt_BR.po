@@ -2809,7 +2809,7 @@ msgstr "Gerencie Resumos de E-mail nas configurações do seu site"
 #: inc/emails/providers/emailit/emailit-handler.php:200
 #: inc/emails/providers/emailit/emailit-handler.php:228
 msgid "Emailit send failed: "
-msgstr "Falha no envio pelo Emailit: "
+msgstr "Falha no envio pelo Emailit:"
 
 #: inc/emails/providers/emailit/emailit-handler.php:210
 msgid "Email sent successfully via Emailit."

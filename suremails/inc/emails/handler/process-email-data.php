@@ -599,9 +599,9 @@ class ProcessEmailData {
 			$is_html = ProviderHelper::is_html( $processed_data['headers']['content_type'] );
 			if( $is_html ) {
 				$phpmailer->Body = $processed_data['message'];
-				$phpmailer->AltBody = wp_kses_post($processed_data['message']);
+				$phpmailer->AltBody = wp_strip_all_tags($processed_data['message']);
 			} else {
-				$phpmailer->Body    =  wp_kses_post($processed_data['message']);
+				$phpmailer->Body = $processed_data['message'];
 			}
 
 			// Add Attachments.

@@ -2809,7 +2809,7 @@ msgstr "Zarządzaj podsumowaniami e-mail w ustawieniach swojej strony"
 #: inc/emails/providers/emailit/emailit-handler.php:200
 #: inc/emails/providers/emailit/emailit-handler.php:228
 msgid "Emailit send failed: "
-msgstr "Wysyłka Emailit nie powiodła się: "
+msgstr "Wysyłka Emailit nie powiodła się:"
 
 #: inc/emails/providers/emailit/emailit-handler.php:210
 msgid "Email sent successfully via Emailit."
@@ -2884,7 +2884,7 @@ msgstr "Wewnętrzny błąd serwera. Proszę spróbuj ponownie później."
 #: inc/emails/providers/emailit/emailit-handler.php:333
 #, php-format
 msgid "HTTP error %d occurred."
-msgstr ""
+msgstr "Wystąpił błąd HTTP %d."
 
 #: build/main.js:2
 msgid "CartFlows"

@@ -2809,7 +2809,7 @@ msgstr "Beheer e-mailsamenvattingen via je website-instellingen"
 #: inc/emails/providers/emailit/emailit-handler.php:200
 #: inc/emails/providers/emailit/emailit-handler.php:228
 msgid "Emailit send failed: "
-msgstr "E-mailverzending via Emailit mislukt: "
+msgstr "E-mailverzending via Emailit mislukt:"
 
 #: inc/emails/providers/emailit/emailit-handler.php:210
 msgid "Email sent successfully via Emailit."
