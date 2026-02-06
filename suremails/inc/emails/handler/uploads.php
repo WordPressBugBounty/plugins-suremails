@@ -108,23 +108,30 @@ class Uploads {
 	 *
 	 * @since 1.5.0
 	 *
+	 * @param string|null $folder_path Optional. Directory path. Defaults to base directory.
 	 * @return bool True on success, false on failure.
 	 */
-	public static function generate_htaccess_file() {
-		$base_dir = self::get_suremails_base_dir();
-		if ( is_wp_error( $base_dir ) ) {
+	public static function generate_htaccess_file( $folder_path = null ) {
+		if ( null === $folder_path ) {
+			$base_dir = self::get_suremails_base_dir();
+			if ( is_wp_error( $base_dir ) ) {
+				return false;
+			}
+			$folder_path = $base_dir['path'];
+		}
+
+		if ( ! is_dir( $folder_path ) || is_link( $folder_path ) ) {
 			return false;
 		}
 
-		$ht_file = wp_normalize_path( trailingslashit( $base_dir['path'] ) . '.htaccess' );
+		$ht_file = wp_normalize_path( trailingslashit( $folder_path ) . '.htaccess' );
 		$content = apply_filters(
 			'suremails_htaccess_content',
-			'# Disable PHP and Python script execution.
-<Files *>
+			'<Files *>
   SetHandler none
   SetHandler default-handler
-  RemoveHandler .cgi .php .php3 .php4 .php5 .phtml .pl .py .pyc .pyo
-  RemoveType .cgi .php .php3 .php4 .php5 .phtml .pl .py .pyc .pyo
+  RemoveHandler .cgi .php .php3 .php4 .php5 .php7 .phtml .phar .phps .pht .phpt .inc .pl .py .pyc .pyo
+  RemoveType .cgi .php .php3 .php4 .php5 .php7 .phtml .phar .phps .pht .phpt .inc .pl .py .pyc .pyo
 </Files>
 <IfModule mod_php5.c>
   php_flag engine off
@@ -139,7 +146,8 @@ class Uploads {
   Header set X-Robots-Tag "noindex"
 </IfModule>'
 		);
-		if ( function_exists( 'insert_with_markers' ) === false ) {
+
+		if ( ! function_exists( 'insert_with_markers' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/misc.php';
 		}
 		return insert_with_markers( $ht_file, 'SureMails', $content );
@@ -150,20 +158,27 @@ class Uploads {
 	 *
 	 * @since 1.5.0
 	 *
-	 * @param string $folder_path The directory in which to create the file.
-	 * @return int|false Number of bytes written or false on failure.
+	 * @param string|null $folder_path Optional. Directory path. Defaults to base directory.
+	 * @return bool True on success, false on failure.
 	 */
-	public static function generate_index_html( $folder_path ) {
+	public static function generate_index_html( $folder_path = null ) {
+		if ( null === $folder_path ) {
+			$base_dir = self::get_suremails_base_dir();
+			if ( is_wp_error( $base_dir ) ) {
+				return false;
+			}
+			$folder_path = $base_dir['path'];
+		}
+
 		if ( ! is_dir( $folder_path ) || is_link( $folder_path ) ) {
 			return false;
 		}
+
 		$index = wp_normalize_path( trailingslashit( $folder_path ) . 'index.html' );
-		// If the index file already exists, do nothing.
 		if ( file_exists( $index ) ) {
 			return false;
 		}
 
-		// Initialize the WP Filesystem.
 		if ( ! function_exists( 'WP_Filesystem' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
 		}
@@ -171,7 +186,218 @@ class Uploads {
 		if ( empty( $wp_filesystem ) ) {
 			WP_Filesystem();
 		}
-		return $wp_filesystem->put_contents( $index, '' );
+		$result = $wp_filesystem->put_contents( $index, '' );
+		return $result !== false;
+	}
+
+	/**
+	 * Generate web.config file for IIS servers.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param string|null $folder_path Optional. Directory path. Defaults to base directory.
+	 * @return bool True on success, false on failure.
+	 */
+	public static function generate_webconfig_file( $folder_path = null ) {
+		if ( null === $folder_path ) {
+			$base_dir = self::get_suremails_base_dir();
+			if ( is_wp_error( $base_dir ) ) {
+				return false;
+			}
+			$folder_path = $base_dir['path'];
+		}
+
+		if ( ! is_dir( $folder_path ) || is_link( $folder_path ) ) {
+			return false;
+		}
+
+		$dest = wp_normalize_path( trailingslashit( $folder_path ) . 'web.config' );
+		if ( file_exists( $dest ) ) {
+			return false;
+		}
+
+		$content = apply_filters(
+			'suremails_web_config_content',
+			'<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+  <system.webServer>
+    <security>
+      <requestFiltering>
+        <hiddenSegments>
+          <add segment="attachments" />
+        </hiddenSegments>
+        <fileExtensions allowUnlisted="true">
+          <add fileExtension=".php" allowed="false" />
+          <add fileExtension=".phtml" allowed="false" />
+          <add fileExtension=".php3" allowed="false" />
+          <add fileExtension=".php4" allowed="false" />
+          <add fileExtension=".php5" allowed="false" />
+          <add fileExtension=".php7" allowed="false" />
+          <add fileExtension=".phar" allowed="false" />
+          <add fileExtension=".phps" allowed="false" />
+          <add fileExtension=".pht" allowed="false" />
+          <add fileExtension=".phpt" allowed="false" />
+          <add fileExtension=".inc" allowed="false" />
+        </fileExtensions>
+      </requestFiltering>
+    </security>
+    <handlers>
+      <!-- Explicitly remove PHP handler for this directory -->
+      <remove name="PHP_via_FastCGI" />
+      <remove name="php-7.4.33" />
+      <remove name="php" />
+    </handlers>
+  </system.webServer>
+</configuration>'
+		);
+
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+		global $wp_filesystem;
+		if ( empty( $wp_filesystem ) ) {
+			WP_Filesystem();
+		}
+
+		$result = $wp_filesystem->put_contents( $dest, $content );
+		return $result !== false;
+	}
+
+	/**
+	 * Generate index.php file to block direct access.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param string|null $folder_path Optional. Directory path. Defaults to base directory.
+	 * @return bool True on success, false on failure.
+	 */
+	public static function generate_index_php( $folder_path = null ) {
+		if ( null === $folder_path ) {
+			$base_dir = self::get_suremails_base_dir();
+			if ( is_wp_error( $base_dir ) ) {
+				return false;
+			}
+			$folder_path = $base_dir['path'];
+		}
+
+		if ( ! is_dir( $folder_path ) || is_link( $folder_path ) ) {
+			return false;
+		}
+
+		$dest = wp_normalize_path( trailingslashit( $folder_path ) . 'index.php' );
+		if ( file_exists( $dest ) ) {
+			return false;
+		}
+
+		$content = apply_filters(
+			'suremails_index_php_content',
+			'<?php
+// Silence is golden.
+http_response_code( 403 );
+exit;
+'
+		);
+
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+		global $wp_filesystem;
+		if ( empty( $wp_filesystem ) ) {
+			WP_Filesystem();
+		}
+
+		$result = $wp_filesystem->put_contents( $dest, $content );
+		return $result !== false;
+	}
+
+	/**
+	 * Generate .user.ini file for PHP-FPM configurations.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param string|null $folder_path Optional. Directory path. Defaults to base directory.
+	 * @return bool True on success, false on failure.
+	 */
+	public static function generate_user_ini_file( $folder_path = null ) {
+		if ( null === $folder_path ) {
+			$base_dir = self::get_suremails_base_dir();
+			if ( is_wp_error( $base_dir ) ) {
+				return false;
+			}
+			$folder_path = $base_dir['path'];
+		}
+
+		if ( ! is_dir( $folder_path ) || is_link( $folder_path ) ) {
+			return false;
+		}
+
+		$dest = wp_normalize_path( trailingslashit( $folder_path ) . '.user.ini' );
+		if ( file_exists( $dest ) ) {
+			return false;
+		}
+
+		$content = apply_filters(
+			'suremails_user_ini_content',
+			'; Disable dangerous PHP functions
+disable_functions = exec,passthru,shell_exec,system,proc_open,popen,curl_exec,curl_multi_exec,parse_ini_file,show_source
+; Disable PHP execution
+engine = Off
+; Prevent auto-prepend/append attacks
+auto_prepend_file =
+auto_append_file ='
+		);
+
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+		}
+		global $wp_filesystem;
+		if ( empty( $wp_filesystem ) ) {
+			WP_Filesystem();
+		}
+
+		$result = $wp_filesystem->put_contents( $dest, $content );
+		return $result !== false;
+	}
+
+	/**
+	 * Generate all protection files for multi-server compatibility.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @return bool True if all succeeded, false otherwise.
+	 */
+	public static function generate_protection_files() {
+		$base_dir = self::get_suremails_base_dir();
+		if ( is_wp_error( $base_dir ) ) {
+			return false;
+		}
+
+		$results = [];
+
+		// Protect base directory.
+		$results[] = self::generate_htaccess_file();
+		$results[] = self::generate_webconfig_file();
+		$results[] = self::generate_user_ini_file();
+		$results[] = self::generate_index_html();
+		$results[] = self::generate_index_php();
+
+		// Protect attachments subdirectory (where files are actually uploaded).
+		$attachments_dir = trailingslashit( $base_dir['path'] ) . 'attachments';
+		// Create attachments directory if it doesn't exist.
+		if ( ! is_dir( $attachments_dir ) ) {
+			wp_mkdir_p( $attachments_dir );
+		}
+
+		if ( is_dir( $attachments_dir ) ) {
+			// Add protection files for defense in depth.
+			$results[] = self::generate_htaccess_file( $attachments_dir );
+			$results[] = self::generate_webconfig_file( $attachments_dir );
+			$results[] = self::generate_user_ini_file( $attachments_dir );
+			$results[] = self::generate_index_html( $attachments_dir );
+			$results[] = self::generate_index_php( $attachments_dir );
+		}
+
+		return ! in_array( false, $results, true );
 	}
 
 	/**
@@ -237,23 +463,19 @@ class Uploads {
 
 		if ( ! is_dir( $upload_dir ) ) {
 			wp_mkdir_p( $upload_dir );
-
-			// Create security and index files in the upload directories.
-			self::generate_htaccess_file();
-			$base_dir = Uploads::get_suremails_base_dir();
-			if ( ! is_wp_error( $base_dir ) && isset( $base_dir['path'] ) ) {
-				self::generate_index_html( $base_dir['path'] );
-			}
-			self::generate_index_html( $upload_dir );
 		}
 
 		// Get the extension from the original file name.
-		$extension = pathinfo( $original_name, PATHINFO_EXTENSION );
+		$extension = strtolower( pathinfo( $original_name, PATHINFO_EXTENSION ) );
 
-		// Compute a hash of the content.
+		if ( ! $this->is_allowed_file_type( $extension, $content ) ) {
+			return false;
+		}
+
 		$hash = hash( 'md5', $content );
 
-		$new_name = substr( $hash, 0, 16 ) . '-' . basename( $original_name );
+		$random_suffix = wp_generate_password( 12, false );
+		$new_name      = substr( $hash, 0, 16 ) . '-' . $random_suffix . '-' . basename( $original_name );
 
 		$upload_dir = trailingslashit( $upload_dir );
 		$new_path   = $upload_dir . $new_name;
@@ -293,5 +515,97 @@ class Uploads {
 			return $base;
 		}
 		return trailingslashit( trailingslashit( $base['path'] ) . 'attachments' );
+	}
+
+	/**
+	 * Validate file type against whitelist and MIME type.
+	 *
+	 * @since 1.9.1
+	 *
+	 * @param string $extension File extension.
+	 * @param string $content   File content for MIME type detection.
+	 * @return bool True if file type is allowed, false otherwise.
+	 */
+	private function is_allowed_file_type( $extension, $content ) {
+		$allowed_extensions = apply_filters(
+			'suremails_allowed_file_extensions',
+			[
+				'jpg',
+				'jpeg',
+				'png',
+				'gif',
+				'webp',
+				'bmp',
+				'ico',
+				'pdf',
+				'txt',
+				'csv',
+				'rtf',
+			]
+		);
+
+		if ( empty( $extension ) ) {
+			return false;
+		}
+
+		if ( ! in_array( $extension, $allowed_extensions, true ) ) {
+			return false;
+		}
+
+		if ( ! class_exists( 'finfo' ) ) {
+			return false;
+		}
+
+		$finfo = new \finfo( FILEINFO_MIME_TYPE );
+		$mime  = $finfo->buffer( $content );
+
+		$allowed_mimes = apply_filters(
+			'suremails_allowed_mime_types',
+			[
+				'image/jpeg',
+				'image/jpg',
+				'image/png',
+				'image/gif',
+				'image/webp',
+				'image/bmp',
+				'image/x-ms-bmp',
+				'image/x-icon',
+				'image/vnd.microsoft.icon',
+				'application/pdf',
+				'text/plain',
+				'text/csv',
+				'text/rtf',
+				'application/rtf',
+			]
+		);
+
+		if ( ! in_array( $mime, $allowed_mimes, true ) ) {
+			return false;
+		}
+
+		$mime_extension_map = [
+			'image/jpeg'               => [ 'jpg', 'jpeg' ],
+			'image/jpg'                => [ 'jpg', 'jpeg' ],
+			'image/png'                => [ 'png' ],
+			'image/gif'                => [ 'gif' ],
+			'image/webp'               => [ 'webp' ],
+			'image/bmp'                => [ 'bmp' ],
+			'image/x-ms-bmp'           => [ 'bmp' ],
+			'image/x-icon'             => [ 'ico' ],
+			'image/vnd.microsoft.icon' => [ 'ico' ],
+			'application/pdf'          => [ 'pdf' ],
+			'text/plain'               => [ 'txt' ],
+			'text/csv'                 => [ 'csv' ],
+			'text/rtf'                 => [ 'rtf' ],
+			'application/rtf'          => [ 'rtf' ],
+		];
+
+		if ( isset( $mime_extension_map[ $mime ] ) ) {
+			if ( ! in_array( $extension, $mime_extension_map[ $mime ], true ) ) {
+				return false;
+			}
+		}
+
+		return true;
 	}
 }

@@ -47,48 +47,11 @@ class SmtpHandler implements ConnectionHandler {
 	 * @return array The result of the authentication attempt.
 	 */
 	public function authenticate() {
-		$result = [
-			'success'    => false,
+		return [
+			'success'    => true,
 			'message'    => '',
 			'error_code' => 200,
 		];
-
-		try {
-			$phpmailer = ConnectionManager::instance()->get_phpmailer();
-
-			// Server settings.
-			$phpmailer->isSMTP(); // Set mailer to use SMTP.
-			// Disabled phpcs for the following lines to avoid false positive errors of snake casing.
-			$phpmailer->Host        = $this->connection_data['host'] ?? 'smtp.example.com'; // Specify main SMTP server.
-			$phpmailer->SMTPAuth    = true; // Enable SMTP authentication.
-			$phpmailer->Username    = $this->connection_data['username'] ?? ''; // SMTP username.
-			$phpmailer->Password    = $this->connection_data['password'] ?? ''; // SMTP password.
-			$phpmailer->SMTPAutoTLS = (bool) $this->connection_data['auto_tls'];
-			$encryption             = strtolower( sanitize_text_field( $this->connection_data['encryption'] ) );
-			if ( $encryption !== 'none' ) {
-				$phpmailer->SMTPSecure = $encryption;
-			}
-			$phpmailer->Port = $this->connection_data['port']; // TCP port to connect to.
-
-			// Attempt to connect to the SMTP server.
-			$phpmailer->Timeout = 5; // Set a timeout of 5 seconds.
-
-			if ( $phpmailer->smtpConnect() ) {
-				$phpmailer->smtpClose();
-				$result['success'] = true;
-				$result['message'] = __( 'SMTP authentication successful.', 'suremails' );
-			} else {
-				$result['message'] = __( 'SMTP authentication failed: Unable to connect to the SMTP server.', 'suremails' );
-			}
-		} catch ( Exception $e ) {
-			$result['message'] = sprintf(
-				// translators: %s: The error message from PHPMailer.
-				__( 'SMTP authentication failed: %s', 'suremails' ),
-				$e->getMessage()
-			);
-		}
-
-		return $result;
 	}
 
 	/**
@@ -111,10 +74,10 @@ class SmtpHandler implements ConnectionHandler {
 			$phpmailer = ConnectionManager::instance()->get_phpmailer();
 			// Server settings.
 			$phpmailer->isSMTP(); // Set mailer to use SMTP.
-			$phpmailer->Host        = sanitize_text_field( $connection['host'] ); // Specify main SMTP server.
-			$phpmailer->SMTPAuth    = true; // Enable SMTP authentication.
-			$phpmailer->Username    = sanitize_text_field( $connection['username'] ); // SMTP username.
-			$phpmailer->Password    = sanitize_text_field( $connection['password'] ); // SMTP password.
+			$phpmailer->Host        = sanitize_text_field( $connection['host'] ?? '' ); // Specify main SMTP server.
+			$phpmailer->Username    = sanitize_text_field( $connection['username'] ?? '' ); // SMTP username.
+			$phpmailer->Password    = sanitize_text_field( $connection['password'] ?? '' ); // SMTP password.
+			$phpmailer->SMTPAuth    = ! ( empty( $phpmailer->Username ) && empty( $phpmailer->Password ) ); // Enable SMTP auth only if credentials exist.
 			$phpmailer->SMTPAutoTLS = (bool) $connection['auto_tls'];
 			$encryption             = strtolower( sanitize_text_field( $connection['encryption'] ) );
 			if ( $encryption !== 'none' ) {
@@ -202,7 +165,7 @@ class SmtpHandler implements ConnectionHandler {
 				'placeholder' => __( 'Enter port', 'suremails' ),
 			],
 			'username'    => [
-				'required'    => true,
+				'required'    => false,
 				'datatype'    => 'string',
 				'help_text'   => '',
 				'label'       => __( 'Username', 'suremails' ),
@@ -210,7 +173,7 @@ class SmtpHandler implements ConnectionHandler {
 				'placeholder' => __( 'Enter SMTP username', 'suremails' ),
 			],
 			'password'    => [
-				'required'    => true,
+				'required'    => false,
 				'datatype'    => 'string',
 				'help_text'   => '',
 				'label'       => __( 'Password', 'suremails' ),

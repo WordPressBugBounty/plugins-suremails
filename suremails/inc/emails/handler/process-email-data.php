@@ -640,7 +640,17 @@ class ProcessEmailData {
 		}
 
 		$base_name = basename( $attachment );
-		return substr( $base_name, strpos( $base_name, '-' ) + 1 );
+
+		// New format: {16-md5}-{12-random}-{name} = 30 char prefix.
+		// Old format: {16-md5}-{name} = 17 char prefix.
+		// Detection: check if position 29 is a dash (0-indexed: 16 + 1 + 12 = 29).
+		if ( strlen( $base_name ) > 29 && $base_name[29] === '-' ) {
+			return substr( $base_name, 30 );
+		}
+
+		// Backward compatibility: old format <= 1.9.0.
+		$dash_pos = strpos( $base_name, '-' );
+		return $dash_pos !== false ? substr( $base_name, $dash_pos + 1 ) : $base_name;
 	}
 
 	/**

@@ -146,6 +146,28 @@ class RecommendedPlugin extends Api_Base {
 			200
 		);
 	}
+
+	/**
+	 * Get recommended plugins sequence.
+	 *
+	 * @return array
+	 * @since 1.9.0
+	 */
+	public static function get_recommended_plugins_sequence() {
+		$sequence = [
+			'sureforms',
+			'surecart',
+			'surerank',
+			'header-footer-elementor',
+			'suretriggers',
+		];
+
+		if ( ! defined( 'ELEMENTOR_VERSION' ) ) {
+			$sequence = array_diff( $sequence, [ 'header-footer-elementor' ] );
+		}
+
+		return array_values( $sequence );
+	}
 }
 
 // Instantiate the singleton instance of RecommendedPlugin.

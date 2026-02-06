@@ -3,9 +3,9 @@ Contributors: brainstormforce
 Donate link: https://www.paypal.me/BrainstormForce
 Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
-Tested up to: 6.8
+Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.8.1
+Stable tag: 1.9.2
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -244,6 +244,18 @@ You can report the issue through our [Bug Bounty Program](https://brainstormforc
 5. Email Logs – Monitor your email activity with detailed logs to track successful, failed, in progress, and blocked emails easily.
 
 == Changelog ==
+
+v1.9.2 - 21-January-2025
+- Improvement: Added a setting to choose where the SureMail menu appears in the WordPress admin.
+
+v1.9.1 - 26-November-2025
+- Fix: Addressed a security bug. Props to Wordfence for reporting it responsibly.
+
+v1.9.0 04-November-2025
+- New: Zoho Mail email service provider added.
+- Improvement: Improved Weekly Email Summary format with more intuitive design.
+- Improvement: Other SMTP Connection - Improved Other SMTP provider to support have 'username' and 'password' fields optional.
+- Improvement: Added SureMail settings in WP admin menu for better accessibility. 
 
 v1.8.1 - 1-August-2025
 - Fix: AWS - Gmail - PHPMail Connection : Fixed an issue with plain text content type.

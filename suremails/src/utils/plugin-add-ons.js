@@ -19,10 +19,12 @@ import {
 	SureDashLogo,
 	AstraThemeLogo,
 	AbandonedCartsLogo,
+	SureRankLogo,
+	UAE,
 } from 'assets/icons';
 
 export const recommendedPluginsData = {
-	sequence: [
+	sequence: window.suremails?.recommendedPluginsData || [
 		'sureforms',
 		'ultimate-addons-for-gutenberg',
 		'surecart',
@@ -263,5 +265,40 @@ export const pluginAddons = [
 		name: __( 'Cart Abandonment Recovery', 'suremails' ),
 		type: 'plugin',
 		init: 'woo-cart-abandonment-recovery/woo-cart-abandonment-recovery.php',
+	},
+	{
+		id: '13',
+		badgeText: __( 'Free', 'suremails' ),
+		svg: <UAE />,
+		title: __( 'Ultimate Addons for Elementor', 'suremails' ),
+		long_description: __(
+			'Build modern websites with elementor addons.',
+			'suremails'
+		),
+		short_description: __(
+			'Build modern websites with elementor addons.',
+			'suremails'
+		),
+		slug: 'header-footer-elementor',
+		type: 'plugin',
+		init: 'header-footer-elementor/header-footer-elementor.php',
+	},
+
+	{
+		id: '14',
+		badgeText: __( 'Free', 'suremails' ),
+		svg: <SureRankLogo />,
+		title: __( 'SureRank', 'suremails' ),
+		long_description: __(
+			'Optimize your website for search engines with SureRank, an all-in-one SEO plugin for WordPress.',
+			'suremails'
+		),
+		short_description: __(
+			'Optimize your website for search engines with SureRank.',
+			'suremails'
+		),
+		slug: 'surerank',
+		type: 'plugin',
+		init: 'surerank/surerank.php',
 	},
 ];

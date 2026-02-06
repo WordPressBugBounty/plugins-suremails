@@ -285,9 +285,9 @@ const ConnectionProviders = () => {
 			const response = await testAndSaveEmailConnection( payload );
 
 			if ( response?.success ) {
-				toast.success( __( 'Verification successful!', 'suremails' ), {
+				toast.success( __( 'Saved successfully!', 'suremails' ), {
 					description: __(
-						'Connection tested and saved successfully!',
+						'Connection details saved successfully!',
 						'suremails'
 					),
 				} );

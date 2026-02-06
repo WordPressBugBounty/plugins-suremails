@@ -20,7 +20,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 /**
  * Class Notice
  *
- * Handles the `/disable-notice` REST API endpoint.
+ * Handles the notice dismissal REST API endpoints.
  */
 class Notice extends Api_Base {
 	use Instance;
@@ -39,13 +39,27 @@ class Notice extends Api_Base {
 	 * @return void
 	 */
 	public function register_routes() {
+		// Configuration notice dismissal (15 days).
 		register_rest_route(
 			$this->get_api_namespace(),
 			$this->rest_base,
 			[
 				[
 					'methods'             => WP_REST_Server::EDITABLE,
-					'callback'            => [ $this, 'handle_notice' ],
+					'callback'            => [ $this, 'handle_configuration_notice' ],
+					'permission_callback' => [ $this, 'validate_permission' ],
+				],
+			]
+		);
+
+		// Menu location notice dismissal (permanent).
+		register_rest_route(
+			$this->get_api_namespace(),
+			'/disable-menu-location-notice',
+			[
+				[
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => [ $this, 'handle_menu_location_notice' ],
 					'permission_callback' => [ $this, 'validate_permission' ],
 				],
 			]
@@ -53,13 +67,13 @@ class Notice extends Api_Base {
 	}
 
 	/**
-	 * Disable admin notice for 15 days.
+	 * Disable configuration notice for 15 days.
 	 *
 	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
 	 * @return WP_REST_Response
 	 */
-	public function handle_notice( $request ) {
-		// Calculate “now + 15 days”.
+	public function handle_configuration_notice( $request ) {
+		// Calculate "now + 15 days".
 		$expiry_time = time() + ( 1296000 );
 		update_option( 'suremails_notice_dismissal_time', $expiry_time );
 
@@ -67,6 +81,24 @@ class Notice extends Api_Base {
 			[
 				'success' => true,
 				'message' => __( 'Notice disabled for 15 days.', 'suremails' ),
+			]
+		);
+	}
+
+	/**
+	 * Disable menu location notice permanently (one-time dismissal).
+	 *
+	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
+	 * @return WP_REST_Response
+	 */
+	public function handle_menu_location_notice( $request ) {
+		// Set a permanent flag - notice will never show again once dismissed.
+		update_option( 'suremails_menu_notice_dismissed', true );
+
+		return rest_ensure_response(
+			[
+				'success' => true,
+				'message' => __( 'Menu location notice dismissed.', 'suremails' ),
 			]
 		);
 	}

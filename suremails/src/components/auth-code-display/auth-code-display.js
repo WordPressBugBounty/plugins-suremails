@@ -3,6 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { toast } from '@bsf/force-ui';
 import { __ } from '@wordpress/i18n';
 import { ONBOARDING_SESSION_STORAGE_KEY } from '@screens/onboarding/onboarding-state';
+import {
+	isValidOAuthProvider,
+	getProviderTypeByState,
+} from '@oauth/oauth-providers';
 
 /* global sessionStorage */
 
@@ -13,12 +17,12 @@ const AuthCodeDisplay = () => {
 		ONBOARDING_SESSION_STORAGE_KEY
 	);
 
-	const redirectToGmailConnectionDrawer = () => {
+	const redirectToConnectionDrawer = ( providerType ) => {
 		setTimeout( () => {
 			navigate( '/connections', {
 				state: {
 					openDrawer: true,
-					selectedProvider: 'GMAIL',
+					selectedProvider: providerType,
 				},
 			} );
 		}, 300 );
@@ -52,7 +56,7 @@ const AuthCodeDisplay = () => {
 		const urlParams = new URLSearchParams( window.location.search );
 		const state = urlParams.get( 'state' );
 
-		if ( ! state || state !== 'gmail' ) {
+		if ( ! state || ! isValidOAuthProvider( state ) ) {
 			cleanUrlToDashboard();
 
 			toast.error( __( 'Authorization Failed', 'suremails' ), {
@@ -63,7 +67,7 @@ const AuthCodeDisplay = () => {
 				autoDismiss: false,
 			} );
 
-			redirectToGmailConnectionDrawer();
+			redirectToConnectionDrawer( 'GMAIL' );
 			return;
 		}
 
@@ -75,10 +79,12 @@ const AuthCodeDisplay = () => {
 
 			cleanUrlToDashboard();
 
+			const providerType = getProviderTypeByState( state );
+
 			const updatedFormState = {
 				...storedFormState,
 				auth_code: code,
-				type: 'GMAIL',
+				type: providerType,
 				refresh_token: '',
 				force_save: true,
 			};
@@ -88,7 +94,8 @@ const AuthCodeDisplay = () => {
 				JSON.stringify( updatedFormState )
 			);
 
-			redirectToGmailConnectionDrawer();
+			// Redirect to appropriate connection drawer based on provider
+			redirectToConnectionDrawer( providerType );
 			return;
 		}
 
@@ -102,9 +109,12 @@ const AuthCodeDisplay = () => {
 
 		const storedFormState =
 			JSON.parse( localStorage.getItem( 'formStateValues' ) ) || {};
+
+		const providerType = getProviderTypeByState( state );
+
 		const updatedFormState = {
 			...storedFormState,
-			type: 'GMAIL',
+			type: providerType,
 			refresh_token: '',
 			force_save: true,
 		};
@@ -115,7 +125,9 @@ const AuthCodeDisplay = () => {
 		);
 
 		cleanUrlToDashboard();
-		redirectToGmailConnectionDrawer();
+
+		// Redirect to appropriate connection drawer based on provider
+		redirectToConnectionDrawer( providerType );
 	}, [ navigate ] );
 
 	// For onboarding flow
@@ -129,15 +141,17 @@ const AuthCodeDisplay = () => {
 		const code = urlParams.get( 'code' );
 		const state = urlParams.get( 'state' );
 
-		if ( ! code || state !== 'gmail' ) {
+		if ( ! code || ! isValidOAuthProvider( state ) ) {
 			return;
 		}
 
 		cleanUrlToDashboard();
 
+		const connectionType = getProviderTypeByState( state );
+
 		navigate( '/onboarding/connection', {
 			state: {
-				connection: 'GMAIL',
+				connection: connectionType,
 				auth_code: code,
 			},
 		} );

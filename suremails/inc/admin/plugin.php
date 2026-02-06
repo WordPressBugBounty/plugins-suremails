@@ -9,9 +9,11 @@
 
 namespace SureMails\Inc\Admin;
 
+use SureMails\Inc\API\RecommendedPlugin;
 use SureMails\Inc\Onboarding;
 use SureMails\Inc\Settings;
 use SureMails\Inc\Traits\Instance;
+use SureMails\Inc\Utils\Utils;
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit; // Exit if accessed directly.
@@ -35,6 +37,9 @@ class Plugin {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_scripts' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_notice_scripts' ] );
 		add_action( 'admin_notices', [ $this, 'check_configuration' ] );
+		add_action( 'admin_notices', [ $this, 'show_menu_location_notice' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_menu_location_notice_scripts' ] );
+		add_action( 'admin_head', [ $this, 'hide_duplicate_menu_css' ] );
 
 		// Add settings link to the plugin action links.
 		add_filter( 'plugin_action_links_' . SUREMAILS_BASE, [ $this, 'add_settings_link' ] );
@@ -75,7 +80,7 @@ class Plugin {
 				}
 
 				wp_safe_redirect(
-					admin_url( 'options-general.php?page=' . $page )
+					Utils::get_admin_url( str_replace( SUREMAILS, '', $page ) )
 				);
 				exit;
 			}
@@ -169,9 +174,9 @@ class Plugin {
 			'suremails-admin-notice',
 			'suremailsNotice',
 			[
-				'dashboardUrl'  => esc_url( admin_url( 'options-general.php?page=' . SUREMAILS . '#/dashboard' ) ),
+				'dashboardUrl'  => esc_url( Utils::get_admin_url( '/dashboard' ) ),
 				'nonce'         => wp_create_nonce( 'wp_rest' ),
-				'onboardingURL' => admin_url( 'options-general.php?page=' . SUREMAILS . '#/onboarding/welcome' ),
+				'onboardingURL' => Utils::get_admin_url( '/onboarding/welcome' ),
 			]
 		);
 
@@ -185,13 +190,29 @@ class Plugin {
 	 * @return void
 	 */
 	public function add_admin_menu() {
-		add_options_page(
-			__( 'SureMail Settings', 'suremails' ),
-			__( 'SureMail SMTP', 'suremails' ),
-			'manage_options',
-			SUREMAILS,
-			[ $this, 'render_suremails_frontend' ]
-		);
+		if ( Utils::is_sidebar_enabled() ) {
+
+			add_menu_page(
+				__( 'SureMail Settings', 'suremails' ),
+				__( 'SureMail SMTP', 'suremails' ),
+				'manage_options',
+				SUREMAILS,
+				[ $this, 'render_suremails_frontend' ],
+				'dashicons-email-alt',
+				30
+			);
+
+			// Add submenu items using helper function.
+			$this->add_suremails_submenus();
+		} else {
+			add_options_page(
+				__( 'SureMail Settings', 'suremails' ),
+				__( 'SureMail SMTP', 'suremails' ),
+				'manage_options',
+				SUREMAILS,
+				[ $this, 'render_suremails_frontend' ]
+			);
+		}
 	}
 
 	/**
@@ -201,8 +222,8 @@ class Plugin {
 	 * @return void
 	 */
 	public function enqueue_admin_scripts( $hook ) {
-		// Ensure scripts are only enqueued on the SureMails settings page.
-		if ( $hook !== 'settings_page_' . SUREMAILS ) {
+		// Check if we're on a SureMails admin page.
+		if ( ! $this->is_suremails_admin_page( $hook ) ) {
 			return;
 		}
 
@@ -260,16 +281,28 @@ class Plugin {
 				'privacyPolicyURL'             => 'https://suremails.com/privacy-policy?utm_campaign=suremails&utm_medium=suremails-dashboard',
 				'docsURL'                      => 'https://suremails.com/docs?utm_campaign=suremails&utm_medium=suremails-dashboard',
 				'supportURL'                   => 'https://suremails.com/contact/?utm_campaign=suremails&utm_medium=suremails-dashboard',
-				'adminURL'                     => admin_url( 'options-general.php?page=' . SUREMAILS ),
+				'adminURL'                     => Utils::get_admin_url(),
 				'ottokit_connected'            => apply_filters( 'suretriggers_is_user_connected', '' ),
 				'ottokit_admin_url'            => admin_url( 'admin.php?page=suretriggers' ),
 				'pluginInstallationPermission' => current_user_can( 'install_plugins' ),
 				'onboardingCompleted'          => Onboarding::instance()->get_onboarding_status(),
+				'recommendedPluginsData'       => RecommendedPlugin::get_recommended_plugins_sequence(),
 			]
 		);
 
 		// Set the script translations.
 		wp_set_script_translations( 'suremails-react-script', 'suremails', SUREMAILS_DIR . 'languages' );
+
+		// Hide duplicate main menu item in submenu.
+		wp_add_inline_style(
+			'suremails-react-styles',
+			'
+			#adminmenu .toplevel_page_' . SUREMAILS . ' .wp-submenu li.wp-first-item,
+			#adminmenu .toplevel_page_' . SUREMAILS . ' .wp-submenu li.wp-first-item a { 
+				display: none !important; 
+			}
+		'
+		);
 	}
 
 	/**
@@ -289,13 +322,165 @@ class Plugin {
 	 */
 	public function add_settings_link( array $links ) {
 
-		$settings_url = admin_url( 'options-general.php?page=' . SUREMAILS . '#settings' );
+		$settings_url = Utils::get_admin_url( 'settings' );
 		$links[]      = '<a href="' . esc_url( $settings_url ) . '">' . __( 'Settings', 'suremails' ) . '</a>';
 
-		$wizard_url = admin_url( 'options-general.php?page=' . SUREMAILS . '#/onboarding/welcome' );
+		$wizard_url = Utils::get_admin_url( '/onboarding/welcome' );
 		$links[]    = '<a href="' . esc_url( $wizard_url ) . '">' . __( 'Setup Wizard', 'suremails' ) . '</a>';
 
 		return $links;
+	}
+
+	/**
+	 * Hide duplicate menu item with CSS in admin head.
+	 *
+	 * @return void
+	 */
+	public function hide_duplicate_menu_css() {
+		if ( ! is_admin() || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// Only apply these styles if showing in sidebar.
+		if ( Utils::is_sidebar_enabled() ) {
+			?>
+			<style>
+				#adminmenu .toplevel_page_<?php echo esc_attr( SUREMAILS ); ?> .wp-submenu li.wp-first-item,
+				#adminmenu .toplevel_page_<?php echo esc_attr( SUREMAILS ); ?> .wp-submenu li.wp-first-item a {
+					display: none !important;
+				}
+			</style>
+			<?php
+		}
+	}
+
+	/**
+	 * Show menu location notice to inform users about the menu location change.
+	 *
+	 * @return void
+	 */
+	public function show_menu_location_notice() {
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		if ( $this->is_menu_notice_disabled() ) {
+			return;
+		}
+
+		$current_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		if ( $current_page === SUREMAILS ) {
+			return;
+		}
+
+		?>
+			<div id="suremails-menu-location-notice" class="notice notice-info is-dismissible">
+			</div>
+		<?php
+	}
+
+	/**
+	 * Enqueue menu location notice scripts and styles.
+	 *
+	 * @return void
+	 */
+	public function enqueue_menu_location_notice_scripts() {
+		if ( ! is_admin() || ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
+		// If notice is disabled (dismissed), do not enqueue.
+		if ( $this->is_menu_notice_disabled() ) {
+			return;
+		}
+
+		$current_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+
+		// Don't enqueue on SureMails pages.
+		if ( $current_page === SUREMAILS ) {
+			return;
+		}
+
+		// Use the same admin-notice script for menu location notice.
+		$assets = require SUREMAILS_DIR . 'build/admin-notice.asset.php';
+
+		if ( ! isset( $assets ) ) {
+			return;
+		}
+
+		wp_enqueue_script(
+			'suremails-admin-notice',
+			SUREMAILS_PLUGIN_URL . 'build/admin-notice.js',
+			[ 'wp-element', 'wp-dom-ready', 'wp-i18n' ],
+			$assets['version'],
+			true
+		);
+
+		wp_enqueue_style(
+			'suremails-admin-notice',
+			SUREMAILS_PLUGIN_URL . 'build/admin-notice.css',
+			[],
+			$assets['version'],
+		);
+
+		// Localize script for menu location notice.
+		wp_localize_script(
+			'suremails-admin-notice',
+			'suremailsMenuNotice',
+			[
+				'settingsUrl' => esc_url( Utils::get_admin_url( 'settings' ) ),
+				'nonce'       => wp_create_nonce( 'wp_rest' ),
+			]
+		);
+
+		// Set the script translations.
+		wp_set_script_translations( 'suremails-admin-notice', 'suremails', SUREMAILS_DIR . 'languages' );
+	}
+
+	/**
+	 * Add SureMails submenu items.
+	 *
+	 * @return void
+	 */
+	private function add_suremails_submenus() {
+		$submenu_items = [
+			[
+				'title' => __( 'Dashboard', 'suremails' ),
+				'path'  => '/dashboard',
+			],
+			[
+				'title' => __( 'Settings', 'suremails' ),
+				'path'  => '/settings',
+			],
+			[
+				'title' => __( 'Connections', 'suremails' ),
+				'path'  => '/connections',
+			],
+			[
+				'title' => __( 'Email Logs', 'suremails' ),
+				'path'  => '/logs',
+			],
+			[
+				'title' => __( 'Notifications', 'suremails' ),
+				'path'  => '/notifications',
+			],
+		];
+
+		foreach ( $submenu_items as $item ) {
+			add_submenu_page(
+				SUREMAILS,
+				$item['title'],
+				$item['title'],
+				'manage_options',
+				SUREMAILS . '#' . $item['path'],
+				[ $this, 'render_suremails_frontend' ]
+			);
+		}
 	}
 
 	/**
@@ -318,6 +503,35 @@ class Plugin {
 	}
 
 	/**
+	 * Check if the current page is a SureMails admin page.
+	 *
+	 * @param string $hook The page hook.
+	 * @return bool True if on a SureMails page, false otherwise.
+	 */
+	private function is_suremails_admin_page( $hook ) {
+		if ( Utils::is_sidebar_enabled() ) {
+			// Top-level menu page.
+			if ( $hook === 'toplevel_page_' . SUREMAILS ) {
+				return true;
+			}
+
+			// Submenu pages.
+			$submenu_hooks = [
+				'suremails_page_' . SUREMAILS . '#/dashboard',
+				'suremails_page_' . SUREMAILS . '#/settings',
+				'suremails_page_' . SUREMAILS . '#/connections',
+				'suremails_page_' . SUREMAILS . '#/logs',
+				'suremails_page_' . SUREMAILS . '#/notifications',
+				'suremails_page_' . SUREMAILS . '#/add-ons',
+			];
+
+			return in_array( $hook, $submenu_hooks, true );
+		}
+			// Settings submenu page (default).
+			return $hook === 'settings_page_' . SUREMAILS;
+	}
+
+	/**
 	 * Check if the notice is currently disabled.
 	 *
 	 * @return bool True if notice is disabled (within expiry), false if notice should be shown.
@@ -337,6 +551,15 @@ class Plugin {
 
 		// Still within disabled period.
 		return true; // Notice is disabled.
+	}
+
+	/**
+	 * Check if the menu location notice is currently disabled.
+	 *
+	 * @return bool True if notice is disabled (dismissed), false if notice should be shown.
+	 */
+	private function is_menu_notice_disabled() {
+		return (bool) get_option( 'suremails_menu_notice_dismissed', false );
 	}
 }
 

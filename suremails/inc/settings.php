@@ -37,12 +37,21 @@ const DEFAULT_CONNECTION_DETAILS = [
 ];
 
 const MISC_SETTINGS = [
-	'email_summary'        => 'yes',
 	'email_summary_active' => 'yes',
 	'email_summary_day'    => 'monday',
 	'email_summary_index'  => '1',
+	'show_in_sidebar'      => 'no',
 ];
 
+// Maps frontend field names to database keys.
+// Note: emailSummaryIndex is included for API compatibility but is managed
+// by the WeeklySummary cron job, not user input settings.
+const MISC_SETTINGS_MAPPING = [
+	'emailSummaryActive' => 'email_summary_active',
+	'emailSummaryIndex'  => 'email_summary_index',
+	'emailSummaryDay'    => 'email_summary_day',
+	'showInSidebar'      => 'show_in_sidebar',
+];
 /**
  * Class Settings
  *
@@ -320,7 +329,11 @@ class Settings {
 	/**
 	 * Update the value of a specific key in the 'suremails_settings' option.
 	 *
-	 * @param string $key The key to update in the settings.
+	 * This method allows updating any misc setting that already exists in the
+	 * settings array or is defined in MISC_SETTINGS. It prevents adding
+	 * arbitrary keys to maintain data integrity.
+	 *
+	 * @param string $key   The setting key to update.
 	 * @param mixed  $value The new value to set for the specified key.
 	 * @return void
 	 */
@@ -331,7 +344,16 @@ class Settings {
 			return;
 		}
 
-		if ( is_array( $settings ) && array_key_exists( $key, $settings ) ) {
+		// Only update if the key already exists in stored settings or is a known misc setting.
+		// This prevents accidentally adding arbitrary keys while allowing updates to
+		// both existing settings and new settings from MISC_SETTINGS defaults.
+		if ( ! is_array( $settings ) ) {
+			return;
+		}
+
+		$is_valid_key = array_key_exists( $key, $settings ) || array_key_exists( $key, MISC_SETTINGS );
+
+		if ( $is_valid_key ) {
 			$settings[ $key ] = $value;
 		}
 

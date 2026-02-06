@@ -1,10 +1,11 @@
 import apiFetch from '@wordpress/api-fetch';
 import { __ } from '@wordpress/i18n';
 
-export const get_gmail_auth_url = async (
+export const get_auth_url = async (
 	provider,
 	client_id,
-	client_secret
+	client_secret,
+	redirect_url
 ) => {
 	try {
 		const response = await apiFetch( {
@@ -18,6 +19,7 @@ export const get_gmail_auth_url = async (
 				provider,
 				client_id,
 				client_secret,
+				redirect_url,
 			} ),
 		} );
 		return response;

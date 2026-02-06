@@ -8,6 +8,7 @@
 
 namespace SureMails\Inc\Analytics;
 
+use SureMails\Inc\DB\EmailLog;
 use SureMails\Inc\Settings;
 use SureMails\Inc\Traits\Instance;
 
@@ -60,6 +61,7 @@ class Analytics {
 				'ottokit_integration' => apply_filters( 'suretriggers_is_user_connected', '' ),
 				'backup_connection'   => $backup_connection,
 			],
+			'site_type'      => $this->get_site_type(),
 		];
 
 		return $stats_data;
@@ -130,5 +132,43 @@ class Analytics {
 		}
 
 		return false;
+	}
+
+	/**
+	 * Get site type based on email activity in the last 30 days.
+	 *
+	 * - super: Site sends at least 50 emails in the last 30 days.
+	 * - active: Site sends at least 10 emails in the last 30 days.
+	 * - inactive: Site sends less than 10 emails in the last 30 days.
+	 *
+	 * @return string Site type: 'super', 'active', or 'inactive'.
+	 */
+	private function get_site_type(): string {
+		global $wpdb;
+
+		$thirty_days_ago = gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) );
+
+		$table_name = EmailLog::instance()->get_table_name();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$count = $wpdb->get_var(
+			$wpdb->prepare(
+				// phpcs:ignore
+				"SELECT COUNT(*) FROM `{$table_name}` WHERE `created_at` >= %s",
+				$thirty_days_ago
+			)
+		);
+
+		$email_count = (int) $count;
+
+		if ( $email_count >= 50 ) {
+			return 'super';
+		}
+
+		if ( $email_count >= 10 ) {
+			return 'active';
+		}
+
+		return 'inactive';
 	}
 }

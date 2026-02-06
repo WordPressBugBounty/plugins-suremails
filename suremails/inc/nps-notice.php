@@ -27,13 +27,14 @@ if ( ! class_exists( 'Nps_Notice' ) ) {
 
 		/**
 		 * Array of allowed screens where the NPS survey should be displayed.
-		 * This ensures that the NPS survey is only displayed on SureForms pages.
+		 * This ensures that the NPS survey is only displayed on SureMails pages.
 		 *
 		 * @var array<string>
 		 * @since 1.0.0
+		 * @since 1.9.0
 		 */
 		private static $allowed_screens = [
-			'settings_page_' . SUREMAILS,
+			'toplevel_page_' . SUREMAILS,
 		];
 
 		/**
@@ -87,7 +88,6 @@ if ( ! class_exists( 'Nps_Notice' ) ) {
 						'plugin_name'                 => __( 'SureMail', 'suremails' ),
 						'nps_rating_message'          => __( 'How likely are you to recommend SureMail to your friends or colleagues?', 'suremails' ),
 						'feedback_title'              => __( 'Thanks a lot for your feedback! 😍', 'suremails' ),
-						'feedback_content'            => __( 'Could you please do us a favor and give us a 5-star rating on WordPress? It would help others choose SureMail with confidence. Thank you!', 'suremails' ),
 						'plugin_rating_link'          => esc_url( 'https://wordpress.org/support/plugin/suremails/reviews/#new-post' ),
 						'plugin_rating_title'         => __( 'Thank you for your feedback', 'suremails' ),
 						'plugin_rating_content'       => __( 'We value your input. How can we improve your experience?', 'suremails' ),

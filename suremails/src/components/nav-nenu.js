@@ -49,6 +49,53 @@ const NavMenu = () => {
 		setActivePath( location.pathname );
 	}, [ location.pathname ] );
 
+	useEffect( () => {
+		const updateWordPressMenuState = () => {
+			// Find the SureMails main menu item
+			const sureMailsMainMenu = document.querySelector(
+				'#adminmenu li.toplevel_page_' +
+					( window.suremails?.adminURL
+						?.split( 'page=' )[ 1 ]
+						?.split( '#' )[ 0 ] || 'suremail' )
+			);
+
+			if ( ! sureMailsMainMenu ) {
+				return;
+			}
+
+			const wpSubmenuItems =
+				sureMailsMainMenu.querySelectorAll( '.wp-submenu a' );
+
+			// Remove all current active states from SureMails submenu items
+			wpSubmenuItems.forEach( ( item ) => {
+				item.classList.remove( 'current' );
+				item.parentElement.classList.remove( 'current' );
+			} );
+
+			// Find and activate the corresponding WordPress menu item
+			const currentPath = location.pathname;
+			const currentHash = location.hash || '#' + currentPath;
+
+			let matchingItem = null;
+
+			matchingItem = Array.from( wpSubmenuItems ).find( ( item ) => {
+				const href = item.getAttribute( 'href' );
+				return href && href.includes( currentHash );
+			} );
+
+			// Apply active state to matching item
+			if ( matchingItem ) {
+				matchingItem.classList.add( 'current' );
+				matchingItem.parentElement.classList.add( 'current' );
+			}
+		};
+
+		// Update with delay to ensure DOM and React state are ready
+		const timeout = setTimeout( updateWordPressMenuState, 200 );
+
+		return () => clearTimeout( timeout );
+	}, [ location.pathname ] );
+
 	const handleIconClick = () => {
 		navigate( '/dashboard' );
 	};

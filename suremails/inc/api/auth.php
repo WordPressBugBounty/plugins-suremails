@@ -9,6 +9,8 @@
 
 namespace SureMails\Inc\API;
 
+use SureMails\Inc\Emails\Providers\GMAIL\GmailHandler;
+use SureMails\Inc\Emails\Providers\ZOHO\ZohoHandler;
 use SureMails\Inc\Traits\Instance;
 use WP_REST_Response;
 use WP_REST_Server;
@@ -61,55 +63,39 @@ class Auth extends Api_Base {
 	 * @param \WP_REST_Request<array<string, mixed>> $request The REST request instance.
 	 * @return WP_REST_Response Returns the auth URL or an error.
 	 */
-	public function get_auth_url( $request ) {
+	public function get_auth_url( $request ): WP_REST_Response {
 		$params = $request->get_json_params();
 
-		$provider = isset( $params['provider'] ) ? sanitize_text_field( $params['provider'] ) : '';
+		$provider     = isset( $params['provider'] ) ? sanitize_text_field( $params['provider'] ) : '';
+		$provider_key = strtolower( $provider );
 
-		if ( strtolower( $provider ) === 'gmail' ) {
-			$reponse = $this->get_gmail_auth_url( $params );
-			return new WP_REST_Response( $reponse, 200 );
+		if ( ! in_array( $provider_key, array_keys( $this->get_supported_providers() ), true ) ) {
+			return new WP_REST_Response( [ 'error' => __( 'Unsupported provider.', 'suremails' ) ], 400 );
 		}
 
-		return new WP_REST_Response( [ 'error' => __( 'Unsupported provider.', 'suremails' ) ], 400 );
+		$supported_providers = $this->get_supported_providers();
+		$handler_class       = $supported_providers[ $provider_key ];
+		$response            = $handler_class::get_auth_url( $params );
+
+		if ( isset( $response['error'] ) ) {
+			return new WP_REST_Response( $response, 400 );
+		}
+
+		return new WP_REST_Response( $response, 200 );
 	}
 
 	/**
-	 * Generates the Gmail authorization URL.
+	 * Get supported OAuth providers
 	 *
-	 * Validates the provided client credentials and returns the Gmail auth URL.
-	 *
-	 * @param array $params The parameters passed in the API request.
-	 * @return WP_REST_Response|array Returns the Gmail auth URL or an error response.
+	 * @return array
 	 */
-	private function get_gmail_auth_url( $params ) {
-
-		$client_id     = isset( $params['client_id'] ) ? sanitize_text_field( $params['client_id'] ) : '';
-		$client_secret = isset( $params['client_secret'] ) ? sanitize_text_field( $params['client_secret'] ) : '';
-
-		if ( empty( $client_id ) || empty( $client_secret ) ) {
-			return new WP_REST_Response( [ 'error' => __( 'Client ID and Client Secret are required.', 'suremails' ) ], 400 );
-		}
-
-		$redirect_uri = admin_url( 'options-general.php?page=suremail' );
-		// Construct the Gmail authorization URL.
-		$auth_url = 'https://accounts.google.com/o/oauth2/auth?' . http_build_query(
-			[
-				'client_id'              => $client_id,
-				'redirect_uri'           => $redirect_uri,
-				'response_type'          => 'code',
-				'scope'                  => 'https://mail.google.com/',
-				'state'                  => 'gmail',
-				'access_type'            => 'offline',
-				'approval_prompt'        => 'force',
-				'include_granted_scopes' => 'true',
-			]
-		);
-
+	private function get_supported_providers() {
 		return [
-			'auth_url' => $auth_url,
+			'gmail' => GmailHandler::class,
+			'zoho'  => ZohoHandler::class,
 		];
 	}
+
 }
 
 // Instantiate the Auth class to register the routes.

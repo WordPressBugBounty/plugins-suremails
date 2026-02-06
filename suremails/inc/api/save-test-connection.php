@@ -268,7 +268,7 @@ class SaveTestConnection extends Api_Base {
 
 		$providers = [
 			'GMAIL',
-
+			'ZOHO',
 		];
 
 		if ( ! in_array( $connection_data['type'], $providers ) ) {
@@ -286,6 +286,14 @@ class SaveTestConnection extends Api_Base {
 		}
 		if ( isset( $new_fields['expire_stamp'] ) ) {
 			$connection_data['expire_stamp'] = $new_fields['expire_stamp'];
+		}
+
+		if ( isset( $new_fields['account_id'] ) ) {
+			$connection_data['account_id'] = $new_fields['account_id']; // zoho.
+		}
+
+		if ( isset( $new_fields['from_email'] ) ) {
+			$connection_data['from_email'] = $new_fields['from_email']; // zoho.
 		}
 
 		unset( $connection_data['auth_code'] );

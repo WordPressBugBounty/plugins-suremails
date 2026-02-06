@@ -142,55 +142,60 @@ const RecommendedPlugins = () => {
 					containerType="grid"
 					className="gap-1 p-1 grid-cols-2 md:grid-cols-4 min-[1020px]:grid-cols-1 xl:grid-cols-2"
 				>
-					{ recommendedPluginsData.sequence.map( ( slug ) => {
-						const card = pluginAddons.find(
-							( p ) => p.slug === slug
-						);
-						if ( ! card ) {
-							return null;
-						}
+					{ recommendedPluginsData.sequence
+						.slice( 0, 4 )
+						.map( ( slug ) => {
+							const card = pluginAddons.find(
+								( p ) => p.slug === slug
+							);
+							if ( ! card ) {
+								return null;
+							}
 
-						return (
-							<Container.Item key={ card.slug } className="flex">
-								<Container
-									containerType="flex"
-									direction="column"
-									className="w-[190px] min-w-[144px] min-h-[135px] flex-1 gap-1 p-2 rounded-md shadow-soft-shadow-inner bg-background-primary"
+							return (
+								<Container.Item
+									key={ card.slug }
+									className="flex"
 								>
-									<Container.Item>
-										<Container className="items-center gap-1.5 p-1">
-											<Container.Item
-												className="[&>svg]:size-5 flex"
-												grow={ 0 }
-												shrink={ 0 }
+									<Container
+										containerType="flex"
+										direction="column"
+										className="w-[190px] min-w-[144px] min-h-[135px] flex-1 gap-1 p-2 rounded-md shadow-soft-shadow-inner bg-background-primary"
+									>
+										<Container.Item>
+											<Container className="items-center gap-1.5 p-1">
+												<Container.Item
+													className="[&>svg]:size-5 flex"
+													grow={ 0 }
+													shrink={ 0 }
+												>
+													{ card.svg }
+												</Container.Item>
+												<Container.Item className="flex">
+													<Label className="text-sm font-medium">
+														{ card.title }
+													</Label>
+												</Container.Item>
+											</Container>
+										</Container.Item>
+										<Container.Item className="gap-0.5 p-1">
+											<Label
+												variant="help"
+												className="text-sm font-normal text-text-tertiary"
 											>
-												{ card.svg }
-											</Container.Item>
-											<Container.Item className="flex">
-												<Label className="text-sm font-medium">
-													{ card.title }
-												</Label>
-											</Container.Item>
-										</Container>
-									</Container.Item>
-									<Container.Item className="gap-0.5 p-1">
-										<Label
-											variant="help"
-											className="text-sm font-normal text-text-tertiary"
-										>
-											{ recommendedPluginsData?.description ===
-											'long_description'
-												? card?.long_description
-												: card?.short_description }
-										</Label>
-									</Container.Item>
-									<Container.Item className="gap-0.5 px-1 pt-2 pb-1 mt-auto">
-										{ renderActionButton( card ) }
-									</Container.Item>
-								</Container>
-							</Container.Item>
-						);
-					} ) }
+												{ recommendedPluginsData?.description ===
+												'long_description'
+													? card?.long_description
+													: card?.short_description }
+											</Label>
+										</Container.Item>
+										<Container.Item className="gap-0.5 px-1 pt-2 pb-1 mt-auto">
+											{ renderActionButton( card ) }
+										</Container.Item>
+									</Container>
+								</Container.Item>
+							);
+						} ) }
 				</Container>
 			</Container.Item>
 		</Container>

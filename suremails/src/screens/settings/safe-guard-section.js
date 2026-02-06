@@ -65,8 +65,8 @@ const validationSchema = z.object( {
 // Separate components for better organization
 const ContentGuardHeader = () => (
 	<div className="space-y-1.5">
-		<Shield className="w-6 h-6 text-icon-primary" strokeWidth="1.25" />
-		<div className="space-y-1">
+		<div className="flex items-center gap-2">
+			<Shield className="w-6 h-6 text-icon-primary" strokeWidth="1.25" />
 			<Title
 				tag="h2"
 				title={ __(
@@ -74,11 +74,13 @@ const ContentGuardHeader = () => (
 					'suremails'
 				) }
 			/>
+		</div>
+		<div className="space-y-1">
 			{ window?.suremails?.contentGuardPopupStatus && (
 				<>
 					<p>
 						{ __(
-							'Reputation Shield validates your emails with AI for harmful and inappropriate content before they are processed. If an email contains problematic material, it is blocked before it reaches your SMTP provider.',
+							'This validates your emails with AI for harmful and inappropriate content. If an email contains problematic material, it is blocked before it reaches your SMTP provider.',
 							'suremails'
 						) }
 					</p>
@@ -142,7 +144,7 @@ const UserDetailsFormDialog = ( {
 					</div>
 					<Dialog.Description>
 						{ __(
-							'Activate Reputation Shield to safeguard your emails. Optionally, share your email address to receive valuable tips for optimising your email delivery.',
+							'Please enter your name & email address',
 							'suremails'
 						) }
 					</Dialog.Description>

@@ -4,7 +4,7 @@ import parse from 'html-react-parser';
 import DOMPurify from 'dompurify';
 import { cn } from '@utils/utils';
 import CopyButton from '@components/copy-button';
-import { get_gmail_auth_url } from '@api/auth';
+import { get_auth_url } from '@api/auth';
 import { __ } from '@wordpress/i18n';
 
 const SHOW_MORE_CHARACTER_LIMIT = 50;
@@ -52,21 +52,28 @@ const FormField = ( {
 		return null;
 	}
 	const render_auth_code = check_auth_code();
-	const handleGmailAuth = async ( provider, client_id, client_secret ) => {
+	const handleProviderAuth = async (
+		provider,
+		client_id,
+		client_secret,
+		redirect_url
+	) => {
 		if ( typeof onClickAuthenticate === 'function' ) {
 			onClickAuthenticate(
 				provider,
 				formStateValues,
 				client_id,
-				client_secret
+				client_secret,
+				redirect_url
 			);
 		}
 
 		try {
-			const response = await get_gmail_auth_url(
+			const response = await get_auth_url(
 				provider,
 				client_id,
-				client_secret
+				client_secret,
+				redirect_url
 			);
 			if ( response?.auth_url ) {
 				window.open(
@@ -257,10 +264,13 @@ const FormField = ( {
 									formStateValues?.client_id || '';
 								const client_secret =
 									formStateValues?.client_secret || '';
-								handleGmailAuth(
+								const redirect_url =
+									formStateValues?.redirect_url || '';
+								handleProviderAuth(
 									provider,
 									client_id,
 									client_secret,
+									redirect_url,
 									formStateValues
 								);
 							} else {

@@ -34,9 +34,36 @@ const Settings = () => {
 		mutationFn: saveSettings,
 		onSuccess: ( data ) => {
 			queryClient.setQueryData( [ 'settings' ], data );
-			toast.success( __( 'Settings saved successfully', 'suremails' ), {
-				description: __( 'Your changes have been saved.', 'suremails' ),
-			} );
+
+			// Check if redirect is needed (e.g., when showInSidebar changes)
+			if ( data?.reload && data?.redirect_url ) {
+				// Show single toast with countdown message
+				toast.success(
+					__( 'Settings saved successfully', 'suremails' ),
+					{
+						description: __(
+							'Applying new settings…',
+							'suremails'
+						),
+						duration: 3000,
+					}
+				);
+
+				// Redirect to the new admin URL after 3 seconds
+				setTimeout( () => {
+					window.location.href = data.redirect_url;
+				}, 3000 );
+			} else {
+				toast.success(
+					__( 'Settings saved successfully', 'suremails' ),
+					{
+						description: __(
+							'Your changes have been saved.',
+							'suremails'
+						),
+					}
+				);
+			}
 		},
 		onError: ( error ) => {
 			toast.error( __( 'Error saving settings', 'suremails' ), {
@@ -60,8 +87,9 @@ const Settings = () => {
 			connection_title: '',
 		},
 		emailSimulation: false,
-		emailSummary: false,
+		emailSummaryActive: false,
 		emailSummaryDay: 'monday',
+		showInSidebar: false,
 		analytics: false,
 	} );
 
@@ -83,8 +111,9 @@ const Settings = () => {
 						'',
 				},
 				emailSimulation: settingsData.email_simulation === 'yes',
-				emailSummary: settingsData?.emailSummary === 'yes',
+				emailSummaryActive: settingsData?.emailSummaryActive === 'yes',
 				emailSummaryDay: settingsData?.emailSummaryDay || 'monday',
+				showInSidebar: settingsData?.showInSidebar === 'yes',
 				analytics: settingsData.analytics === 'yes',
 			} );
 		}
@@ -130,9 +159,11 @@ const Settings = () => {
 			formState.emailSimulation !==
 				( settingsData?.email_simulation === 'yes' ) ||
 			formState.analytics !== ( settingsData?.analytics === 'yes' ) ||
-			formState.emailSummary !==
-				( settingsData?.emailSummary === 'yes' ) ||
-			formState.emailSummaryDay !== settingsData?.emailSummaryDay
+			formState.emailSummaryActive !==
+				( settingsData?.emailSummaryActive === 'yes' ) ||
+			formState.emailSummaryDay !== settingsData?.emailSummaryDay ||
+			formState.showInSidebar !==
+				( settingsData?.showInSidebar === 'yes' )
 		);
 	};
 
@@ -148,8 +179,9 @@ const Settings = () => {
 				email_simulation: formState.emailSimulation ? 'yes' : 'no',
 				log_emails: formState.logEmails ? 'yes' : 'no',
 				analytics: formState.analytics ? 'yes' : 'no',
-				emailSummary: formState.emailSummary ? 'yes' : 'no',
+				emailSummaryActive: formState.emailSummaryActive ? 'yes' : 'no',
 				emailSummaryDay: formState.emailSummaryDay,
+				showInSidebar: formState.showInSidebar ? 'yes' : 'no',
 				default_connection: formState.defaultConnection.email
 					? formState.defaultConnection
 					: {
@@ -323,70 +355,76 @@ const Settings = () => {
 						</div>
 					) }
 
-					<LineSkeleton />
 					{ /* Default Connection */ }
-					<div className="flex flex-col w-full h-auto gap-1.5">
-						<Select
-							by="id"
-							value={ formState.defaultConnection }
-							onChange={ ( value ) =>
-								handleChange( 'defaultConnection', value )
-							}
-							className="w-full h-auto"
-							disabled={ ! hasConnections }
-						>
-							<Select.Button
-								label={ __(
-									'Default Connection',
-									'suremails'
-								) }
-							>
-								{ getConnectionLabel(
-									formState.defaultConnection
-								) }
-							</Select.Button>
-							<Select.Options className="z-999999">
-								{ defaultConnectionOptions.map( ( option ) => (
-									<Select.Option
-										key={ option.value.id }
-										value={ option.value }
+					{ defaultConnectionOptions.length >= 1 && (
+						<>
+							<LineSkeleton />
+							<div className="flex flex-col w-full h-auto gap-1.5">
+								<Select
+									by="id"
+									value={ formState.defaultConnection }
+									onChange={ ( value ) =>
+										handleChange(
+											'defaultConnection',
+											value
+										)
+									}
+									className="w-full h-auto"
+									disabled={ ! hasConnections }
+								>
+									<Select.Button
+										label={ __(
+											'Default Connection',
+											'suremails'
+										) }
 									>
-										{ option.label }
-									</Select.Option>
-								) ) }
-							</Select.Options>
-						</Select>
-						<Label tag="p" size="sm" variant="help">
-							{ __(
-								'This connection will be used by default unless a specific "from email" address is provided in the email headers.',
-								'suremails'
-							) }
-						</Label>
-					</div>
-
-					<LineSkeleton />
+										{ getConnectionLabel(
+											formState.defaultConnection
+										) }
+									</Select.Button>
+									<Select.Options className="z-999999">
+										{ defaultConnectionOptions.map(
+											( option ) => (
+												<Select.Option
+													key={ option.value.id }
+													value={ option.value }
+												>
+													{ option.label }
+												</Select.Option>
+											)
+										) }
+									</Select.Options>
+								</Select>
+								<Label tag="p" size="sm" variant="help">
+									{ __(
+										'This connection will be used by default unless a specific "from email" address is provided in the email headers.',
+										'suremails'
+									) }
+								</Label>
+							</div>
+							<LineSkeleton />
+						</>
+					) }
 
 					{ /* Email Summary  */ }
 					<div className="flex w-[648px] gap-3">
 						<Switch
-							checked={ formState.emailSummary }
+							checked={ formState.emailSummaryActive }
 							onChange={ ( value ) => {
-								handleChange( 'emailSummary', value );
+								handleChange( 'emailSummaryActive', value );
 							} }
 							size="sm"
 							label={ {
-								heading: __(
-									'Enable Email Summary',
-									'suremails'
-								),
+								heading: __( 'Get Email Summary', 'suremails' ),
 								description: __(
 									'Get a weekly summary of emails sent from your site.',
 									'suremails'
 								),
 							} }
+							className="mt-1"
 						/>
 					</div>
-					{ formState.emailSummary && (
+					{ formState.emailSummaryActive && (
 						<div className="flex flex-col w-full h-auto gap-1.5">
 							<Select
 								value={ formState.emailSummaryDay }
@@ -424,6 +462,7 @@ const Settings = () => {
 							</Label>
 						</div>
 					) }
+					<LineSkeleton />
 
 					{ /* Email Simulation  */ }
 					<div className="flex w-[648px] gap-3">
@@ -440,8 +479,34 @@ const Settings = () => {
 									'suremails'
 								),
 							} }
+							className="mt-1"
 						/>
 					</div>
+
+					{ /* Show in Sidebar  */ }
+					<div className="flex w-[648px] gap-3">
+						<Switch
+							checked={ formState.showInSidebar }
+							onChange={ ( value ) => {
+								handleChange( 'showInSidebar', value );
+							} }
+							size="sm"
+							label={ {
+								heading: __(
+									'SureMail Admin Menu',
+									'suremails'
+								),
+								description: __(
+									'Toggle to show SureMail in the main menu or under Settings → SureMail.',
+									'suremails'
+								),
+							} }
+							className="mt-1"
+						/>
+					</div>
+
+					<LineSkeleton />
+
 					<div className="flex w-[648px] gap-3">
 						<Switch
 							checked={ formState.analytics }
@@ -458,7 +523,7 @@ const Settings = () => {
 									<span>
 										<span>
 											{ __(
-												'Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. ',
+												'Provide non-sensitive information such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. ',
 												'suremails'
 											) }
 										</span>

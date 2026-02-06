@@ -2,7 +2,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: SureMail 1.6.1\n"
 "Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/suremails\n"
-"Last-Translator: gpt-po v1.2.3\n"
+"Last-Translator: gpt-po v1.2.4\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
@@ -16,7 +16,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: suremails.php
-#: inc/nps-notice.php:87
+#: inc/nps-notice.php:88
 msgid "SureMail"
 msgstr "SureMail"
 
@@ -35,11 +35,13 @@ msgstr "Les e-mails WordPress disparaissent souvent ou atterrissent dans les spa
 msgid "https://suremails.com/"
 msgstr "https://suremails.com/"
 
-#: inc/admin/plugin.php:189
+#: inc/admin/plugin.php:196
+#: inc/admin/plugin.php:209
 msgid "SureMail Settings"
 msgstr "Paramètres de SureMail"
 
-#: inc/admin/plugin.php:293
+#: inc/admin/plugin.php:326
+#: inc/admin/plugin.php:457
 #: build/main.js:2
 msgid "Settings"
 msgstr "Paramètres"
@@ -150,7 +152,7 @@ msgstr "Une erreur est survenue :"
 msgid "Invalid connection type."
 msgstr "Type de connexion invalide."
 
-#: inc/api/save-test-connection.php:310
+#: inc/api/save-test-connection.php:318
 msgid "Missing required field."
 msgstr "Champ requis manquant."
 
@@ -169,19 +171,19 @@ msgstr "E-mail envoyé avec succès."
 msgid "Failed to send test email"
 msgstr "Échec de l'envoi de l'e-mail de test"
 
-#: inc/api/set-settings.php:85
+#: inc/api/set-settings.php:86
 msgid "Settings data is missing or invalid."
 msgstr "Les données des paramètres sont manquantes ou invalides."
 
-#: inc/api/set-settings.php:104
+#: inc/api/set-settings.php:129
 msgid "Invalid or missing default connection data."
 msgstr "Données de connexion par défaut invalides ou manquantes."
 
-#: inc/api/set-settings.php:176
+#: inc/api/set-settings.php:201
 msgid "Settings updated successfully."
 msgstr "Paramètres mis à jour avec succès."
 
-#: inc/api/set-settings.php:192
+#: inc/api/set-settings.php:223
 msgid "No changes made to the settings."
 msgstr "Aucun changement apporté aux paramètres."
 
@@ -216,7 +218,7 @@ msgstr "Échec de la mise à jour de l'ID de journal %d."
 #: inc/emails/providers/emailit/emailit-handler.php:95
 #: inc/emails/providers/mailgun/mailgun-handler.php:98
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:107
-#: inc/emails/providers/smtp/smtp-handler.php:127
+#: inc/emails/providers/smtp/smtp-handler.php:90
 msgid "WordPress"
 msgstr "WordPress"
 
@@ -293,18 +295,20 @@ msgid "Enter your AWS secret key"
 msgstr "Entrez votre clé secrète AWS"
 
 #: inc/emails/providers/aws/aws-handler.php:214
-#: inc/emails/providers/smtp/smtp-handler.php:225
+#: inc/emails/providers/smtp/smtp-handler.php:188
 msgid "The Return Path is where bounce messages (failed delivery notices) are sent. If it’s off, you might not get these messages. Turn it on to receive bounce notifications at the \"From Email\" address if delivery fails."
 msgstr "Le chemin de retour est l'endroit où les messages de rebond (avis de livraison échouée) sont envoyés. S'il est désactivé, vous pourriez ne pas recevoir ces messages. Activez-le pour recevoir des notifications de rebond à l'adresse \"Email de l'expéditeur\" si la livraison échoue."
 
 #: inc/emails/providers/aws/aws-handler.php:215
-#: inc/emails/providers/gmail/gmail-handler.php:292
-#: inc/emails/providers/smtp/smtp-handler.php:226
+#: inc/emails/providers/gmail/gmail-handler.php:328
+#: inc/emails/providers/smtp/smtp-handler.php:189
+#: inc/emails/providers/zoho/zoho-handler.php:423
 msgid "Return Path"
 msgstr "Chemin de retour"
 
 #: inc/emails/providers/aws/aws-handler.php:217
-#: inc/emails/providers/gmail/gmail-handler.php:294
+#: inc/emails/providers/gmail/gmail-handler.php:330
+#: inc/emails/providers/zoho/zoho-handler.php:425
 msgid "Enter Return Path"
 msgstr "Entrez le chemin de retour"
 
@@ -436,120 +440,129 @@ msgstr "Échec du décodage de la réponse JSON d'Elastic Email."
 msgid "Email sending failed via Elastic Email. Error: %1$s"
 msgstr "Échec de l'envoi d'email via Elastic Email. Erreur : %1$s"
 
-#: inc/emails/providers/gmail/gmail-handler.php:67
+#: inc/emails/providers/gmail/gmail-handler.php:68
 msgid "Failed to authenticate with Gmail."
 msgstr "Échec de l'authentification avec Gmail."
 
-#: inc/emails/providers/gmail/gmail-handler.php:97
+#: inc/emails/providers/gmail/gmail-handler.php:98
+#: inc/emails/providers/zoho/zoho-handler.php:100
 msgid "No authorization code or refresh token provided. Please authenticate first."
 msgstr "Aucun code d'autorisation ou jeton de rafraîchissement fourni. Veuillez d'abord vous authentifier."
 
-#: inc/emails/providers/gmail/gmail-handler.php:103
+#: inc/emails/providers/gmail/gmail-handler.php:104
 msgid "Failed to retrieve authentication tokens. Please try to re-authenticate"
 msgstr "Échec de la récupération des jetons d'authentification. Veuillez essayer de vous ré-authentifier"
 
-#: inc/emails/providers/gmail/gmail-handler.php:111
+#: inc/emails/providers/gmail/gmail-handler.php:112
 msgid "Successfully authenticated with Gmail."
 msgstr "Authentification réussie avec Gmail."
 
-#: inc/emails/providers/gmail/gmail-handler.php:130
-#: inc/emails/providers/gmail/gmail-handler.php:184
+#: inc/emails/providers/gmail/gmail-handler.php:131
+#: inc/emails/providers/gmail/gmail-handler.php:185
 msgid "Email sending failed via Gmail."
 msgstr "Échec de l'envoi d'email via Gmail."
 
-#: inc/emails/providers/gmail/gmail-handler.php:154
+#: inc/emails/providers/gmail/gmail-handler.php:155
 msgid "Email sending failed via Gmail. Failed to encode email message to JSON."
 msgstr "Échec de l'envoi d'email via Gmail. Échec de l'encodage du message email en JSON."
 
-#: inc/emails/providers/gmail/gmail-handler.php:179
+#: inc/emails/providers/gmail/gmail-handler.php:180
 msgid "Email sent successfully via Gmail."
 msgstr "Email envoyé avec succès via Gmail."
 
-#: inc/emails/providers/gmail/gmail-handler.php:201
+#: inc/emails/providers/gmail/gmail-handler.php:236
 msgid "Gmail Connection"
 msgstr "Connexion Gmail"
 
-#: inc/emails/providers/gmail/gmail-handler.php:202
+#: inc/emails/providers/gmail/gmail-handler.php:237
 msgid "Enter the details below to connect with your Gmail account."
 msgstr "Entrez les détails ci-dessous pour vous connecter à votre compte Gmail."
 
-#: inc/emails/providers/gmail/gmail-handler.php:205
+#: inc/emails/providers/gmail/gmail-handler.php:240
 msgid "Google Workspace / Gmail"
 msgstr "Google Workspace / Gmail"
 
-#: inc/emails/providers/gmail/gmail-handler.php:237
+#: inc/emails/providers/gmail/gmail-handler.php:272
 #: inc/emails/providers/outlook/outlook-handler.php:104
+#: inc/emails/providers/zoho/zoho-handler.php:366
 msgid "Client ID"
 msgstr "ID client"
 
-#: inc/emails/providers/gmail/gmail-handler.php:239
+#: inc/emails/providers/gmail/gmail-handler.php:274
 msgid "Enter your Gmail Client ID"
 msgstr "Entrez votre ID client Gmail"
 
 #. translators: %s: Documentation link.
-#: inc/emails/providers/gmail/gmail-handler.php:242
+#: inc/emails/providers/gmail/gmail-handler.php:277
 #, php-format
 msgid "Get Client ID and Secret ID from Google Cloud Platform. Follow the Gmail %s"
 msgstr "Obtenez l'ID client et l'ID secret depuis Google Cloud Platform. Suivez le %s de Gmail"
 
-#. translators: %s: Documentation link.
-#: inc/emails/providers/gmail/gmail-handler.php:243
+#: inc/emails/providers/gmail/gmail-handler.php:278
+#: inc/emails/providers/zoho/zoho-handler.php:372
 msgid "documentation."
 msgstr "documentation."
 
-#: inc/emails/providers/gmail/gmail-handler.php:249
+#: inc/emails/providers/gmail/gmail-handler.php:284
 #: inc/emails/providers/outlook/outlook-handler.php:112
+#: inc/emails/providers/zoho/zoho-handler.php:378
 msgid "Client Secret"
 msgstr "Client Secret"
 
-#: inc/emails/providers/gmail/gmail-handler.php:251
+#: inc/emails/providers/gmail/gmail-handler.php:286
 msgid "Enter your Gmail Client Secret"
 msgstr "Entrez votre Client Secret Gmail"
 
-#: inc/emails/providers/gmail/gmail-handler.php:258
+#: inc/emails/providers/gmail/gmail-handler.php:293
+#: inc/emails/providers/zoho/zoho-handler.php:387
 msgid "Paste the authorization code or refresh token here."
 msgstr "Collez le code d'autorisation ou le jeton de rafraîchissement ici."
 
-#: inc/emails/providers/gmail/gmail-handler.php:265
+#: inc/emails/providers/gmail/gmail-handler.php:300
 #: inc/emails/providers/outlook/outlook-handler.php:120
+#: inc/emails/providers/zoho/zoho-handler.php:394
 msgid "Redirect URI"
 msgstr "URI de redirection"
 
-#: inc/emails/providers/gmail/gmail-handler.php:269
+#: inc/emails/providers/gmail/gmail-handler.php:304
 msgid "Copy the above URL and add it to the \"Authorized Redirect URIs\" section in your Google Cloud Project. Ensure the URL matches exactly."
 msgstr "Copiez l'URL ci-dessus et ajoutez-la à la section \"URI de redirection autorisées\" de votre projet Google Cloud. Assurez-vous que l'URL correspond exactement."
 
-#: inc/emails/providers/gmail/gmail-handler.php:276
+#: inc/emails/providers/gmail/gmail-handler.php:311
 msgid "Authenticate with Google"
 msgstr "S'authentifier avec Google"
 
-#: inc/emails/providers/gmail/gmail-handler.php:277
+#: inc/emails/providers/gmail/gmail-handler.php:312
+#: inc/emails/providers/zoho/zoho-handler.php:406
 msgid "Click here to re-authenticate"
 msgstr "Cliquez ici pour vous réauthentifier"
 
-#: inc/emails/providers/gmail/gmail-handler.php:291
+#: inc/emails/providers/gmail/gmail-handler.php:327
+#: inc/emails/providers/zoho/zoho-handler.php:422
 msgid "The Return Path is where bounce messages (failed delivery notices) are sent. Enable this to receive bounce notifications at the \"From Email\" address if delivery fails."
 msgstr "Le chemin de retour est l'endroit où les messages de rebond (avis de livraison échouée) sont envoyés. Activez cela pour recevoir des notifications de rebond à l'adresse \"Email de l'expéditeur\" si la livraison échoue."
 
-#: inc/emails/providers/gmail/gmail-handler.php:331
+#: inc/emails/providers/gmail/gmail-handler.php:367
+#: inc/emails/providers/zoho/zoho-handler.php:503
 msgid "Failed to encode body to JSON."
 msgstr "Échec de l'encodage du corps en JSON."
 
-#: inc/emails/providers/gmail/gmail-handler.php:346
+#: inc/emails/providers/gmail/gmail-handler.php:382
 msgid "Unknown error from Gmail API."
 msgstr "Erreur inconnue de l'API Gmail."
 
-#: inc/emails/providers/gmail/gmail-handler.php:363
+#: inc/emails/providers/gmail/gmail-handler.php:399
 msgid "Failed to get new token from Gmail API."
 msgstr "Échec de l'obtention d'un nouveau jeton de l'API Gmail."
 
 #. translators: %s: Error message.
-#: inc/emails/providers/gmail/gmail-handler.php:379
+#: inc/emails/providers/gmail/gmail-handler.php:415
 #, php-format
 msgid "Email sending failed via Gmail. Failed to refresh Gmail token: %s"
 msgstr "L'envoi d'email a échoué via Gmail. Échec du rafraîchissement du jeton Gmail : %s"
 
-#: inc/emails/providers/gmail/gmail-handler.php:395
+#: inc/emails/providers/gmail/gmail-handler.php:431
+#: inc/emails/providers/zoho/zoho-handler.php:585
 msgid "Successfully updated tokens."
 msgstr "Jetons mis à jour avec succès."
 
@@ -885,76 +898,76 @@ msgstr "Entrez votre clé API SendGrid"
 msgid "Email sending was simulated, but no email was actually sent."
 msgstr "L'envoi d'email a été simulé, mais aucun email n'a réellement été envoyé."
 
-#: inc/emails/providers/smtp/smtp-handler.php:170
+#: inc/emails/providers/smtp/smtp-handler.php:133
 msgid "SMTP Connection"
 msgstr "Connexion SMTP"
 
-#: inc/emails/providers/smtp/smtp-handler.php:171
+#: inc/emails/providers/smtp/smtp-handler.php:134
 msgid "Enter the details below to connect with your SMTP account."
 msgstr "Entrez les détails ci-dessous pour vous connecter à votre compte SMTP."
 
-#: inc/emails/providers/smtp/smtp-handler.php:173
+#: inc/emails/providers/smtp/smtp-handler.php:136
 msgid "Other SMTP Provider"
 msgstr "Autre fournisseur SMTP"
 
-#: inc/emails/providers/smtp/smtp-handler.php:192
+#: inc/emails/providers/smtp/smtp-handler.php:155
 msgid "Host"
 msgstr "Hôte"
 
-#: inc/emails/providers/smtp/smtp-handler.php:194
+#: inc/emails/providers/smtp/smtp-handler.php:157
 msgid "Enter the SMTP host"
 msgstr "Entrez l'hôte SMTP"
 
-#: inc/emails/providers/smtp/smtp-handler.php:200
+#: inc/emails/providers/smtp/smtp-handler.php:163
 msgid "Port"
 msgstr "Port"
 
-#: inc/emails/providers/smtp/smtp-handler.php:202
+#: inc/emails/providers/smtp/smtp-handler.php:165
 msgid "Enter port"
 msgstr "Entrez le port"
 
-#: inc/emails/providers/smtp/smtp-handler.php:208
+#: inc/emails/providers/smtp/smtp-handler.php:171
 msgid "Username"
 msgstr "Nom d'utilisateur"
 
-#: inc/emails/providers/smtp/smtp-handler.php:210
+#: inc/emails/providers/smtp/smtp-handler.php:173
 msgid "Enter SMTP username"
 msgstr "Entrez le nom d'utilisateur SMTP"
 
-#: inc/emails/providers/smtp/smtp-handler.php:216
+#: inc/emails/providers/smtp/smtp-handler.php:179
 msgid "Password"
 msgstr "Mot de passe"
 
-#: inc/emails/providers/smtp/smtp-handler.php:218
+#: inc/emails/providers/smtp/smtp-handler.php:181
 msgid "Enter SMTP password"
 msgstr "Entrez le mot de passe SMTP"
 
-#: inc/emails/providers/smtp/smtp-handler.php:235
+#: inc/emails/providers/smtp/smtp-handler.php:198
 msgid "Choose SSL for port 465, or TLS for port 25 or 587"
 msgstr "Choisissez SSL pour le port 465, ou TLS pour le port 25 ou 587"
 
-#: inc/emails/providers/smtp/smtp-handler.php:236
+#: inc/emails/providers/smtp/smtp-handler.php:199
 msgid "Encryption"
 msgstr "Chiffrement"
 
-#: inc/emails/providers/smtp/smtp-handler.php:239
+#: inc/emails/providers/smtp/smtp-handler.php:202
 #: build/main.js:2
 msgid "None"
 msgstr "Aucun"
 
-#: inc/emails/providers/smtp/smtp-handler.php:240
+#: inc/emails/providers/smtp/smtp-handler.php:203
 msgid "SSL"
 msgstr "SSL"
 
-#: inc/emails/providers/smtp/smtp-handler.php:241
+#: inc/emails/providers/smtp/smtp-handler.php:204
 msgid "TLS"
 msgstr "TLS"
 
-#: inc/emails/providers/smtp/smtp-handler.php:248
+#: inc/emails/providers/smtp/smtp-handler.php:211
 msgid "Enable TLS automatically if the server supports it."
 msgstr "Activer TLS automatiquement si le serveur le prend en charge."
 
-#: inc/emails/providers/smtp/smtp-handler.php:249
+#: inc/emails/providers/smtp/smtp-handler.php:212
 msgid "Auto TLS"
 msgstr "TLS automatique"
 
@@ -1056,17 +1069,13 @@ msgstr "Sélectionnez votre région SparkPost"
 msgid "Select the endpoint you want to use for sending messages. If you are subject to EU laws, you may need to use the EU region. %1$sLearn more at SparkPost.com%2$s"
 msgstr "Sélectionnez le point de terminaison que vous souhaitez utiliser pour envoyer des messages. Si vous êtes soumis aux lois de l'UE, vous devrez peut-être utiliser la région UE. %1$sEn savoir plus sur SparkPost.com%2$s"
 
-#: inc/nps-notice.php:88
+#: inc/nps-notice.php:89
 msgid "How likely are you to recommend SureMail to your friends or colleagues?"
 msgstr "Quelle est la probabilité que vous recommandiez SureMail à vos amis ou collègues ?"
 
-#: inc/nps-notice.php:89
+#: inc/nps-notice.php:90
 msgid "Thanks a lot for your feedback! 😍"
 msgstr "Merci beaucoup pour vos retours ! 😍"
-
-#: inc/nps-notice.php:90
-msgid "Could you please do us a favor and give us a 5-star rating on WordPress? It would help others choose SureMail with confidence. Thank you!"
-msgstr "Pourriez-vous nous faire une faveur et nous donner une note de 5 étoiles sur WordPress ? Cela aiderait les autres à choisir SureMail en toute confiance. Merci !"
 
 #: inc/nps-notice.php:92
 msgid "Thank you for your feedback"
@@ -1135,12 +1144,12 @@ msgstr "Séquence de connexion pour l'email de l'expéditeur"
 msgid "Enter priority"
 msgstr "Entrez la priorité"
 
-#: admin-notice/components/notice.js:36
+#: admin-notice/index.js:15
 #: build/admin-notice.js:2
 msgid "Your website's emails may not be delivering! Create a connection with an SMTP service to ensure reliable email delivery."
 msgstr "Les emails de votre site web peuvent ne pas être livrés ! Créez une connexion avec un service SMTP pour garantir une livraison fiable des emails."
 
-#: admin-notice/components/notice.js:53
+#: admin-notice/index.js:19
 #: build/admin-notice.js:2
 msgid "Configure SureMail"
 msgstr "Configurer SureMail"
@@ -1253,14 +1262,6 @@ msgstr "Retour"
 #: build/main.js:2
 msgid "No changes to save."
 msgstr "Aucun changement à enregistrer."
-
-#: build/main.js:2
-msgid "Verification successful!"
-msgstr "Vérification réussie !"
-
-#: build/main.js:2
-msgid "Connection tested and saved successfully!"
-msgstr "Connexion testée et enregistrée avec succès !"
 
 #: build/main.js:2
 msgid "Verification Failed!"
@@ -1718,6 +1719,7 @@ msgstr "Êtes-vous sûr de vouloir supprimer le(s) journal(aux) sélectionné(s)
 msgid "Are you sure you want to resend the selected email(s)?"
 msgstr "Êtes-vous sûr de vouloir renvoyer le(s) email(s) sélectionné(s) ?"
 
+#: inc/admin/plugin.php:465
 #: build/main.js:2
 msgid "Email Logs"
 msgstr "Journaux d'email"
@@ -2081,6 +2083,7 @@ msgstr "Erreur de chargement des notifications."
 msgid "There was an issue fetching notifications."
 msgstr "Il y a eu un problème lors de la récupération des notifications."
 
+#: inc/admin/plugin.php:469
 #: build/main.js:2
 msgid "Notifications"
 msgstr "Notifications"
@@ -2132,10 +2135,6 @@ msgstr "Reputation Shield valide vos e-mails avec l'IA pour détecter le contenu
 #: build/main.js:2
 msgid "Activate Reputation Shield and Protect Your Emails"
 msgstr "Activez Reputation Shield et protégez vos e-mails"
-
-#: build/main.js:2
-msgid "Activate Reputation Shield to safeguard your emails. Optionally, share your email address to receive valuable tips for optimising your email delivery."
-msgstr "Activez Reputation Shield pour protéger vos e-mails. Optionnellement, partagez votre adresse e-mail pour recevoir des conseils précieux pour optimiser la livraison de vos e-mails."
 
 #: build/main.js:2
 msgid "Activate Reputation Shield"
@@ -2441,11 +2440,12 @@ msgstr "Quoi de neuf ?"
 msgid "Email Simulation Active"
 msgstr "Simulation d'e-mail active"
 
-#: inc/api/auth.php:74
+#: inc/api/auth.php:73
 msgid "Unsupported provider."
 msgstr "Fournisseur non pris en charge."
 
-#: inc/api/auth.php:91
+#: inc/emails/providers/gmail/gmail-handler.php:206
+#: inc/emails/providers/zoho/zoho-handler.php:259
 msgid "Client ID and Client Secret are required."
 msgstr "L'ID client et le secret client sont requis."
 
@@ -2489,7 +2489,7 @@ msgstr "Échec de la réexpédition de l'e-mail."
 msgid "Failed to get email template."
 msgstr "Échec de l'obtention du modèle d'e-mail."
 
-#: inc/api/set-settings.php:64
+#: inc/api/set-settings.php:65
 msgid "Settings data to update."
 msgstr "Données de paramètres à mettre à jour."
 
@@ -2664,28 +2664,14 @@ msgstr "Email marketing"
 msgid "Email sending failed via SendGrid. Error: %s"
 msgstr "Échec de l'envoi de l'email via SendGrid. Erreur : %s"
 
-#: inc/emails/providers/smtp/smtp-handler.php:79
-msgid "SMTP authentication successful."
-msgstr "Authentification SMTP réussie."
-
-#: inc/emails/providers/smtp/smtp-handler.php:81
-msgid "SMTP authentication failed: Unable to connect to the SMTP server."
-msgstr "Échec de l'authentification SMTP : Impossible de se connecter au serveur SMTP."
-
-#. translators: %s: The error message from PHPMailer.
-#: inc/emails/providers/smtp/smtp-handler.php:86
-#, php-format
-msgid "SMTP authentication failed: %s"
-msgstr "Échec de l'authentification SMTP : %s"
-
-#: inc/emails/providers/smtp/smtp-handler.php:141
+#: inc/emails/providers/smtp/smtp-handler.php:104
 msgid "Email sent successfully via SMTP."
 msgstr "Email envoyé avec succès via SMTP."
 
 #. translators: %s: The error message from PHPMailer.
 #. translators: %s: The error message.
-#: inc/emails/providers/smtp/smtp-handler.php:146
-#: inc/emails/providers/smtp/smtp-handler.php:155
+#: inc/emails/providers/smtp/smtp-handler.php:109
+#: inc/emails/providers/smtp/smtp-handler.php:118
 #, php-format
 msgid "Email sending failed via SMTP: %s"
 msgstr "Échec de l'envoi de l'email via SMTP : %s"
@@ -2699,15 +2685,17 @@ msgstr "Échec de l'envoi de l'email via SMTP : %s"
 msgid "Email sending failed via SMTP2GO. Error: %s"
 msgstr "Échec de l'envoi de l'email via SMTP2GO. Erreur : %s"
 
+#: inc/admin/plugin.php:453
 #: build/main.js:2
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
+#: inc/admin/plugin.php:461
 #: build/main.js:2
 msgid "Connections"
 msgstr "Connexions"
 
-#: inc/api/notice.php:69
+#: inc/api/notice.php:83
 msgid "Notice disabled for 15 days."
 msgstr "Avis désactivé pendant 15 jours."
 
@@ -2715,21 +2703,18 @@ msgstr "Avis désactivé pendant 15 jours."
 msgid "Let's get started"
 msgstr "Commençons"
 
-#: inc/admin/plugin.php:190
+#: inc/admin/plugin.php:197
+#: inc/admin/plugin.php:210
 msgid "SureMail SMTP"
 msgstr "SureMail SMTP"
 
-#: inc/admin/plugin.php:296
+#: inc/admin/plugin.php:329
 msgid "Setup Wizard"
 msgstr "Assistant de configuration"
 
 #: build/main.js:2
 msgid "Enable Anonymous Analytics"
 msgstr "Activer l’analyse anonyme"
-
-#: build/main.js:2
-msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
-msgstr "Collectez des informations non sensibles de votre site web, telles que la version de PHP et les fonctionnalités utilisées, pour nous aider à corriger les bugs plus rapidement, prendre des décisions plus intelligentes et développer des fonctionnalités qui comptent vraiment pour vous."
 
 #: build/main.js:2
 msgid "Learn More"
@@ -2743,66 +2728,50 @@ msgstr "Terminez d’abord les étapes précédentes"
 msgid "You need to complete the previous steps before accessing this step."
 msgstr "Vous devez terminer les étapes précédentes avant d’accéder à cette étape."
 
-#. translators: 1: From date, 2: To date
-#: inc/controller/weekly-summary.php:93
-#, php-format
-msgid "Email summary of your last week — %1$s to %2$s"
-msgstr "Résumé par e-mail de votre dernière semaine — %1$s à %2$s"
-
-#: inc/controller/weekly-summary.php:167
+#: inc/controller/weekly-summary.php:143
 msgid "Weekly Summary"
 msgstr "Résumé hebdomadaire"
 
-#: inc/controller/weekly-summary.php:174
-#: inc/controller/weekly-summary.php:368
+#: inc/controller/weekly-summary.php:150
+#: inc/controller/weekly-summary.php:442
 msgid "SureMail Logo"
 msgstr "Logo SureMail"
 
-#: inc/controller/weekly-summary.php:214
+#: inc/controller/weekly-summary.php:184
 msgid "Hey There,"
 msgstr "Bonjour,"
 
-#. translators: %s: Number of days
-#: inc/controller/weekly-summary.php:220
-#, php-format
-msgid "Here's your SureMail report for the last %s"
-msgstr "Voici votre rapport SureMail pour les derniers %s"
-
-#: inc/controller/weekly-summary.php:230
+#: inc/controller/weekly-summary.php:209
 msgid "View Email Logs"
 msgstr "Voir les journaux d'e-mails"
 
-#: inc/controller/weekly-summary.php:246
+#: inc/controller/weekly-summary.php:225
 msgid "Emails Sent Successfully"
 msgstr "E-mails envoyés avec succès"
 
-#: inc/controller/weekly-summary.php:247
+#: inc/controller/weekly-summary.php:226
 msgid "Emails Failed to Send"
 msgstr "E-mails non envoyés"
 
-#: inc/controller/weekly-summary.php:248
+#: inc/controller/weekly-summary.php:227
 msgid "Emails Blocked by Reputation Shield"
 msgstr "E-mails bloqués par le bouclier de réputation"
 
-#: inc/controller/weekly-summary.php:257
+#: inc/controller/weekly-summary.php:238
 msgid "Emails"
 msgstr "E-mails"
 
-#: inc/controller/weekly-summary.php:260
+#: inc/controller/weekly-summary.php:242
 msgid "Last Week"
 msgstr "La semaine dernière"
 
-#: inc/controller/weekly-summary.php:325
-msgid "Learn more about our other products"
-msgstr "En savoir plus sur nos autres produits"
-
-#. translators: %s: Product name
-#: inc/controller/weekly-summary.php:336
+#. translators: %s: Product name.
+#: inc/controller/weekly-summary.php:396
 #, php-format
 msgid "%s logo"
 msgstr "Logo %s"
 
-#: inc/controller/weekly-summary.php:361
+#: inc/controller/weekly-summary.php:435
 msgid "Manage Email Summaries from your website settings"
 msgstr "Gérez les résumés d'e-mails depuis les paramètres de votre site"
 
@@ -2839,7 +2808,6 @@ msgstr "Emailit"
 msgid "Get your API key from your Emailit dashboard. %1$s. Important: Before sending emails, you must %2$s in your Emailit account."
 msgstr "Obtenez votre clé API depuis votre tableau de bord Emailit. %1$s. Important : Avant d'envoyer des e-mails, vous devez %2$s dans votre compte Emailit."
 
-#. translators: %1$s: API key link, %2$s: domain verification link.
 #: inc/emails/providers/emailit/emailit-handler.php:267
 msgid "Get API Key"
 msgstr "Obtenir la clé API"
@@ -2935,10 +2903,6 @@ msgid "Sunday"
 msgstr "Dimanche"
 
 #: build/main.js:2
-msgid "Enable Email Summary"
-msgstr "Activer le résumé par e-mail"
-
-#: build/main.js:2
 msgid "Get a weekly summary of emails sent from your site."
 msgstr "Recevez un résumé hebdomadaire des e-mails envoyés depuis votre site."
 
@@ -2949,3 +2913,340 @@ msgstr "Planifier les rapports"
 #: build/main.js:2
 msgid "Choose the day of the week to receive your summary email."
 msgstr "Choisissez le jour de la semaine pour recevoir votre e-mail de résumé."
+
+#: inc/controller/weekly-summary.php:94
+msgid "Your Website"
+msgstr "Votre site Web"
+
+#. translators: 1: Website name, 2: From date, 3: To date
+#: inc/controller/weekly-summary.php:103
+#, php-format
+msgid "Email Summary of last week - %1$s - %2$s to %3$s"
+msgstr "Résumé par e-mail de la semaine dernière - %1$s - %2$s à %3$s"
+
+#. translators: 1: From date, 2: To date
+#: inc/controller/weekly-summary.php:111
+#, php-format
+msgid "Email Summary of last week - %1$s to %2$s"
+msgstr "Résumé par e-mail de la semaine dernière - %1$s à %2$s"
+
+#. translators: %s: Website name or URL link
+#: inc/controller/weekly-summary.php:199
+#, php-format
+msgid "Here is your SureMail report for the last 7 days of %s"
+msgstr "Voici votre rapport SureMail pour les 7 derniers jours de %s"
+
+#: inc/controller/weekly-summary.php:288
+msgid "Build Faster with Astra"
+msgstr "Construisez plus vite avec Astra"
+
+#: inc/controller/weekly-summary.php:289
+msgid "Fast, lightweight & customizable WordPress theme for website builders."
+msgstr "Thème WordPress rapide, léger et personnalisable pour les créateurs de sites Web."
+
+#: inc/controller/weekly-summary.php:295
+msgid "Boost Sales with SureCart"
+msgstr "Augmentez vos ventes avec SureCart"
+
+#: inc/controller/weekly-summary.php:296
+msgid "Powerful WordPress e-commerce plugin for selling digital and physical products."
+msgstr "Plugin e-commerce WordPress puissant pour vendre des produits numériques et physiques."
+
+#: inc/controller/weekly-summary.php:302
+msgid "Grow Your List with SureForms"
+msgstr "Développez votre liste avec SureForms"
+
+#: inc/controller/weekly-summary.php:303
+msgid "Creating beautiful, functional forms has never been easier with this AI form builder."
+msgstr "Créer de beaux formulaires fonctionnels n'a jamais été aussi facile avec ce générateur de formulaires IA."
+
+#: inc/controller/weekly-summary.php:309
+msgid "Engage Viewers with Presto Player"
+msgstr "Engagez les spectateurs avec Presto Player"
+
+#: inc/controller/weekly-summary.php:310
+msgid "The best video player plugin for WordPress with modern video experience."
+msgstr "Le meilleur plugin lecteur vidéo pour WordPress avec une expérience vidéo moderne."
+
+#: inc/controller/weekly-summary.php:316
+msgid "Impress Clients with SureDash"
+msgstr "Impressionnez vos clients avec SureDash"
+
+#: inc/controller/weekly-summary.php:317
+msgid "All-in-one solution to connect, engage, grow, and scale your community."
+msgstr "Solution tout-en-un pour connecter, engager, développer et faire évoluer votre communauté."
+
+#: inc/controller/weekly-summary.php:323
+msgid "Increase Conversions with CartFlows"
+msgstr "Augmentez les conversions avec CartFlows"
+
+#: inc/controller/weekly-summary.php:324
+msgid "One click sales funnel builder for WordPress with conversion optimized templates."
+msgstr "Constructeur de tunnels de vente en un clic pour WordPress avec des modèles optimisés pour la conversion."
+
+#: inc/controller/weekly-summary.php:330
+msgid "Monetize Content with SureMembers"
+msgstr "Monétisez le contenu avec SureMembers"
+
+#: inc/controller/weekly-summary.php:331
+msgid "Top-rated WordPress membership plugin for managing member access and content."
+msgstr "Plugin d'adhésion WordPress de premier ordre pour gérer l'accès des membres et le contenu."
+
+#: inc/controller/weekly-summary.php:337
+msgid "Launch Sites with Starter Templates"
+msgstr "Lancez des sites avec des modèles de démarrage"
+
+#: inc/controller/weekly-summary.php:338
+msgid "Build beautiful websites in minutes with 600+ AI-powered templates for Elementor and Gutenberg."
+msgstr "Créez de beaux sites Web en quelques minutes avec plus de 600 modèles alimentés par IA pour Elementor et Gutenberg."
+
+#: inc/controller/weekly-summary.php:344
+msgid "Create Sites Instantly with ZipWP"
+msgstr "Créez des sites instantanément avec ZipWP"
+
+#: inc/controller/weekly-summary.php:345
+msgid "Plan, build, and host stunning WordPress websites instantly. No setup. No mess."
+msgstr "Planifiez, construisez et hébergez des sites WordPress impressionnants instantanément. Pas de configuration. Pas de désordre."
+
+#: inc/controller/weekly-summary.php:351
+msgid "Work Smarter with OttoKit"
+msgstr "Travaillez plus intelligemment avec OttoKit"
+
+#: inc/controller/weekly-summary.php:352
+msgid "No-code AI automation tool for creating automated workflows without technical skills."
+msgstr "Outil d'automatisation IA sans code pour créer des flux de travail automatisés sans compétences techniques."
+
+#: inc/controller/weekly-summary.php:358
+msgid "Collaborate Better with SureFeedback"
+msgstr "Collaborez mieux avec SureFeedback"
+
+#: inc/controller/weekly-summary.php:359
+msgid "Get design feedback and client approval using WordPress with visual collaboration."
+msgstr "Obtenez des retours sur la conception et l'approbation du client en utilisant WordPress avec une collaboration visuelle."
+
+#: inc/controller/weekly-summary.php:365
+msgid "Rank Higher with SureRank"
+msgstr "Classez plus haut avec SureRank"
+
+#: inc/controller/weekly-summary.php:366
+msgid "Modern SEO without the bloat - simple, lightweight SEO assistant for better rankings."
+msgstr "SEO moderne sans surcharge - assistant SEO simple et léger pour de meilleurs classements."
+
+#. translators: %s: Product name
+#: inc/controller/weekly-summary.php:419
+#, php-format
+msgid "Explore %s →"
+msgstr "Explorer %s →"
+
+#: inc/emails/providers/zoho/zoho-handler.php:63
+msgid "Failed to authenticate with Zoho Mail."
+msgstr "Échec de l'authentification avec Zoho Mail."
+
+#: inc/emails/providers/zoho/zoho-handler.php:87
+msgid "Zoho OAuth Error: "
+msgstr "Erreur OAuth de Zoho :"
+
+#: inc/emails/providers/zoho/zoho-handler.php:95
+msgid "Failed to authenticate with Zoho Mail. "
+msgstr "Échec de l'authentification avec Zoho Mail."
+
+#: inc/emails/providers/zoho/zoho-handler.php:106
+msgid "Failed to retrieve authentication tokens. Please try to re-authenticate."
+msgstr "Échec de la récupération des jetons d'authentification. Veuillez réessayer de vous authentifier."
+
+#: inc/emails/providers/zoho/zoho-handler.php:114
+msgid "Successfully authenticated with Zoho Mail."
+msgstr "Authentification réussie avec Zoho Mail."
+
+#: inc/emails/providers/zoho/zoho-handler.php:120
+#: inc/emails/providers/zoho/zoho-handler.php:151
+msgid "Failed to get Zoho account details."
+msgstr "Impossible d'obtenir les détails du compte Zoho."
+
+#: inc/emails/providers/zoho/zoho-handler.php:201
+msgid "Email sending failed via Zoho Mail. Failed to encode email message to JSON."
+msgstr "L'envoi de l'e-mail via Zoho Mail a échoué. Impossible d'encoder le message en JSON."
+
+#: inc/emails/providers/zoho/zoho-handler.php:232
+msgid "Email sent successfully via Zoho Mail."
+msgstr "E-mail envoyé avec succès via Zoho Mail."
+
+#: inc/emails/providers/zoho/zoho-handler.php:237
+msgid "Email sending failed via Zoho Mail."
+msgstr "L'envoi de l'e-mail via Zoho Mail a échoué."
+
+#: inc/emails/providers/zoho/zoho-handler.php:288
+msgid "Zoho Connection"
+msgstr "Connexion Zoho"
+
+#: inc/emails/providers/zoho/zoho-handler.php:289
+msgid "Enter the details below to connect with your Zoho Mail account."
+msgstr "Entrez les détails ci-dessous pour vous connecter à votre compte Zoho Mail."
+
+#: inc/emails/providers/zoho/zoho-handler.php:292
+msgid "Zoho Mail"
+msgstr "Zoho Mail"
+
+#: inc/emails/providers/zoho/zoho-handler.php:310
+msgid "The 'From Email' must match your Zoho Mail account address. SureMail will automatically use 'from_email' set in Zoho account."
+msgstr "L'adresse 'De l'e-mail' doit correspondre à l'adresse de votre compte Zoho Mail. SureMail utilisera automatiquement 'from_email' défini dans le compte Zoho."
+
+#: inc/emails/providers/zoho/zoho-handler.php:328
+msgid "Zoho Region"
+msgstr "Région Zoho"
+
+#: inc/emails/providers/zoho/zoho-handler.php:334
+msgid "United States - com"
+msgstr "États-Unis - com"
+
+#: inc/emails/providers/zoho/zoho-handler.php:338
+msgid "India - in"
+msgstr "Inde - in"
+
+#: inc/emails/providers/zoho/zoho-handler.php:342
+msgid "Europe - eu"
+msgstr "Europe - eu"
+
+#: inc/emails/providers/zoho/zoho-handler.php:346
+msgid "Australia - com.au"
+msgstr "Australie - com.au"
+
+#: inc/emails/providers/zoho/zoho-handler.php:350
+msgid "Japan - jp"
+msgstr "Japon - jp"
+
+#: inc/emails/providers/zoho/zoho-handler.php:354
+msgid "Canada - ca"
+msgstr "Canada - ca"
+
+#: inc/emails/providers/zoho/zoho-handler.php:358
+msgid "China - com.cn"
+msgstr "Chine - com.cn"
+
+#: inc/emails/providers/zoho/zoho-handler.php:361
+msgid "Select your Zoho region. This should match the region where you created your Zoho account."
+msgstr "Sélectionnez votre région Zoho. Cela doit correspondre à la région où vous avez créé votre compte Zoho."
+
+#: inc/emails/providers/zoho/zoho-handler.php:368
+msgid "Enter your Zoho Client ID"
+msgstr "Entrez votre ID client Zoho"
+
+#. translators: %s: Documentation link.
+#: inc/emails/providers/zoho/zoho-handler.php:371
+#, php-format
+msgid "Get Client ID and Secret ID from Zoho Developer Console. Follow the Zoho Mail %s"
+msgstr "Obtenez l'ID client et l'ID secret depuis la console développeur Zoho. Suivez le %s de Zoho Mail"
+
+#: inc/emails/providers/zoho/zoho-handler.php:380
+msgid "Enter your Zoho Client Secret"
+msgstr "Entrez votre secret client Zoho"
+
+#: inc/emails/providers/zoho/zoho-handler.php:398
+msgid "Copy the above URL and add it to the \"Authorized Redirect URIs\" section in your Zoho Developer Console. Ensure the URL matches exactly."
+msgstr "Copiez l'URL ci-dessus et ajoutez-la à la section \"URIs de redirection autorisées\" dans votre console développeur Zoho. Assurez-vous que l'URL correspond exactement."
+
+#: inc/emails/providers/zoho/zoho-handler.php:405
+msgid "Authenticate with Zoho"
+msgstr "Authentifiez-vous avec Zoho"
+
+#: inc/emails/providers/zoho/zoho-handler.php:524
+msgid "OAuth error occurred"
+msgstr "Une erreur OAuth est survenue"
+
+#. translators: %1$d: HTTP response code, %2$s: response body
+#: inc/emails/providers/zoho/zoho-handler.php:527
+#, php-format
+msgid "HTTP %1$d: %2$s"
+msgstr "HTTP %1$d : %2$s"
+
+#: inc/emails/providers/zoho/zoho-handler.php:529
+msgid "Unknown error from Zoho API."
+msgstr "Erreur inconnue de l'API Zoho."
+
+#: inc/emails/providers/zoho/zoho-handler.php:548
+msgid "Failed to get new token from Zoho API."
+msgstr "Échec de l'obtention d'un nouveau jeton depuis l'API Zoho."
+
+#. translators: %s: Error message.
+#: inc/emails/providers/zoho/zoho-handler.php:564
+#, php-format
+msgid "Email sending failed via Zoho Mail. Failed to refresh Zoho token: %s"
+msgstr "L'envoi de l'e-mail via Zoho Mail a échoué. Échec de la mise à jour du jeton Zoho : %s"
+
+#: inc/emails/providers/zoho/zoho-handler.php:571
+msgid "Failed to refresh Zoho token. Invalid token response received."
+msgstr "Échec de la mise à jour du jeton Zoho. Réponse de jeton invalide reçue."
+
+#: inc/emails/providers/zoho/zoho-handler.php:615
+msgid "Refresh token not found."
+msgstr "Jeton de rafraîchissement non trouvé."
+
+#: build/main.js:2
+msgid "Saved successfully!"
+msgstr "Enregistré avec succès !"
+
+#: build/main.js:2
+msgid "Connection details saved successfully!"
+msgstr "Les détails de connexion ont été enregistrés avec succès !"
+
+#: build/main.js:2
+msgid "Ultimate Addons for Elementor"
+msgstr "Ultimate Addons pour Elementor"
+
+#: build/main.js:2
+msgid "Build modern websites with elementor addons."
+msgstr "Créez des sites modernes avec des addons Elementor."
+
+#: build/main.js:2
+msgid "SureRank"
+msgstr "SureRank"
+
+#: build/main.js:2
+msgid "Optimize your website for search engines with SureRank, an all-in-one SEO plugin for WordPress."
+msgstr "Optimisez votre site pour les moteurs de recherche avec SureRank, un plugin SEO tout-en-un pour WordPress."
+
+#: build/main.js:2
+msgid "Optimize your website for search engines with SureRank."
+msgstr "Optimisez votre site pour les moteurs de recherche avec SureRank."
+
+#: build/main.js:2
+msgid "This validates your emails with AI for harmful and inappropriate content. If an email contains problematic material, it is blocked before it reaches your SMTP provider."
+msgstr "Cela valide vos e-mails avec l'IA pour détecter les contenus nuisibles et inappropriés. Si un e-mail contient du matériel problématique, il est bloqué avant d'atteindre votre fournisseur SMTP."
+
+#: build/main.js:2
+msgid "Please enter your name & email address"
+msgstr "Veuillez entrer votre nom et votre adresse e-mail"
+
+#: build/main.js:2
+msgid "Applying new settings…"
+msgstr "Application des nouveaux paramètres…"
+
+#: build/main.js:2
+msgid "Get Email Summary"
+msgstr "Obtenir le résumé des e-mails"
+
+#: build/main.js:2
+msgid "SureMail Admin Menu"
+msgstr "Menu d'administration de SureMail"
+
+#: build/main.js:2
+msgid "Toggle to show SureMail in the main menu or under Settings → SureMail."
+msgstr "Basculer pour afficher SureMail dans le menu principal ou sous Paramètres → SureMail."
+
+#: build/main.js:2
+msgid "Provide non-sensitive information such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
+msgstr "Fournissez des informations non sensibles telles que la version PHP et les fonctionnalités utilisées, pour nous aider à corriger les bugs plus rapidement, à prendre des décisions plus intelligentes et à créer des fonctionnalités qui ont réellement de l'importance pour vous."
+
+#: inc/api/notice.php:101
+msgid "Menu location notice dismissed."
+msgstr "Avis de localisation du menu ignoré."
+
+#: admin-notice/index.js:40
+#: build/admin-notice.js:2
+msgid "Go to Settings"
+msgstr "Aller aux Paramètres"
+
+#: admin-notice/index.js:36
+#: build/admin-notice.js:2
+msgid "SureMail is now under Settings → SureMail. You can change its menu position in settings."
+msgstr "SureMail est maintenant sous Paramètres → SureMail. Vous pouvez changer sa position dans le menu dans les paramètres."

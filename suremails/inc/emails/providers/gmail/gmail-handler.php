@@ -12,6 +12,7 @@ namespace SureMails\Inc\Emails\Providers\GMAIL;
 use SureMails\Inc\ConnectionManager;
 use SureMails\Inc\Emails\Handler\ConnectionHandler;
 use SureMails\Inc\Settings;
+use SureMails\Inc\Utils\Utils;
 use WP_Error;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -75,7 +76,7 @@ class GmailHandler implements ConnectionHandler {
 			$body   = [
 				'code'          => $auth_code,
 				'grant_type'    => 'authorization_code',
-				'redirect_uri'  => admin_url( 'options-general.php?page=suremail' ),
+				'redirect_uri'  => $this->connection_data['redirect_url'] ?? Utils::get_admin_url(),
 				'client_id'     => $this->connection_data['client_id'],
 				'client_secret' => $this->connection_data['client_secret'],
 			];
@@ -192,6 +193,40 @@ class GmailHandler implements ConnectionHandler {
 	}
 
 	/**
+	 * Get Gmail authorization URL.
+	 *
+	 * @param array $params The parameters passed in the API request.
+	 * @return array Returns the Gmail auth URL or an error response.
+	 */
+	public static function get_auth_url( $params ) {
+		$client_id     = isset( $params['client_id'] ) ? sanitize_text_field( $params['client_id'] ) : '';
+		$client_secret = isset( $params['client_secret'] ) ? sanitize_text_field( $params['client_secret'] ) : '';
+
+		if ( empty( $client_id ) || empty( $client_secret ) ) {
+			return [ 'error' => __( 'Client ID and Client Secret are required.', 'suremails' ) ];
+		}
+
+		$redirect_uri = isset( $params['redirect_url'] ) ? sanitize_text_field( $params['redirect_url'] ) : Utils::get_admin_url();
+
+		$auth_url = 'https://accounts.google.com/o/oauth2/auth?' . http_build_query(
+			[
+				'client_id'              => $client_id,
+				'redirect_uri'           => $redirect_uri,
+				'response_type'          => 'code',
+				'scope'                  => 'https://mail.google.com/',
+				'state'                  => 'gmail',
+				'access_type'            => 'offline',
+				'approval_prompt'        => 'force',
+				'include_granted_scopes' => 'true',
+			]
+		);
+
+		return [
+			'auth_url' => $auth_url,
+		];
+	}
+
+	/**
 	 * Get the Gmail connection options.
 	 *
 	 * @return array The Gmail connection options.
@@ -228,7 +263,7 @@ class GmailHandler implements ConnectionHandler {
 	 * @return array The Gmail specific fields.
 	 */
 	public static function get_specific_fields() {
-		$redirect_uri = admin_url( 'options-general.php?page=suremail' );
+		$redirect_uri = Utils::get_admin_url();
 
 		return [
 			'client_id'     => [
@@ -280,6 +315,7 @@ class GmailHandler implements ConnectionHandler {
 						'provider' => 'gmail',
 						'client_id',
 						'client_secret',
+						'redirect_url',
 					],
 				],
 				'size'            => 'sm',

@@ -11,6 +11,7 @@ import { testAndSaveEmailConnection as apiTestAndSaveEmailConnection } from '@ap
 import { useMemo } from 'react';
 import ProvidersSkeleton from './providers-skeleton';
 import ExtendedDynamicForm from './extended-dynamic-form';
+import { isOAuthProvider } from '@oauth/oauth-providers';
 
 const ProvidersDrawer = ( {
 	isOpen,
@@ -202,9 +203,9 @@ const ProvidersDrawer = ( {
 			const response = await apiTestAndSaveEmailConnection( payload );
 
 			if ( response?.success ) {
-				toast.success( __( 'Verification successful!', 'suremails' ), {
+				toast.success( __( 'Saved successfully!', 'suremails' ), {
 					description: __(
-						'Connection tested and saved successfully!',
+						'Connection details saved successfully!',
 						'suremails'
 					),
 				} );
@@ -253,7 +254,9 @@ const ProvidersDrawer = ( {
 
 	const handleClickAuthenticate = ( provider, formStateValues ) => {
 		const timestampOffset = 5 * 60 * 1000;
-		if ( provider?.toLowerCase() === 'gmail' ) {
+		const providerLower = provider?.toLowerCase();
+
+		if ( isOAuthProvider( providerLower ) ) {
 			localStorage.setItem(
 				'formStateValues',
 				JSON.stringify( {
@@ -327,6 +330,7 @@ const ProvidersDrawer = ( {
 									onClickAuthenticate={
 										handleClickAuthenticate
 									}
+									providerOptions={ selectedProviderData }
 								/>
 							</div>
 						) }
