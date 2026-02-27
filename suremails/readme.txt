@@ -5,7 +5,7 @@ Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.2
+Stable tag: 1.9.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -245,7 +245,11 @@ You can report the issue through our [Bug Bounty Program](https://brainstormforc
 
 == Changelog ==
 
-v1.9.2 - 21-January-2025
+v1.9.3 - 27-February-2026
+- Fix: Attachment storing - Fixed an where duplicate attachments were stored in database.
+- Improvement: Emailit connection - Updated Emailit V1 API to V2 and added support for the new API features.
+
+v1.9.2 - 21-January-2026
 - Improvement: Added a setting to choose where the SureMail menu appears in the WordPress admin.
 
 v1.9.1 - 26-November-2025

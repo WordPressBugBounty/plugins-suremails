@@ -35,7 +35,7 @@ class EmailitHandler implements ConnectionHandler {
 	 *
 	 * @var string
 	 */
-	private $api_url = 'https://api.emailit.com/v1/emails';
+	private $api_url = 'https://api.emailit.com/v2/emails';
 
 	/**
 	 * Constructor.
@@ -89,73 +89,99 @@ class EmailitHandler implements ConnectionHandler {
 		];
 
 		// Prepare basic email payload.
+		$from_email = isset( $connection['from_email'] ) ? sanitize_email( $connection['from_email'] ) : '';
+		if ( empty( $from_email ) || ! is_email( $from_email ) ) {
+			$result['message'] = __( 'Invalid or missing from email address.', 'suremails' );
+			return $result;
+		}
+
+		$from_name  = ! empty( $connection['from_name'] )
+			? sanitize_text_field( $connection['from_name'] )
+			: __( 'WordPress', 'suremails' );
+
 		$email_payload = [
 			'from'    => $this->format_email_address(
-				sanitize_email( $connection['from_email'] ),
-				! empty( $connection['from_name'] ) ? sanitize_text_field( $connection['from_name'] ) : __( 'WordPress', 'suremails' )
+				$from_email,
+				$from_name
 			),
 			'subject' => sanitize_text_field( $atts['subject'] ?? '' ),
 		];
 
 		// Prepare recipients.
 		$to_recipients = $processed_data['to'] ?? [];
-		if ( ! empty( $to_recipients ) ) {
-			$primary_recipient   = reset( $to_recipients );
-			$email_payload['to'] = sanitize_email( $primary_recipient['email'] );
+		$to_emails     = [];
+		foreach ( $to_recipients as $recipient ) {
+			if ( ! isset( $recipient['email'] ) ) {
+				continue;
+			}
+			$sanitized_email = sanitize_email( $recipient['email'] );
+			if ( is_email( $sanitized_email ) ) {
+				$to_emails[] = $sanitized_email;
+			}
+		}
+		if ( ! empty( $to_emails ) ) {
+			$email_payload['to'] = $to_emails;
+		} else {
+			$result['message'] = __( 'No valid recipient email addresses provided.', 'suremails' );
+			return $result;
 		}
 
 		// Handle reply-to.
 		$reply_to = $processed_data['headers']['reply_to'] ?? [];
 		if ( ! empty( $reply_to ) ) {
-			$reply_to_email            = reset( $reply_to );
-			$email_payload['reply_to'] = sanitize_email( $reply_to_email['email'] );
+			$reply_to_email = reset( $reply_to );
+			if ( isset( $reply_to_email['email'] ) && ! empty( $reply_to_email['email'] ) ) {
+				$sanitized_email = sanitize_email( $reply_to_email['email'] );
+				if ( is_email( $sanitized_email ) ) {
+					$email_payload['reply_to'] = $sanitized_email;
+				}
+			}
 		}
 
 		// Add content based on content type.
 		$content_type = $processed_data['headers']['content_type'] ?? '';
 		$is_html      = ProviderHelper::is_html( $content_type );
 
+		$message = $atts['message'] ?? '';
 		if ( $is_html ) {
-			$email_payload['html'] = $atts['message'];
+			$email_payload['html'] = $message;
 		}
 
 		// Always include text version.
-		$email_payload['text'] = $is_html ? wp_strip_all_tags( $atts['message'] ) : $atts['message'];
+		$email_payload['text'] = $is_html ? wp_strip_all_tags( $message ) : $message;
 
-		// Handle headers for CC and BCC.
-		$headers = [];
-
-		// Handle CC.
+		// Handle CC (v2 API uses array of email addresses).
 		if ( ! empty( $processed_data['headers']['cc'] ) ) {
-			$cc_addresses = [];
+			$cc_emails = [];
 			foreach ( $processed_data['headers']['cc'] as $cc ) {
-				$cc_addresses[] = $this->format_email_address(
-					sanitize_email( $cc['email'] ),
-					isset( $cc['name'] ) ? sanitize_text_field( $cc['name'] ) : ''
-				);
+				if ( ! isset( $cc['email'] ) ) {
+					continue;
+				}
+				$sanitized_email = sanitize_email( $cc['email'] );
+				if ( is_email( $sanitized_email ) ) {
+					$cc_emails[] = $sanitized_email;
+				}
 			}
-			if ( ! empty( $cc_addresses ) ) {
-				$headers['cc'] = implode( ', ', $cc_addresses );
+			if ( ! empty( $cc_emails ) ) {
+				$email_payload['cc'] = $cc_emails;
 			}
 		}
 
-		// Handle BCC.
+		// Handle BCC (v2 API uses array of email addresses).
 		if ( ! empty( $processed_data['headers']['bcc'] ) ) {
-			$bcc_addresses = [];
+			$bcc_emails = [];
 			foreach ( $processed_data['headers']['bcc'] as $bcc ) {
-				$bcc_addresses[] = $this->format_email_address(
-					sanitize_email( $bcc['email'] ),
-					isset( $bcc['name'] ) ? sanitize_text_field( $bcc['name'] ) : ''
-				);
+				if ( ! isset( $bcc['email'] ) ) {
+					continue;
+				}
+				$sanitized_email = sanitize_email( $bcc['email'] );
+				if ( is_email( $sanitized_email ) ) {
+					$bcc_emails[] = $sanitized_email;
+				}
 			}
-			if ( ! empty( $bcc_addresses ) ) {
-				$headers['bcc'] = implode( ', ', $bcc_addresses );
+			if ( ! empty( $bcc_emails ) ) {
+				$email_payload['bcc'] = $bcc_emails;
 			}
-		}
-
-		// Add headers to payload if not empty.
-		if ( ! empty( $headers ) ) {
-			$email_payload['headers'] = $headers;
 		}
 
 		// Handle attachments.
@@ -190,7 +216,7 @@ class EmailitHandler implements ConnectionHandler {
 			$response = wp_safe_remote_post(
 				$this->api_url,
 				[
-					'headers' => $this->get_headers( $connection['api_key'] ),
+					'headers' => $this->get_headers( $connection['api_key'] ?? '' ),
 					'body'    => $json_payload,
 					'timeout' => 30,
 				]
@@ -205,7 +231,8 @@ class EmailitHandler implements ConnectionHandler {
 			$response_code = wp_remote_retrieve_response_code( $response );
 			$response_body = wp_remote_retrieve_body( $response );
 
-			if ( $response_code === 200 || $response_code === 202 ) {
+			// v2 API returns 200/201 for success, 202 for scheduled emails.
+			if ( $response_code === 200 || $response_code === 201 || $response_code === 202 ) {
 				$result['success'] = true;
 				$result['message'] = __( 'Email sent successfully via Emailit.', 'suremails' );
 				$result['send']    = true;

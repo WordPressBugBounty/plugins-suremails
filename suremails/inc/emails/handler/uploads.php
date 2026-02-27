@@ -472,17 +472,22 @@ auto_append_file ='
 			return false;
 		}
 
-		$hash = hash( 'md5', $content );
+		$hash = hash( 'sha256', $content );
 
-		$random_suffix = wp_generate_password( 12, false );
-		$new_name      = substr( $hash, 0, 16 ) . '-' . $random_suffix . '-' . basename( $original_name );
+		$file_name = basename( $original_name );
 
 		$upload_dir = trailingslashit( $upload_dir );
-		$new_path   = $upload_dir . $new_name;
 
-		if ( is_file( $new_path ) ) {
-			return $new_path;
+		// Check if file exists.
+		$existing_file = $this->find_file_by_hash_and_name( $upload_dir, $hash, $file_name );
+		if ( $existing_file !== false ) {
+			return $existing_file;
 		}
+
+		// No duplicate found - create new file.
+		$random_suffix = wp_generate_password( 12, false );
+		$new_name      = substr( $hash, 0, 16 ) . '-' . $random_suffix . '-' . $file_name;
+		$new_path      = $upload_dir . $new_name;
 
 		// Ensure the upload directory is writable using the WP helper.
 		if ( ! wp_is_writable( $upload_dir ) ) {
@@ -500,6 +505,67 @@ auto_append_file ='
 
 		$result = $wp_filesystem->put_contents( $new_path, $content, FS_CHMOD_FILE );
 		return $result ? $new_path : false;
+	}
+
+	/**
+	 * Find an existing file by its content hash AND original filename (for deduplication).
+	 *
+	 * Since filenames use format {16-hash}-{12-random}-{name} or {16-hash}-{name},
+	 * we check both the hash prefix and the ending filename.
+	 *
+	 * @since 1.9.3
+	 *
+	 * @param string $upload_dir    Directory to search in.
+	 * @param string $hash          Full content hash of the file.
+	 * @param string $original_name Original filename to match.
+	 * @return string|false Path to existing file or false if not found.
+	 */
+	private function find_file_by_hash_and_name( $upload_dir, $hash, $original_name ) {
+		$hash_prefix = substr( $hash, 0, 16 );
+
+		// Old format: {16-hash}-{name}.
+		$old_format_path = $upload_dir . $hash_prefix . '-' . $original_name;
+		if ( file_exists( $old_format_path ) && is_file( $old_format_path ) && $this->is_path_within_directory( $old_format_path, $upload_dir ) ) {
+			return $old_format_path;
+		}
+
+		// New format: {16-hash}-{12-random}-{name}.
+		// The random part is exactly 12 characters, so use: {16-hash}-????????????-{name}.
+		$pattern = $upload_dir . $hash_prefix . '-????????????-' . $original_name;
+		$files   = glob( $pattern );
+
+		if ( ! empty( $files ) && is_array( $files ) ) {
+			foreach ( $files as $file ) {
+				if ( is_string( $file ) && file_exists( $file ) && is_file( $file ) && $this->is_path_within_directory( $file, $upload_dir ) ) {
+					return $file;
+				}
+			}
+		}
+
+		return false;
+	}
+
+	/**
+	 * Check whether a path is within a specific directory.
+	 *
+	 * @since 1.9.3
+	 *
+	 * @param string $path      File path to validate.
+	 * @param string $directory Base directory.
+	 * @return bool True when the file path is within the directory.
+	 */
+	private function is_path_within_directory( $path, $directory ) {
+		$real_path      = realpath( $path );
+		$real_directory = realpath( $directory );
+
+		if ( ! is_string( $real_path ) || ! is_string( $real_directory ) ) {
+			return false;
+		}
+
+		$normalized_path      = wp_normalize_path( $real_path );
+		$normalized_directory = wp_normalize_path( trailingslashit( $real_directory ) );
+
+		return 0 === strpos( $normalized_path, $normalized_directory );
 	}
 
 	/**

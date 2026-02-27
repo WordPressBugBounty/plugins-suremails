@@ -32,7 +32,7 @@ class SetSettings extends Api_Base {
 	/**
 	 * Option name for storing SureMails connections.
 	 */
-	public const SUREMAILS_ANALYTICS = 'suremails_analytics_optin';
+	public const SUREMAILS_ANALYTICS = 'suremails_usage_optin';
 
 	/**
 	 * Route base.

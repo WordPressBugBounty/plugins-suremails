@@ -162,7 +162,24 @@ const isImageFile = ( filename ) => {
 	const imageExtensions = [ 'jpg', 'jpeg', 'png', 'gif', 'webp' ];
 	const ext = filename.split( '.' ).pop().toLowerCase();
 	const isImage = imageExtensions.includes( ext );
-	const displayName = filename.substring( filename.indexOf( '-' ) + 1 );
+
+	// Extract display name handling both old and new formats:
+	// New format: {16-hash}-{12-random}-{name} = 30 char prefix
+	// Old format: {16-hash}-{name} = 17 char prefix
+	let displayName = filename;
+
+	const newFormatMatch = filename.match(
+		/^[0-9a-fA-F]{16}-[a-zA-Z0-9]{12}-(.+)$/
+	);
+	if ( newFormatMatch ) {
+		displayName = newFormatMatch[ 1 ];
+	} else {
+		const firstDashIndex = filename.indexOf( '-' );
+		if ( firstDashIndex !== -1 ) {
+			displayName = filename.substring( firstDashIndex + 1 );
+		}
+	}
+
 	return { isImage, displayName };
 };
 

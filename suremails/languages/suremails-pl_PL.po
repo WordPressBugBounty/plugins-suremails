@@ -215,7 +215,7 @@ msgstr "Nie udało się zaktualizować identyfikatora logu %d."
 #: inc/emails/handler/mail-handler.php:472
 #: inc/emails/providers/aws/aws-handler.php:134
 #: inc/emails/providers/brevo/brevo-handler.php:152
-#: inc/emails/providers/emailit/emailit-handler.php:95
+#: inc/emails/providers/emailit/emailit-handler.php:100
 #: inc/emails/providers/mailgun/mailgun-handler.php:98
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:107
 #: inc/emails/providers/smtp/smtp-handler.php:90
@@ -335,7 +335,7 @@ msgid "Brevo Connection saved successfully."
 msgstr "Połączenie z Brevo zapisane pomyślnie."
 
 #: inc/emails/providers/brevo/brevo-handler.php:227
-#: inc/emails/providers/emailit/emailit-handler.php:187
+#: inc/emails/providers/emailit/emailit-handler.php:213
 #: inc/emails/providers/mailjet/mailjet-handler.php:147
 #: inc/emails/providers/sendgrid/sendgrid-handler.php:184
 #: inc/emails/providers/smtp2go/smtp2go-handler.php:139
@@ -369,7 +369,7 @@ msgstr "Brevo (Sendinblue)"
 
 #: inc/emails/providers/brevo/brevo-handler.php:307
 #: inc/emails/providers/elastic/elastic-handler.php:478
-#: inc/emails/providers/emailit/emailit-handler.php:270
+#: inc/emails/providers/emailit/emailit-handler.php:297
 #: inc/emails/providers/mailersend/mailersend-handler.php:238
 #: inc/emails/providers/mailgun/mailgun-handler.php:215
 #: inc/emails/providers/mailjet/mailjet-handler.php:223
@@ -1031,8 +1031,8 @@ msgstr "Błąd: %s"
 msgid "Email sent successfully via SparkPost."
 msgstr "Email został pomyślnie wysłany za pośrednictwem SparkPost."
 
-#: inc/emails/providers/emailit/emailit-handler.php:306
-#: inc/emails/providers/emailit/emailit-handler.php:311
+#: inc/emails/providers/emailit/emailit-handler.php:333
+#: inc/emails/providers/emailit/emailit-handler.php:338
 #: inc/emails/providers/sparkpost/sparkpost-handler.php:195
 msgid "Unknown error"
 msgstr "Nieznany błąd"
@@ -2775,81 +2775,81 @@ msgstr "Logo %s"
 msgid "Manage Email Summaries from your website settings"
 msgstr "Zarządzaj podsumowaniami e-mail w ustawieniach swojej strony"
 
-#: inc/emails/providers/emailit/emailit-handler.php:200
-#: inc/emails/providers/emailit/emailit-handler.php:228
+#: inc/emails/providers/emailit/emailit-handler.php:226
+#: inc/emails/providers/emailit/emailit-handler.php:255
 msgid "Emailit send failed: "
 msgstr "Wysyłka Emailit nie powiodła się:"
 
-#: inc/emails/providers/emailit/emailit-handler.php:210
+#: inc/emails/providers/emailit/emailit-handler.php:237
 msgid "Email sent successfully via Emailit."
 msgstr "E-mail wysłany pomyślnie przez Emailit."
 
 #. translators: %s is the error message from Emailit API.
-#: inc/emails/providers/emailit/emailit-handler.php:223
+#: inc/emails/providers/emailit/emailit-handler.php:250
 #, php-format
 msgid "Email sending failed via Emailit: %s"
 msgstr "Wysyłka e-maila przez Emailit nie powiodła się: %s"
 
-#: inc/emails/providers/emailit/emailit-handler.php:243
+#: inc/emails/providers/emailit/emailit-handler.php:270
 msgid "Emailit Connection"
 msgstr "Połączenie Emailit"
 
-#: inc/emails/providers/emailit/emailit-handler.php:244
+#: inc/emails/providers/emailit/emailit-handler.php:271
 msgid "Enter the details below to connect with your Emailit account. Important: Your sending domain must be verified in Emailit before you can send emails."
 msgstr "Wprowadź poniższe dane, aby połączyć się ze swoim kontem Emailit. Ważne: Twoja domena wysyłkowa musi być zweryfikowana w Emailit, zanim będziesz mógł wysyłać e-maile."
 
-#: inc/emails/providers/emailit/emailit-handler.php:246
+#: inc/emails/providers/emailit/emailit-handler.php:273
 msgid "Emailit"
 msgstr "Emailit"
 
 #. translators: %1$s: API key link, %2$s: domain verification link.
-#: inc/emails/providers/emailit/emailit-handler.php:266
+#: inc/emails/providers/emailit/emailit-handler.php:293
 #, php-format
 msgid "Get your API key from your Emailit dashboard. %1$s. Important: Before sending emails, you must %2$s in your Emailit account."
 msgstr "Pobierz swój klucz API z panelu Emailit. %1$s. Ważne: Przed wysyłką e-maili musisz %2$s na swoim koncie Emailit."
 
-#: inc/emails/providers/emailit/emailit-handler.php:267
+#: inc/emails/providers/emailit/emailit-handler.php:294
 msgid "Get API Key"
 msgstr "Pobierz klucz API"
 
-#: inc/emails/providers/emailit/emailit-handler.php:268
+#: inc/emails/providers/emailit/emailit-handler.php:295
 msgid "verify your sending domain"
 msgstr "zweryfikuj swoją domenę wysyłkową"
 
-#: inc/emails/providers/emailit/emailit-handler.php:272
+#: inc/emails/providers/emailit/emailit-handler.php:299
 msgid "Enter your Emailit API Key"
 msgstr "Wprowadź swój klucz API Emailit"
 
-#: inc/emails/providers/emailit/emailit-handler.php:318
+#: inc/emails/providers/emailit/emailit-handler.php:345
 msgid "Bad request. Please check your email data."
 msgstr "Nieprawidłowe żądanie. Proszę sprawdź dane e-mail."
 
-#: inc/emails/providers/emailit/emailit-handler.php:320
+#: inc/emails/providers/emailit/emailit-handler.php:347
 msgid "Unauthorized. Please check your API key."
 msgstr "Brak autoryzacji. Proszę sprawdź swój klucz API."
 
-#: inc/emails/providers/emailit/emailit-handler.php:322
+#: inc/emails/providers/emailit/emailit-handler.php:349
 msgid "Forbidden. Access denied."
 msgstr "Zabronione. Dostęp odmówiony."
 
-#: inc/emails/providers/emailit/emailit-handler.php:324
+#: inc/emails/providers/emailit/emailit-handler.php:351
 msgid "Not found. Please check the API endpoint."
 msgstr "Nie znaleziono. Proszę sprawdź punkt końcowy API."
 
-#: inc/emails/providers/emailit/emailit-handler.php:326
+#: inc/emails/providers/emailit/emailit-handler.php:353
 msgid "Domain verification required. Your sending domain must be verified in Emailit before you can send emails. Please verify your domain in your Emailit dashboard at https://app.emailit.com/domains"
 msgstr "Wymagana weryfikacja domeny. Twoja domena wysyłkowa musi być zweryfikowana w Emailit, zanim będziesz mógł wysyłać e-maile. Proszę zweryfikuj swoją domenę w panelu Emailit pod adresem https://app.emailit.com/domains"
 
-#: inc/emails/providers/emailit/emailit-handler.php:328
+#: inc/emails/providers/emailit/emailit-handler.php:355
 msgid "Rate limit exceeded. Please try again later."
 msgstr "Przekroczono limit zapytań. Proszę spróbuj ponownie później."
 
-#: inc/emails/providers/emailit/emailit-handler.php:330
+#: inc/emails/providers/emailit/emailit-handler.php:357
 msgid "Internal server error. Please try again later."
 msgstr "Wewnętrzny błąd serwera. Proszę spróbuj ponownie później."
 
 #. translators: %d is the HTTP error code.
-#: inc/emails/providers/emailit/emailit-handler.php:333
+#: inc/emails/providers/emailit/emailit-handler.php:360
 #, php-format
 msgid "HTTP error %d occurred."
 msgstr "Wystąpił błąd HTTP %d."
@@ -3250,3 +3250,11 @@ msgstr "Przejdź do Ustawień"
 #: build/admin-notice.js:2
 msgid "SureMail is now under Settings → SureMail. You can change its menu position in settings."
 msgstr "SureMail jest teraz dostępny w Ustawienia → SureMail. Możesz zmienić jego pozycję w menu w ustawieniach."
+
+#: inc/emails/providers/emailit/emailit-handler.php:94
+msgid "Invalid or missing from email address."
+msgstr "Nieprawidłowy lub brakujący adres e-mail nadawcy."
+
+#: inc/emails/providers/emailit/emailit-handler.php:125
+msgid "No valid recipient email addresses provided."
+msgstr "Nie podano prawidłowych adresów e-mail odbiorców."
