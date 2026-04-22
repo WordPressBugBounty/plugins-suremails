@@ -16,6 +16,7 @@ msgstr ""
 #. Plugin Name of the plugin
 #. Author of the plugin
 #: suremails.php
+#: inc/abilities/ability.php:70
 #: inc/nps-notice.php:88
 msgid "SureMail"
 msgstr "SureMail"
@@ -40,8 +41,8 @@ msgstr "https://suremails.com/"
 msgid "SureMail Settings"
 msgstr "Ustawienia SureMail"
 
-#: inc/admin/plugin.php:326
-#: inc/admin/plugin.php:457
+#: inc/admin/plugin.php:349
+#: inc/admin/plugin.php:480
 #: build/main.js:2
 msgid "Settings"
 msgstr "Ustawienia"
@@ -87,10 +88,16 @@ msgstr "Brak nonce."
 msgid "Nonce is invalid."
 msgstr "Nonce jest nieprawidłowy."
 
+#: inc/abilities/ability.php:217
+#: inc/abilities/ability.php:409
 #: inc/api/delete-connection.php:86
 msgid "No connections found."
 msgstr "Nie znaleziono połączeń."
 
+#: inc/abilities/ability.php:156
+#: inc/abilities/ability.php:221
+#: inc/abilities/ability.php:413
+#: inc/abilities/ability.php:501
 #: inc/api/delete-connection.php:97
 #: inc/api/send-test-email.php:107
 msgid "Connection not found."
@@ -100,6 +107,7 @@ msgstr "Połączenie nie zostało znalezione."
 msgid "Connection details do not match."
 msgstr "Szczegóły połączenia się nie zgadzają."
 
+#: inc/abilities/ability.php:239
 #: inc/api/delete-connection.php:128
 #: build/main.js:2
 msgid "Connection deleted successfully."
@@ -125,45 +133,46 @@ msgstr "Nie masz uprawnień do wykonania tej akcji."
 msgid "Invalid nonce."
 msgstr "Nieprawidłowy nonce."
 
-#: inc/api/save-test-connection.php:95
+#: inc/api/save-test-connection.php:96
 msgid "Unsupported connection type."
 msgstr "Nieobsługiwany typ połączenia."
 
 #. translators: %s: Connection priority
-#: inc/api/save-test-connection.php:125
+#: inc/api/save-test-connection.php:126
 #, php-format
 msgid "Connection Sequence %1$s is already assigned to another connection. Please choose a different sequence."
 msgstr "Sekwencja połączenia %1$s jest już przypisana do innego połączenia. Wybierz inną sekwencję."
 
-#: inc/api/save-test-connection.php:141
+#: inc/api/save-test-connection.php:142
 msgid "Failed to authenticate."
 msgstr "Nie udało się uwierzytelnić."
 
-#: inc/api/save-test-connection.php:154
+#: inc/api/save-test-connection.php:155
 msgid "Connection authenticated and settings saved."
 msgstr "Połączenie uwierzytelnione, a ustawienia zapisane."
 
-#: inc/api/save-test-connection.php:163
+#: inc/api/save-test-connection.php:164
 msgid "An error occurred: "
 msgstr "Wystąpił błąd:"
 
-#: inc/api/save-test-connection.php:185
-#: inc/emails/handler/mail-handler.php:168
+#: inc/api/save-test-connection.php:186
+#: inc/emails/handler/mail-handler.php:183
 msgid "Invalid connection type."
 msgstr "Nieprawidłowy typ połączenia."
 
-#: inc/api/save-test-connection.php:318
+#: inc/api/save-test-connection.php:328
 msgid "Missing required field."
 msgstr "Brak wymaganego pola."
 
+#. translators: %s: Site name
 #. Translators: %s is the site name.
+#: inc/abilities/ability.php:515
 #: inc/api/send-test-email.php:136
 #, php-format
 msgid "SureMail: Test Email - %s"
 msgstr "SureMail: Testowy e-mail - %s"
 
 #: inc/api/send-test-email.php:143
-#: inc/emails/handler/mail-handler.php:183
 msgid "Email sent successfully."
 msgstr "E-mail został pomyślnie wysłany."
 
@@ -179,11 +188,12 @@ msgstr "Dane ustawień są niekompletne lub nieprawidłowe."
 msgid "Invalid or missing default connection data."
 msgstr "Nieprawidłowe lub brakujące dane domyślnego połączenia."
 
-#: inc/api/set-settings.php:201
+#: inc/abilities/ability.php:981
+#: inc/api/set-settings.php:199
 msgid "Settings updated successfully."
 msgstr "Ustawienia zostały pomyślnie zaktualizowane."
 
-#: inc/api/set-settings.php:223
+#: inc/api/set-settings.php:221
 msgid "No changes made to the settings."
 msgstr "Nie wprowadzono żadnych zmian w ustawieniach."
 
@@ -206,25 +216,21 @@ msgstr "Tarcza reputacji"
 #: inc/controller/content-guard.php:388
 #: inc/controller/logger.php:563
 #: inc/controller/logger.php:565
-#: inc/emails/handler/mail-handler.php:360
+#: inc/emails/handler/mail-handler.php:420
 #, php-format
 msgid "Failed to update log ID %d."
 msgstr "Nie udało się zaktualizować identyfikatora logu %d."
 
-#: inc/emails/handler/mail-handler.php:145
-#: inc/emails/handler/mail-handler.php:472
+#: inc/emails/handler/mail-handler.php:158
+#: inc/emails/handler/mail-handler.php:532
 #: inc/emails/providers/aws/aws-handler.php:134
-#: inc/emails/providers/brevo/brevo-handler.php:152
-#: inc/emails/providers/emailit/emailit-handler.php:100
+#: inc/emails/providers/brevo/brevo-handler.php:164
+#: inc/emails/providers/emailit/emailit-handler.php:102
 #: inc/emails/providers/mailgun/mailgun-handler.php:98
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:107
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:113
 #: inc/emails/providers/smtp/smtp-handler.php:90
 msgid "WordPress"
 msgstr "WordPress"
-
-#: inc/emails/handler/mail-handler.php:183
-msgid "Failed to send email."
-msgstr "Nie udało się wysłać e-maila."
 
 #: inc/emails/handler/uploads.php:75
 msgid "Invalid upload base directory."
@@ -286,7 +292,7 @@ msgid "Enter your AWS access key"
 msgstr "Wprowadź swój klucz dostępu AWS"
 
 #: inc/emails/providers/aws/aws-handler.php:205
-#: inc/emails/providers/mailjet/mailjet-handler.php:231
+#: inc/emails/providers/mailjet/mailjet-handler.php:239
 msgid "Secret Key"
 msgstr "Klucz tajny"
 
@@ -313,9 +319,9 @@ msgid "Enter Return Path"
 msgstr "Wprowadź ścieżkę zwrotną"
 
 #: inc/emails/providers/aws/aws-handler.php:228
-#: inc/emails/providers/mailgun/mailgun-handler.php:230
-#: inc/emails/providers/netcore/netcore-handler.php:225
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:290
+#: inc/emails/providers/mailgun/mailgun-handler.php:241
+#: inc/emails/providers/netcore/netcore-handler.php:237
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:298
 msgid "Region"
 msgstr "Region"
 
@@ -334,53 +340,53 @@ msgstr "Klucz API lub adres Email nadawcy jest brakujący w danych połączenia.
 msgid "Brevo Connection saved successfully."
 msgstr "Połączenie z Brevo zapisane pomyślnie."
 
-#: inc/emails/providers/brevo/brevo-handler.php:227
-#: inc/emails/providers/emailit/emailit-handler.php:213
-#: inc/emails/providers/mailjet/mailjet-handler.php:147
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:184
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:139
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:152
+#: inc/emails/providers/brevo/brevo-handler.php:237
+#: inc/emails/providers/emailit/emailit-handler.php:226
+#: inc/emails/providers/mailjet/mailjet-handler.php:155
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:196
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:151
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:160
 msgid "Failed to encode email payload to JSON."
 msgstr "Nie udało się zakodować ładunku e-maila do formatu JSON."
 
-#: inc/emails/providers/brevo/brevo-handler.php:256
+#: inc/emails/providers/brevo/brevo-handler.php:266
 msgid "Email sent successfully via Brevo."
 msgstr "E-mail wysłany pomyślnie przez Brevo."
 
-#: inc/emails/providers/brevo/brevo-handler.php:258
-#: inc/emails/providers/mailersend/mailersend-handler.php:196
-#: inc/emails/providers/mailgun/mailgun-handler.php:179
-#: inc/emails/providers/postmark/postmark-handler.php:175
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:213
+#: inc/emails/providers/brevo/brevo-handler.php:268
+#: inc/emails/providers/mailersend/mailersend-handler.php:198
+#: inc/emails/providers/mailgun/mailgun-handler.php:190
+#: inc/emails/providers/postmark/postmark-handler.php:182
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:225
 msgid "Unknown error."
 msgstr "Nieznany błąd."
 
-#: inc/emails/providers/brevo/brevo-handler.php:285
+#: inc/emails/providers/brevo/brevo-handler.php:295
 msgid "Brevo Connection"
 msgstr "Połączenie z Brevo"
 
-#: inc/emails/providers/brevo/brevo-handler.php:286
+#: inc/emails/providers/brevo/brevo-handler.php:296
 msgid "Enter the details below to connect with your Brevo account."
 msgstr "Wprowadź poniższe dane, aby połączyć się ze swoim kontem Brevo."
 
-#: inc/emails/providers/brevo/brevo-handler.php:288
+#: inc/emails/providers/brevo/brevo-handler.php:298
 msgid "Brevo (Sendinblue)"
 msgstr "Brevo (Sendinblue)"
 
-#: inc/emails/providers/brevo/brevo-handler.php:307
-#: inc/emails/providers/elastic/elastic-handler.php:478
-#: inc/emails/providers/emailit/emailit-handler.php:297
-#: inc/emails/providers/mailersend/mailersend-handler.php:238
-#: inc/emails/providers/mailgun/mailgun-handler.php:215
-#: inc/emails/providers/mailjet/mailjet-handler.php:223
-#: inc/emails/providers/netcore/netcore-handler.php:217
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:262
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:227
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:282
+#: inc/emails/providers/brevo/brevo-handler.php:317
+#: inc/emails/providers/elastic/elastic-handler.php:491
+#: inc/emails/providers/emailit/emailit-handler.php:310
+#: inc/emails/providers/mailersend/mailersend-handler.php:240
+#: inc/emails/providers/mailgun/mailgun-handler.php:226
+#: inc/emails/providers/mailjet/mailjet-handler.php:231
+#: inc/emails/providers/netcore/netcore-handler.php:229
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:274
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:239
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:290
 msgid "API Key"
 msgstr "Klucz API"
 
-#: inc/emails/providers/brevo/brevo-handler.php:309
+#: inc/emails/providers/brevo/brevo-handler.php:319
 msgid "Enter your Brevo API key"
 msgstr "Wprowadź swój klucz API Brevo"
 
@@ -388,54 +394,54 @@ msgstr "Wprowadź swój klucz API Brevo"
 msgid "Elastic Email connection authenticated successfully."
 msgstr "Połączenie z Elastic Email uwierzytelnione pomyślnie."
 
-#: inc/emails/providers/elastic/elastic-handler.php:184
+#: inc/emails/providers/elastic/elastic-handler.php:197
 msgid "Email sent successfully via Elastic Email."
 msgstr "E-mail wysłany pomyślnie przez Elastic Email."
 
-#: inc/emails/providers/elastic/elastic-handler.php:457
+#: inc/emails/providers/elastic/elastic-handler.php:470
 msgid "Elastic Email Connection"
 msgstr "Połączenie z Elastic Email"
 
-#: inc/emails/providers/elastic/elastic-handler.php:458
+#: inc/emails/providers/elastic/elastic-handler.php:471
 msgid "Enter the details below to connect with your Elastic Email account."
 msgstr "Wprowadź poniższe dane, aby połączyć się ze swoim kontem Elastic Email."
 
-#: inc/emails/providers/elastic/elastic-handler.php:461
+#: inc/emails/providers/elastic/elastic-handler.php:474
 msgid "Elastic Email"
 msgstr "Elastic Email"
 
-#: inc/emails/providers/elastic/elastic-handler.php:480
+#: inc/emails/providers/elastic/elastic-handler.php:493
 msgid "Enter your Elastic Email API key"
 msgstr "Wprowadź swój klucz API Elastic Email"
 
 #. translators: %s: www.mailgun.com/about/regions/ URL.
-#: inc/emails/providers/elastic/elastic-handler.php:491
+#: inc/emails/providers/elastic/elastic-handler.php:504
 #, php-format
 msgid "Select the type of email you will be sending using this connection. Choose Transactional Email for emails like password resets, order confirmations, etc. Select Marketing Email for sending bulk emails like newsletters, broadcasts, etc. %1$sLearn more%2$s"
 msgstr "Wybierz typ e-maila, który będziesz wysyłać za pomocą tego połączenia. Wybierz e-mail transakcyjny dla wiadomości takich jak resetowanie hasła, potwierdzenia zamówienia itp. Wybierz e-mail marketingowy do wysyłania masowych wiadomości, takich jak biuletyny, transmisje itp. %1$sDowiedz się więcej%2$s"
 
-#: inc/emails/providers/elastic/elastic-handler.php:495
+#: inc/emails/providers/elastic/elastic-handler.php:508
 msgid "Email Type"
 msgstr "Typ e-maila"
 
-#: inc/emails/providers/elastic/elastic-handler.php:497
+#: inc/emails/providers/elastic/elastic-handler.php:510
 msgid "Select Email Type"
 msgstr "Wybierz typ e-maila"
 
-#: inc/emails/providers/elastic/elastic-handler.php:537
+#: inc/emails/providers/elastic/elastic-handler.php:550
 msgid "Email sending failed via Elastic Email. Failed to encode email payload to JSON."
 msgstr "Wysyłanie e-maila nie powiodło się przez Elastic Email. Nie udało się zakodować ładunku e-maila do formatu JSON."
 
-#: inc/emails/providers/elastic/elastic-handler.php:554
+#: inc/emails/providers/elastic/elastic-handler.php:567
 msgid "Email sending failed via Elastic Email. Unauthorized: API key invalid or insufficient permissions."
 msgstr "Wysyłanie e-maila nie powiodło się przez Elastic Email. Nieautoryzowane: klucz API jest nieprawidłowy lub brak uprawnień."
 
-#: inc/emails/providers/elastic/elastic-handler.php:561
+#: inc/emails/providers/elastic/elastic-handler.php:574
 msgid "Failed to decode JSON response from Elastic Email."
 msgstr "Nie udało się zdekodować odpowiedzi JSON z Elastic Email."
 
 #. translators: 1: Error log
-#: inc/emails/providers/elastic/elastic-handler.php:569
+#: inc/emails/providers/elastic/elastic-handler.php:582
 #, php-format
 msgid "Email sending failed via Elastic Email. Error: %1$s"
 msgstr "Wysyłanie e-maila nie powiodło się przez Elastic Email. Błąd: %1$s"
@@ -570,37 +576,37 @@ msgstr "Tokeny zostały pomyślnie zaktualizowane."
 msgid "MailerSend connection saved successfully."
 msgstr "Połączenie MailerSend zapisano pomyślnie."
 
-#: inc/emails/providers/mailersend/mailersend-handler.php:155
+#: inc/emails/providers/mailersend/mailersend-handler.php:157
 msgid "Email sending failed via MailerSend. Failed to encode email body to JSON."
 msgstr "Wysyłanie e-maili nie powiodło się przez MailerSend. Nie udało się zakodować treści e-maila do JSON."
 
-#: inc/emails/providers/mailersend/mailersend-handler.php:172
+#: inc/emails/providers/mailersend/mailersend-handler.php:174
 msgid "Email sending failed via MailerSend. "
 msgstr "Wysyłanie e-maili nie powiodło się przez MailerSend."
 
-#: inc/emails/providers/mailersend/mailersend-handler.php:185
+#: inc/emails/providers/mailersend/mailersend-handler.php:187
 msgid "Email sent successfully via MailerSend."
 msgstr "E-mail został pomyślnie wysłany przez MailerSend."
 
 #. translators: %s: Error message
-#: inc/emails/providers/mailersend/mailersend-handler.php:201
+#: inc/emails/providers/mailersend/mailersend-handler.php:203
 #, php-format
 msgid "Email sending failed via MailerSend. Error: %s"
 msgstr "Wysyłanie e-maili nie powiodło się przez MailerSend. Błąd: %s"
 
-#: inc/emails/providers/mailersend/mailersend-handler.php:217
+#: inc/emails/providers/mailersend/mailersend-handler.php:219
 msgid "MailerSend Connection"
 msgstr "Połączenie MailerSend"
 
-#: inc/emails/providers/mailersend/mailersend-handler.php:218
+#: inc/emails/providers/mailersend/mailersend-handler.php:220
 msgid "Enter the details below to connect with your MailerSend account."
 msgstr "Wprowadź poniższe dane, aby połączyć się z kontem MailerSend."
 
-#: inc/emails/providers/mailersend/mailersend-handler.php:221
+#: inc/emails/providers/mailersend/mailersend-handler.php:223
 msgid "MailerSend"
 msgstr "MailerSend"
 
-#: inc/emails/providers/mailersend/mailersend-handler.php:240
+#: inc/emails/providers/mailersend/mailersend-handler.php:242
 msgid "Enter your MailerSend API key"
 msgstr "Wprowadź swój klucz API MailerSend"
 
@@ -612,55 +618,55 @@ msgstr "Połączenie Mailgun zapisano pomyślnie."
 msgid "Mailgun domain is missing."
 msgstr "Brak domeny Mailgun."
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:165
-#: inc/emails/providers/mailgun/mailgun-handler.php:180
+#: inc/emails/providers/mailgun/mailgun-handler.php:176
+#: inc/emails/providers/mailgun/mailgun-handler.php:191
 msgid "Mailgun send failed: "
 msgstr "Wysyłanie przez Mailgun nie powiodło się:"
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:177
+#: inc/emails/providers/mailgun/mailgun-handler.php:188
 msgid "Email sent successfully via Mailgun."
 msgstr "E-mail został pomyślnie wysłany przez Mailgun."
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:194
+#: inc/emails/providers/mailgun/mailgun-handler.php:205
 msgid "Mailgun Connection"
 msgstr "Połączenie Mailgun"
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:195
+#: inc/emails/providers/mailgun/mailgun-handler.php:206
 msgid "Enter the details below to connect with your Mailgun account."
 msgstr "Wprowadź poniższe dane, aby połączyć się z kontem Mailgun."
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:198
+#: inc/emails/providers/mailgun/mailgun-handler.php:209
 msgid "Mailgun"
 msgstr "Mailgun"
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:217
+#: inc/emails/providers/mailgun/mailgun-handler.php:228
 msgid "Enter your Mailgun API key"
 msgstr "Wprowadź swój klucz API Mailgun"
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:223
+#: inc/emails/providers/mailgun/mailgun-handler.php:234
 msgid "Domain"
 msgstr "Domena"
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:225
+#: inc/emails/providers/mailgun/mailgun-handler.php:236
 msgid "Enter your Mailgun domain"
 msgstr "Wprowadź swoją domenę Mailgun"
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:233
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:293
+#: inc/emails/providers/mailgun/mailgun-handler.php:244
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:301
 msgid "US"
 msgstr "USA"
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:234
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:294
+#: inc/emails/providers/mailgun/mailgun-handler.php:245
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:302
 msgid "EU"
 msgstr "UE"
 
-#: inc/emails/providers/mailgun/mailgun-handler.php:237
+#: inc/emails/providers/mailgun/mailgun-handler.php:248
 msgid "Select your Mailgun region"
 msgstr "Wybierz swój region Mailgun"
 
 #. translators: %s: www.mailgun.com/about/regions/ URL.
-#: inc/emails/providers/mailgun/mailgun-handler.php:239
+#: inc/emails/providers/mailgun/mailgun-handler.php:250
 #, php-format
 msgid "Select the endpoint you want to use for sending messages. If you are subject to EU laws, you may need to use the EU region. %1$sLearn more at Mailgun.com%2$s"
 msgstr "Wybierz punkt końcowy, którego chcesz użyć do wysyłania wiadomości. Jeśli podlegasz przepisom UE, może być konieczne użycie regionu UE. %1$sDowiedz się więcej na Mailgun.com%2$s"
@@ -678,33 +684,33 @@ msgid "Mailjet API key and Secret key are required."
 msgstr "Klucz API Mailjet i klucz sekretu są wymagane."
 
 #. translators: %s: Error message.
-#: inc/emails/providers/mailjet/mailjet-handler.php:168
-#: inc/emails/providers/mailjet/mailjet-handler.php:188
+#: inc/emails/providers/mailjet/mailjet-handler.php:176
+#: inc/emails/providers/mailjet/mailjet-handler.php:196
 #, php-format
 msgid "Email sending failed via Mailjet. %s"
 msgstr "Wysyłanie e-maili nie powiodło się przez Mailjet. %s"
 
-#: inc/emails/providers/mailjet/mailjet-handler.php:179
+#: inc/emails/providers/mailjet/mailjet-handler.php:187
 msgid "Email sent successfully via Mailjet."
 msgstr "E-mail został pomyślnie wysłany przez Mailjet."
 
-#: inc/emails/providers/mailjet/mailjet-handler.php:202
+#: inc/emails/providers/mailjet/mailjet-handler.php:210
 msgid "Mailjet Connection"
 msgstr "Połączenie Mailjet"
 
-#: inc/emails/providers/mailjet/mailjet-handler.php:203
+#: inc/emails/providers/mailjet/mailjet-handler.php:211
 msgid "Enter the details below to connect with your Mailjet account."
 msgstr "Wprowadź poniższe dane, aby połączyć się z kontem Mailjet."
 
-#: inc/emails/providers/mailjet/mailjet-handler.php:206
+#: inc/emails/providers/mailjet/mailjet-handler.php:214
 msgid "Mailjet"
 msgstr "Mailjet"
 
-#: inc/emails/providers/mailjet/mailjet-handler.php:225
+#: inc/emails/providers/mailjet/mailjet-handler.php:233
 msgid "Enter your Mailjet API key"
 msgstr "Wprowadź swój klucz API Mailjet"
 
-#: inc/emails/providers/mailjet/mailjet-handler.php:233
+#: inc/emails/providers/mailjet/mailjet-handler.php:241
 msgid "Enter your Mailjet Secret key"
 msgstr "Wprowadź swój klucz sekretu Mailjet"
 
@@ -712,40 +718,40 @@ msgstr "Wprowadź swój klucz sekretu Mailjet"
 msgid "Netcore connection saved successfully."
 msgstr "Połączenie Netcore zapisano pomyślnie."
 
-#: inc/emails/providers/netcore/netcore-handler.php:149
+#: inc/emails/providers/netcore/netcore-handler.php:161
 msgid "Email sending failed via Netcore. Failed to encode email body to JSON."
 msgstr "Wysyłanie e-maili nie powiodło się przez Netcore. Nie udało się zakodować treści e-maila do JSON."
 
-#: inc/emails/providers/netcore/netcore-handler.php:166
-#: inc/emails/providers/netcore/netcore-handler.php:182
+#: inc/emails/providers/netcore/netcore-handler.php:178
+#: inc/emails/providers/netcore/netcore-handler.php:194
 msgid "Email sending failed via Netcore. "
 msgstr "Wysyłanie e-maili nie powiodło się przez Netcore."
 
-#: inc/emails/providers/netcore/netcore-handler.php:179
+#: inc/emails/providers/netcore/netcore-handler.php:191
 msgid "Email sent successfully via Netcore."
 msgstr "E-mail został pomyślnie wysłany przez Netcore."
 
-#: inc/emails/providers/netcore/netcore-handler.php:196
+#: inc/emails/providers/netcore/netcore-handler.php:208
 msgid "Netcore Connection"
 msgstr "Połączenie Netcore"
 
-#: inc/emails/providers/netcore/netcore-handler.php:197
+#: inc/emails/providers/netcore/netcore-handler.php:209
 msgid "Enter the details below to connect with your Netcore account."
 msgstr "Wprowadź poniższe dane, aby połączyć się z kontem Netcore."
 
-#: inc/emails/providers/netcore/netcore-handler.php:200
+#: inc/emails/providers/netcore/netcore-handler.php:212
 msgid "Netcore"
 msgstr "Netcore"
 
-#: inc/emails/providers/netcore/netcore-handler.php:219
+#: inc/emails/providers/netcore/netcore-handler.php:231
 msgid "Enter your Netcore API key"
 msgstr "Wprowadź swój klucz API Netcore"
 
-#: inc/emails/providers/netcore/netcore-handler.php:238
+#: inc/emails/providers/netcore/netcore-handler.php:250
 msgid "Select your Netcore region"
 msgstr "Wybierz swój region Netcore"
 
-#: inc/emails/providers/netcore/netcore-handler.php:239
+#: inc/emails/providers/netcore/netcore-handler.php:251
 msgid "Select the endpoint you want to use for sending messages. If you are subject to EU laws, you may need to use the EU region."
 msgstr "Wybierz punkt końcowy, którego chcesz użyć do wysyłania wiadomości. Jeśli podlegasz przepisom UE, może być konieczne użycie regionu UE."
 
@@ -789,29 +795,29 @@ msgstr "Brak adresu e-mail nadawcy w danych połączenia."
 msgid "PHP Mail connection failed."
 msgstr "Połączenie PHP Mail nie powiodło się."
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:106
+#: inc/emails/providers/phpmail/phpmail-handler.php:112
 msgid "Email sending failed via PHP Mail."
 msgstr "Wysyłanie e-maili nie powiodło się za pomocą PHP Mail."
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:112
+#: inc/emails/providers/phpmail/phpmail-handler.php:118
 msgid "Email sent successfully via PHP Mail."
 msgstr "E-mail wysłany pomyślnie za pomocą PHP Mail."
 
 #. translators: %s: The error message.
-#: inc/emails/providers/phpmail/phpmail-handler.php:121
+#: inc/emails/providers/phpmail/phpmail-handler.php:127
 #, php-format
 msgid "Email sending failed via PHP Mail: %s"
 msgstr "Wysyłanie e-maili nie powiodło się za pomocą PHP Mail: %s"
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:134
+#: inc/emails/providers/phpmail/phpmail-handler.php:140
 msgid "PHP Mail Connection"
 msgstr "Połączenie PHP Mail"
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:135
+#: inc/emails/providers/phpmail/phpmail-handler.php:141
 msgid "Enter the details below to connect with your PHP Mail account."
 msgstr "Wprowadź poniższe dane, aby połączyć się z kontem PHP Mail."
 
-#: inc/emails/providers/phpmail/phpmail-handler.php:138
+#: inc/emails/providers/phpmail/phpmail-handler.php:144
 msgid "PHP Mail"
 msgstr "PHP Mail"
 
@@ -819,54 +825,54 @@ msgstr "PHP Mail"
 msgid "Postmark connection saved successfully."
 msgstr "Połączenie Postmark zapisane pomyślnie."
 
-#: inc/emails/providers/postmark/postmark-handler.php:144
+#: inc/emails/providers/postmark/postmark-handler.php:151
 msgid "Email sending failed via Postmark. Failed to encode email payload to JSON."
 msgstr "Wysyłanie e-maili nie powiodło się za pomocą Postmark. Nie udało się zakodować ładunku e-maila do JSON."
 
-#: inc/emails/providers/postmark/postmark-handler.php:160
-#: inc/emails/providers/postmark/postmark-handler.php:176
+#: inc/emails/providers/postmark/postmark-handler.php:167
+#: inc/emails/providers/postmark/postmark-handler.php:183
 msgid "Email sending failed via Postmark. "
 msgstr "Wysyłanie e-maili nie powiodło się za pomocą Postmark."
 
-#: inc/emails/providers/postmark/postmark-handler.php:171
+#: inc/emails/providers/postmark/postmark-handler.php:178
 msgid "Email sent successfully via Postmark."
 msgstr "E-mail wysłany pomyślnie za pomocą Postmark."
 
-#: inc/emails/providers/postmark/postmark-handler.php:190
+#: inc/emails/providers/postmark/postmark-handler.php:197
 msgid "Postmark Connection"
 msgstr "Połączenie Postmark"
 
-#: inc/emails/providers/postmark/postmark-handler.php:191
+#: inc/emails/providers/postmark/postmark-handler.php:198
 msgid "Enter the details below to connect with your Postmark account."
 msgstr "Wprowadź poniższe dane, aby połączyć się z kontem Postmark."
 
-#: inc/emails/providers/postmark/postmark-handler.php:194
+#: inc/emails/providers/postmark/postmark-handler.php:201
 msgid "Postmark"
 msgstr "Postmark"
 
-#: inc/emails/providers/postmark/postmark-handler.php:211
+#: inc/emails/providers/postmark/postmark-handler.php:218
 msgid "Server Token"
 msgstr "Token serwera"
 
-#: inc/emails/providers/postmark/postmark-handler.php:213
+#: inc/emails/providers/postmark/postmark-handler.php:220
 msgid "Enter your Postmark Server Token"
 msgstr "Wprowadź swój token serwera Postmark"
 
 #. translators: %s: postmark URL.
-#: inc/emails/providers/postmark/postmark-handler.php:217
+#: inc/emails/providers/postmark/postmark-handler.php:224
 #, php-format
 msgid "Obtain your API key from Postmark. You can find your API key under the API Tokens tab in your account. %1$sClick here%2$s"
 msgstr "Uzyskaj swój klucz API z Postmark. Możesz znaleźć swój klucz API w zakładce Tokeny API w swoim koncie. %1$sKliknij tutaj%2$s"
 
-#: inc/emails/providers/postmark/postmark-handler.php:226
+#: inc/emails/providers/postmark/postmark-handler.php:233
 msgid "Message Stream ID"
 msgstr "ID strumienia wiadomości"
 
-#: inc/emails/providers/postmark/postmark-handler.php:229
+#: inc/emails/providers/postmark/postmark-handler.php:236
 msgid "The Message Stream ID is optional. If not provided, the default outbound stream (Transactional Stream) will be used."
 msgstr "ID strumienia wiadomości jest opcjonalne. Jeśli nie zostanie podane, użyty zostanie domyślny strumień wychodzący (strumień transakcyjny)."
 
-#: inc/emails/providers/postmark/postmark-handler.php:230
+#: inc/emails/providers/postmark/postmark-handler.php:237
 msgid "Enter your Postmark Message Stream"
 msgstr "Wprowadź swój strumień wiadomości Postmark"
 
@@ -874,23 +880,23 @@ msgstr "Wprowadź swój strumień wiadomości Postmark"
 msgid "SendGrid connection saved successfully."
 msgstr "Połączenie SendGrid zapisane pomyślnie."
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:208
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:220
 msgid "Email sent successfully via SendGrid."
 msgstr "E-mail wysłany pomyślnie za pomocą SendGrid."
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:240
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:252
 msgid "SendGrid Connection"
 msgstr "Połączenie SendGrid"
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:241
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:253
 msgid "Enter the details below to connect with your SendGrid account."
 msgstr "Wprowadź poniższe dane, aby połączyć się z kontem SendGrid."
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:243
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:255
 msgid "SendGrid"
 msgstr "SendGrid"
 
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:264
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:276
 msgid "Enter your SendGrid API Key"
 msgstr "Wprowadź swój klucz API SendGrid"
 
@@ -975,33 +981,33 @@ msgstr "Auto TLS"
 msgid "SMTP2GO connection saved successfully."
 msgstr "Połączenie SMTP2GO zapisane pomyślnie."
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:169
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:181
 msgid "Email sent successfully via SMTP2GO."
 msgstr "Email został pomyślnie wysłany za pośrednictwem SMTP2GO."
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:173
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:185
 msgid "SMTP2GO Server Error"
 msgstr "Błąd serwera SMTP2GO"
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:201
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:213
 msgid "SMTP2GO Connection"
 msgstr "Połączenie SMTP2GO"
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:202
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:214
 msgid "Enter the details below to connect with your SMTP2GO account."
 msgstr "Wprowadź poniższe dane, aby połączyć się z kontem SMTP2GO."
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:204
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:216
 msgid "SMTP2GO"
 msgstr "SMTP2GO"
 
 #. translators: %s: https://app.smtp2go.com/login/ URL.
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:223
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:235
 #, php-format
 msgid "Click on this link to generate an API Key from SMTP2GO - %1$sCreate API Key%2$s"
 msgstr "Kliknij ten link, aby wygenerować klucz API z SMTP2GO - %1$sUtwórz klucz API%2$s"
 
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:229
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:241
 msgid "Enter your SMTP2GO API Key"
 msgstr "Wprowadź swój klucz API SMTP2GO"
 
@@ -1022,49 +1028,49 @@ msgid "API key is missing in the connection data."
 msgstr "Brakuje klucza API w danych połączenia."
 
 #. translators: %s: Error message.
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:177
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:185
 #, php-format
 msgid "Error: %s"
 msgstr "Błąd: %s"
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:190
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:198
 msgid "Email sent successfully via SparkPost."
 msgstr "Email został pomyślnie wysłany za pośrednictwem SparkPost."
 
-#: inc/emails/providers/emailit/emailit-handler.php:333
-#: inc/emails/providers/emailit/emailit-handler.php:338
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:195
+#: inc/emails/providers/emailit/emailit-handler.php:351
+#: inc/emails/providers/emailit/emailit-handler.php:361
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:203
 msgid "Unknown error"
 msgstr "Nieznany błąd"
 
 #. translators: %s: Error message.
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:200
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:208
 #, php-format
 msgid "Email sending failed via SparkPost. Error: %s"
 msgstr "Wysyłanie e-maili nie powiodło się za pośrednictwem SparkPost. Błąd: %s"
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:261
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:269
 msgid "SparkPost Connection"
 msgstr "Połączenie SparkPost"
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:262
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:270
 msgid "Enter the details below to connect with your SparkPost account."
 msgstr "Wprowadź poniższe dane, aby połączyć się z kontem SparkPost."
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:265
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:273
 msgid "SparkPost"
 msgstr "SparkPost"
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:284
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:292
 msgid "Enter your SparkPost API key"
 msgstr "Wprowadź swój klucz API SparkPost"
 
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:297
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:305
 msgid "Select your SpartPost region"
 msgstr "Wybierz swój region SparkPost"
 
 #. translators: %s: www.mailgun.com/about/regions/ URL.
-#: inc/emails/providers/sparkpost/sparkpost-handler.php:299
+#: inc/emails/providers/sparkpost/sparkpost-handler.php:307
 #, php-format
 msgid "Select the endpoint you want to use for sending messages. If you are subject to EU laws, you may need to use the EU region. %1$sLearn more at SparkPost.com%2$s"
 msgstr "Wybierz punkt końcowy, którego chcesz użyć do wysyłania wiadomości. Jeśli podlegasz przepisom UE, może być konieczne użycie regionu UE. %1$sDowiedz się więcej na SparkPost.com%2$s"
@@ -1303,6 +1309,7 @@ msgstr "Wystąpił problem z wysłaniem testowego e-maila."
 msgid "Sent!"
 msgstr "Wysłano!"
 
+#: inc/abilities/ability.php:523
 #: build/main.js:2
 msgid "Test email sent successfully."
 msgstr "Testowy e-mail wysłany pomyślnie."
@@ -1311,6 +1318,7 @@ msgstr "Testowy e-mail wysłany pomyślnie."
 msgid "Failed!"
 msgstr "Niepowodzenie!"
 
+#: inc/abilities/ability.php:524
 #: build/main.js:2
 msgid "Failed to send test email."
 msgstr "Nie udało się wysłać testowego e-maila."
@@ -1638,7 +1646,8 @@ msgstr "X-Mailer:"
 msgid "Attachments (%d)"
 msgstr "Załączniki (%d)"
 
-#: inc/api/resend-email.php:122
+#: inc/abilities/ability.php:801
+#: inc/api/resend-email.php:151
 #: build/main.js:2
 msgid "Email resent successfully."
 msgstr "E-mail wysłany ponownie pomyślnie."
@@ -1719,7 +1728,7 @@ msgstr "Czy na pewno chcesz usunąć wybrane dzienniki? Ta akcja nie może być 
 msgid "Are you sure you want to resend the selected email(s)?"
 msgstr "Czy na pewno chcesz ponownie wysłać wybrane e-maile?"
 
-#: inc/admin/plugin.php:465
+#: inc/admin/plugin.php:488
 #: build/main.js:2
 msgid "Email Logs"
 msgstr "Dzienniki e-maili"
@@ -2083,7 +2092,7 @@ msgstr "Błąd ładowania powiadomień."
 msgid "There was an issue fetching notifications."
 msgstr "Wystąpił problem z pobieraniem powiadomień."
 
-#: inc/admin/plugin.php:469
+#: inc/admin/plugin.php:492
 #: build/main.js:2
 msgid "Notifications"
 msgstr "Powiadomienia"
@@ -2349,18 +2358,6 @@ msgid "Reputation Shield activated successfully"
 msgstr "Tarcza reputacji aktywowana pomyślnie"
 
 #: build/main.js:2
-msgid "Add More Power to Your Website"
-msgstr "Dodaj więcej mocy do swojej strony internetowej"
-
-#: build/main.js:2
-msgid "These tools can help you build your website faster and easier. Try them out and see how they can help your website grow."
-msgstr "Te narzędzia mogą pomóc Ci szybciej i łatwiej zbudować swoją stronę internetową. Wypróbuj je i zobacz, jak mogą pomóc w rozwoju Twojej strony."
-
-#: build/main.js:2
-msgid "Install"
-msgstr "Zainstaluj"
-
-#: build/main.js:2
 msgid "Invalid JSON response"
 msgstr "Nieprawidłowa odpowiedź JSON"
 
@@ -2457,7 +2454,9 @@ msgstr "Nie udało się pobrać logów do usunięcia."
 msgid "Failed to delete the provided log IDs."
 msgstr "Nie udało się usunąć podanych identyfikatorów logów."
 
+#. translators: %d: Number of logs deleted
 #. Translators: %d is the number of logs deleted.
+#: inc/abilities/ability.php:706
 #: inc/api/delete-logs.php:151
 #, php-format
 msgid "%d log(s) deleted successfully."
@@ -2477,11 +2476,13 @@ msgstr "Nie udało się pobrać logów e-maili."
 msgid "Invalid log IDs provided."
 msgstr "Podano nieprawidłowe identyfikatory logów."
 
+#: inc/abilities/ability.php:749
 #: inc/api/resend-email.php:97
 msgid "Log not found."
 msgstr "Log nie znaleziony."
 
-#: inc/api/resend-email.php:128
+#: inc/abilities/ability.php:802
+#: inc/api/resend-email.php:157
 msgid "Failed to resend email."
 msgstr "Nie udało się ponownie wysłać e-maila."
 
@@ -2495,7 +2496,7 @@ msgstr "Dane ustawień do zaktualizowania."
 
 #. translators: %s is the error message.
 #: inc/controller/content-guard.php:354
-#: inc/emails/handler/mail-handler.php:310
+#: inc/emails/handler/mail-handler.php:360
 #, php-format
 msgid "Failed to log email: %s"
 msgstr "Nie udało się zarejestrować e-maila: %s"
@@ -2516,7 +2517,7 @@ msgstr "Wyjątek podczas aktualizacji identyfikatora logu %1$d: %2$s"
 
 #. translators: %s: Exception message.
 #: inc/controller/logger.php:570
-#: inc/db/email-log.php:373
+#: inc/db/email-log.php:383
 #, php-format
 msgid "An exception occurred: %s"
 msgstr "Wystąpił wyjątek: %s"
@@ -2528,8 +2529,8 @@ msgstr "Podano nieprawidłowy identyfikator logu."
 #. translators: %d: Log ID.
 #: inc/controller/logger.php:596
 #: inc/controller/logger.php:598
-#: inc/db/email-log.php:400
-#: inc/db/email-log.php:402
+#: inc/db/email-log.php:410
+#: inc/db/email-log.php:412
 #, php-format
 msgid "Failed to retrieve log ID %d."
 msgstr "Nie udało się pobrać identyfikatora logu %d."
@@ -2560,51 +2561,51 @@ msgid "Error inserting email log: %s"
 msgstr "Błąd podczas wstawiania logu e-mail: %s"
 
 #. translators: %s: Database error message.
-#: inc/db/email-log.php:316
+#: inc/db/email-log.php:326
 #, php-format
 msgid "Error retrieving email logs: %s"
 msgstr "Błąd podczas pobierania logów e-mail: %s"
 
 #. translators: %s: Error message for invalid ID or data.
-#: inc/db/email-log.php:341
+#: inc/db/email-log.php:351
 msgid "Invalid ID or data provided for update."
 msgstr "Podano nieprawidłowy identyfikator lub dane do aktualizacji."
 
 #. translators: %d: Log ID, %s: Database error message.
-#: inc/db/email-log.php:364
+#: inc/db/email-log.php:374
 #, php-format
 msgid "Error updating email log ID %1$d: %2$s"
 msgstr "Błąd podczas aktualizacji identyfikatora logu e-mail %1$d: %2$s"
 
 #. translators: %s: Exception message.
-#: inc/db/email-log.php:371
+#: inc/db/email-log.php:381
 #, php-format
 msgid "Exception updating email log: %s"
 msgstr "Wyjątek podczas aktualizacji logu e-mail: %s"
 
 #. translators: %s: Provided log ID.
-#: inc/db/email-log.php:386
+#: inc/db/email-log.php:396
 #, php-format
 msgid "Invalid log ID provided: %s"
 msgstr "Podano nieprawidłowy identyfikator logu: %s"
 
 #. translators: %s: Database error message.
-#: inc/db/email-log.php:494
+#: inc/db/email-log.php:498
 #, php-format
 msgid "Database error: %s"
 msgstr "Błąd bazy danych: %s"
 
 #. translators: %s: Error message.
-#: inc/db/email-log.php:501
+#: inc/db/email-log.php:505
 #, php-format
 msgid "Error deleting email logs: %s"
 msgstr "Błąd podczas usuwania logów e-mail: %s"
 
-#: inc/emails/handler/mail-handler.php:154
+#: inc/emails/handler/mail-handler.php:170
 msgid "Sent using Default WordPress Handler"
 msgstr "Wysłano za pomocą domyślnego narzędzia WordPress"
 
-#: inc/emails/handler/mail-handler.php:157
+#: inc/emails/handler/mail-handler.php:173
 msgid "Failed to send email using Default WordPress Handler"
 msgstr "Nie udało się wysłać e-maila za pomocą domyślnego narzędzia WordPress"
 
@@ -2632,34 +2633,34 @@ msgstr "Wysyłanie e-maila nie powiodło się przez AWS SES: %s"
 
 #. translators: %s: Error message from Brevo API
 #. translators: %s: Exception message
-#: inc/emails/providers/brevo/brevo-handler.php:241
-#: inc/emails/providers/brevo/brevo-handler.php:261
-#: inc/emails/providers/brevo/brevo-handler.php:269
+#: inc/emails/providers/brevo/brevo-handler.php:251
+#: inc/emails/providers/brevo/brevo-handler.php:271
+#: inc/emails/providers/brevo/brevo-handler.php:279
 #, php-format
 msgid "Email sending failed via Brevo. Error: %s"
 msgstr "Wysyłanie e-maila nie powiodło się przez Brevo. Błąd: %s"
 
 #. translators: %s: Error message from Elastic Email
-#: inc/emails/providers/elastic/elastic-handler.php:175
-#: inc/emails/providers/elastic/elastic-handler.php:192
+#: inc/emails/providers/elastic/elastic-handler.php:188
+#: inc/emails/providers/elastic/elastic-handler.php:205
 #, php-format
 msgid "Email sending failed via Elastic Email. Error: %s"
 msgstr "Wysyłanie e-maila nie powiodło się przez Elastic Email. Błąd: %s"
 
-#: inc/emails/providers/elastic/elastic-handler.php:485
-#: inc/emails/providers/elastic/elastic-handler.php:500
+#: inc/emails/providers/elastic/elastic-handler.php:498
+#: inc/emails/providers/elastic/elastic-handler.php:513
 msgid "Transactional Email"
 msgstr "E-mail transakcyjny"
 
-#: inc/emails/providers/elastic/elastic-handler.php:504
+#: inc/emails/providers/elastic/elastic-handler.php:517
 msgid "Marketing Email"
 msgstr "E-mail marketingowy"
 
 #. translators: %s: Error message from SendGrid
 #. translators: %s: Exception message
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:197
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:216
-#: inc/emails/providers/sendgrid/sendgrid-handler.php:224
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:209
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:228
+#: inc/emails/providers/sendgrid/sendgrid-handler.php:236
 #, php-format
 msgid "Email sending failed via SendGrid. Error: %s"
 msgstr "Wysyłanie e-maila nie powiodło się przez SendGrid. Błąd: %s"
@@ -2678,19 +2679,19 @@ msgstr "Wysyłanie e-maila nie powiodło się przez SMTP: %s"
 
 #. translators: %s: Error message from SMTP2GO
 #. translators: %s: Exception message
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:157
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:176
-#: inc/emails/providers/smtp2go/smtp2go-handler.php:185
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:169
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:188
+#: inc/emails/providers/smtp2go/smtp2go-handler.php:197
 #, php-format
 msgid "Email sending failed via SMTP2GO. Error: %s"
 msgstr "Wysyłanie e-maila nie powiodło się przez SMTP2GO. Błąd: %s"
 
-#: inc/admin/plugin.php:453
+#: inc/admin/plugin.php:476
 #: build/main.js:2
 msgid "Dashboard"
 msgstr "Panel sterowania"
 
-#: inc/admin/plugin.php:461
+#: inc/admin/plugin.php:484
 #: build/main.js:2
 msgid "Connections"
 msgstr "Połączenia"
@@ -2708,13 +2709,9 @@ msgstr "Zaczynajmy"
 msgid "SureMail SMTP"
 msgstr "SureMail SMTP"
 
-#: inc/admin/plugin.php:329
+#: inc/admin/plugin.php:352
 msgid "Setup Wizard"
 msgstr "Kreator konfiguracji"
-
-#: build/main.js:2
-msgid "Enable Anonymous Analytics"
-msgstr "Włącz anonimową analizę"
 
 #: build/main.js:2
 msgid "Learn More"
@@ -2775,81 +2772,81 @@ msgstr "Logo %s"
 msgid "Manage Email Summaries from your website settings"
 msgstr "Zarządzaj podsumowaniami e-mail w ustawieniach swojej strony"
 
-#: inc/emails/providers/emailit/emailit-handler.php:226
-#: inc/emails/providers/emailit/emailit-handler.php:255
+#: inc/emails/providers/emailit/emailit-handler.php:239
+#: inc/emails/providers/emailit/emailit-handler.php:268
 msgid "Emailit send failed: "
 msgstr "Wysyłka Emailit nie powiodła się:"
 
-#: inc/emails/providers/emailit/emailit-handler.php:237
+#: inc/emails/providers/emailit/emailit-handler.php:250
 msgid "Email sent successfully via Emailit."
 msgstr "E-mail wysłany pomyślnie przez Emailit."
 
 #. translators: %s is the error message from Emailit API.
-#: inc/emails/providers/emailit/emailit-handler.php:250
+#: inc/emails/providers/emailit/emailit-handler.php:263
 #, php-format
 msgid "Email sending failed via Emailit: %s"
 msgstr "Wysyłka e-maila przez Emailit nie powiodła się: %s"
 
-#: inc/emails/providers/emailit/emailit-handler.php:270
+#: inc/emails/providers/emailit/emailit-handler.php:283
 msgid "Emailit Connection"
 msgstr "Połączenie Emailit"
 
-#: inc/emails/providers/emailit/emailit-handler.php:271
+#: inc/emails/providers/emailit/emailit-handler.php:284
 msgid "Enter the details below to connect with your Emailit account. Important: Your sending domain must be verified in Emailit before you can send emails."
 msgstr "Wprowadź poniższe dane, aby połączyć się ze swoim kontem Emailit. Ważne: Twoja domena wysyłkowa musi być zweryfikowana w Emailit, zanim będziesz mógł wysyłać e-maile."
 
-#: inc/emails/providers/emailit/emailit-handler.php:273
+#: inc/emails/providers/emailit/emailit-handler.php:286
 msgid "Emailit"
 msgstr "Emailit"
 
 #. translators: %1$s: API key link, %2$s: domain verification link.
-#: inc/emails/providers/emailit/emailit-handler.php:293
+#: inc/emails/providers/emailit/emailit-handler.php:306
 #, php-format
 msgid "Get your API key from your Emailit dashboard. %1$s. Important: Before sending emails, you must %2$s in your Emailit account."
 msgstr "Pobierz swój klucz API z panelu Emailit. %1$s. Ważne: Przed wysyłką e-maili musisz %2$s na swoim koncie Emailit."
 
-#: inc/emails/providers/emailit/emailit-handler.php:294
+#: inc/emails/providers/emailit/emailit-handler.php:307
 msgid "Get API Key"
 msgstr "Pobierz klucz API"
 
-#: inc/emails/providers/emailit/emailit-handler.php:295
+#: inc/emails/providers/emailit/emailit-handler.php:308
 msgid "verify your sending domain"
 msgstr "zweryfikuj swoją domenę wysyłkową"
 
-#: inc/emails/providers/emailit/emailit-handler.php:299
+#: inc/emails/providers/emailit/emailit-handler.php:312
 msgid "Enter your Emailit API Key"
 msgstr "Wprowadź swój klucz API Emailit"
 
-#: inc/emails/providers/emailit/emailit-handler.php:345
+#: inc/emails/providers/emailit/emailit-handler.php:368
 msgid "Bad request. Please check your email data."
 msgstr "Nieprawidłowe żądanie. Proszę sprawdź dane e-mail."
 
-#: inc/emails/providers/emailit/emailit-handler.php:347
+#: inc/emails/providers/emailit/emailit-handler.php:370
 msgid "Unauthorized. Please check your API key."
 msgstr "Brak autoryzacji. Proszę sprawdź swój klucz API."
 
-#: inc/emails/providers/emailit/emailit-handler.php:349
+#: inc/emails/providers/emailit/emailit-handler.php:372
 msgid "Forbidden. Access denied."
 msgstr "Zabronione. Dostęp odmówiony."
 
-#: inc/emails/providers/emailit/emailit-handler.php:351
+#: inc/emails/providers/emailit/emailit-handler.php:374
 msgid "Not found. Please check the API endpoint."
 msgstr "Nie znaleziono. Proszę sprawdź punkt końcowy API."
 
-#: inc/emails/providers/emailit/emailit-handler.php:353
+#: inc/emails/providers/emailit/emailit-handler.php:376
 msgid "Domain verification required. Your sending domain must be verified in Emailit before you can send emails. Please verify your domain in your Emailit dashboard at https://app.emailit.com/domains"
 msgstr "Wymagana weryfikacja domeny. Twoja domena wysyłkowa musi być zweryfikowana w Emailit, zanim będziesz mógł wysyłać e-maile. Proszę zweryfikuj swoją domenę w panelu Emailit pod adresem https://app.emailit.com/domains"
 
-#: inc/emails/providers/emailit/emailit-handler.php:355
+#: inc/emails/providers/emailit/emailit-handler.php:378
 msgid "Rate limit exceeded. Please try again later."
 msgstr "Przekroczono limit zapytań. Proszę spróbuj ponownie później."
 
-#: inc/emails/providers/emailit/emailit-handler.php:357
+#: inc/emails/providers/emailit/emailit-handler.php:380
 msgid "Internal server error. Please try again later."
 msgstr "Wewnętrzny błąd serwera. Proszę spróbuj ponownie później."
 
 #. translators: %d is the HTTP error code.
-#: inc/emails/providers/emailit/emailit-handler.php:360
+#: inc/emails/providers/emailit/emailit-handler.php:383
 #, php-format
 msgid "HTTP error %d occurred."
 msgstr "Wystąpił błąd HTTP %d."
@@ -3233,10 +3230,6 @@ msgstr "Menu administratora SureMail"
 msgid "Toggle to show SureMail in the main menu or under Settings → SureMail."
 msgstr "Przełącz, aby wyświetlić SureMail w głównym menu lub w Ustawieniach → SureMail."
 
-#: build/main.js:2
-msgid "Provide non-sensitive information such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
-msgstr "Podaj nie wrażliwe informacje, takie jak wersja PHP i używane funkcje, aby pomóc nam szybciej naprawić błędy, podejmować lepsze decyzje i tworzyć funkcje, które naprawdę mają znaczenie dla Ciebie."
-
 #: inc/api/notice.php:101
 msgid "Menu location notice dismissed."
 msgstr "Powiadomienie o lokalizacji menu odrzucone."
@@ -3251,10 +3244,629 @@ msgstr "Przejdź do Ustawień"
 msgid "SureMail is now under Settings → SureMail. You can change its menu position in settings."
 msgstr "SureMail jest teraz dostępny w Ustawienia → SureMail. Możesz zmienić jego pozycję w menu w ustawieniach."
 
-#: inc/emails/providers/emailit/emailit-handler.php:94
+#: inc/emails/providers/emailit/emailit-handler.php:96
 msgid "Invalid or missing from email address."
 msgstr "Nieprawidłowy lub brakujący adres e-mail nadawcy."
 
-#: inc/emails/providers/emailit/emailit-handler.php:125
+#: inc/emails/providers/emailit/emailit-handler.php:133
 msgid "No valid recipient email addresses provided."
 msgstr "Nie podano prawidłowych adresów e-mail odbiorców."
+
+#: inc/abilities/ability.php:71
+msgid "Abilities for the SureMail email delivery plugin."
+msgstr "Możliwości wtyczki do dostarczania e-maili SureMail."
+
+#: inc/abilities/ability.php:149
+#: inc/abilities/ability.php:211
+#: inc/abilities/ability.php:403
+msgid "Invalid connection ID."
+msgstr "Nieprawidłowy identyfikator połączenia."
+
+#: inc/abilities/ability.php:262
+msgid "Provider type is required."
+msgstr "Wymagany jest typ dostawcy."
+
+#. translators: %s: provider type
+#: inc/abilities/ability.php:271
+msgid "%s requires browser-based OAuth authentication and cannot be added via this ability."
+msgstr "%s wymaga uwierzytelniania OAuth opartego na przeglądarce i nie może być dodany za pomocą tej funkcji."
+
+#. translators: %s: provider type
+#: inc/abilities/ability.php:283
+msgid "Unsupported provider type: %s."
+msgstr "Nieobsługiwany typ dostawcy: %s."
+
+#: inc/abilities/ability.php:290
+msgid "provider_settings must be an object."
+msgstr "provider_settings musi być obiektem."
+
+#. translators: %s: field name
+#: inc/abilities/ability.php:317
+msgid "Missing required field: %s."
+msgstr "Brak wymaganego pola: %s."
+
+#: inc/abilities/ability.php:382
+msgid "Connection created and authenticated successfully."
+msgstr "Połączenie zostało utworzone i uwierzytelnione pomyślnie."
+
+#: inc/abilities/ability.php:452
+msgid "No changes made to connection."
+msgstr "Brak zmian w połączeniu."
+
+#: inc/abilities/ability.php:471
+msgid "Connection updated successfully."
+msgstr "Połączenie zostało pomyślnie zaktualizowane."
+
+#: inc/abilities/ability.php:494
+msgid "Connection ID and recipient email are required."
+msgstr "Wymagane są identyfikator połączenia i adres e-mail odbiorcy."
+
+#: inc/abilities/ability.php:516
+msgid "This is a test email sent via the SureMail Abilities API to verify your connection is working correctly."
+msgstr "To jest testowy e-mail wysłany za pomocą API SureMail Abilities, aby zweryfikować, czy Twoje połączenie działa poprawnie."
+
+#: inc/abilities/ability.php:627
+msgid "Invalid log ID."
+msgstr "Nieprawidłowy identyfikator dziennika."
+
+#: inc/abilities/ability.php:638
+msgid "Email log not found."
+msgstr "Nie znaleziono dziennika e-maili."
+
+#: inc/abilities/ability.php:660
+#: inc/abilities/ability.php:728
+msgid "Log IDs array is required."
+msgstr "Wymagana jest tablica identyfikatorów dzienników."
+
+#: inc/abilities/ability.php:833
+msgid "Start date is required."
+msgstr "Wymagana jest data rozpoczęcia."
+
+#: inc/abilities/ability.php:982
+msgid "No changes made to settings."
+msgstr "Brak zmian w ustawieniach."
+
+#. translators: %s: field name
+#: inc/abilities/ability.php:1077
+msgid "Required field %s is missing."
+msgstr "Brak wymaganego pola %s."
+
+#. translators: %s: field name
+#: inc/abilities/ability.php:1137
+msgid "Invalid value for %s."
+msgstr "Nieprawidłowa wartość dla %s."
+
+#: inc/abilities/ability.php:1161
+msgid "Inputs not parsed."
+msgstr "Dane wejściowe nie zostały przetworzone."
+
+#. translators: %s: property name
+#: inc/abilities/ability.php:1171
+msgid "Property %s not found."
+msgstr "Nie znaleziono właściwości %s."
+
+#: inc/abilities/config-ability.php:51
+msgid "List connections"
+msgstr "Lista połączeń"
+
+#: inc/abilities/config-ability.php:52
+msgid "Lists every configured email-sending connection on this WordPress site. Returns each connection's ID, provider type (e.g. SMTP, SENDGRID, PHPMAIL), sender email, display name, title, priority/sequence number, force-from flags, and creation date. Sensitive credentials (API keys, passwords, tokens) are never included in the response. Optionally filter by provider type. Use this to discover available connections before sending test emails or managing connections."
+msgstr "Wyświetla wszystkie skonfigurowane połączenia do wysyłania e-maili na tej stronie WordPress. Zwraca identyfikator każdego połączenia, typ dostawcy (np. SMTP, SENDGRID, PHPMAIL), adres e-mail nadawcy, nazwę wyświetlaną, tytuł, priorytet/numer sekwencji, flagi wymuszające nadawcę oraz datę utworzenia. Poufne dane uwierzytelniające (klucze API, hasła, tokeny) nigdy nie są uwzględniane w odpowiedzi. Opcjonalnie filtruj według typu dostawcy. Użyj tego, aby odkryć dostępne połączenia przed wysłaniem testowych e-maili lub zarządzaniem połączeniami."
+
+#: inc/abilities/config-ability.php:62
+msgid "Filter by provider type (e.g., SMTP, SENDGRID, GMAIL)."
+msgstr "Filtruj według typu dostawcy (np. SMTP, SENDGRID, GMAIL)."
+
+#: inc/abilities/config-ability.php:76
+#: inc/abilities/config-ability.php:160
+#: inc/abilities/config-ability.php:239
+msgid "Connection ID."
+msgstr "Identyfikator połączenia."
+
+#: inc/abilities/config-ability.php:80
+#: inc/abilities/config-ability.php:164
+#: inc/abilities/config-ability.php:231
+msgid "Provider type."
+msgstr "Typ dostawcy."
+
+#: inc/abilities/config-ability.php:84
+#: inc/abilities/config-ability.php:168
+#: inc/abilities/config-ability.php:587
+#: inc/abilities/config-ability.php:667
+msgid "Sender email."
+msgstr "Adres e-mail nadawcy."
+
+#: inc/abilities/config-ability.php:88
+#: inc/abilities/config-ability.php:172
+#: inc/abilities/config-ability.php:243
+msgid "Connection title."
+msgstr "Tytuł połączenia."
+
+#: inc/abilities/config-ability.php:92
+msgid "Connection priority/sequence."
+msgstr "Priorytet/sekwencja połączenia."
+
+#: inc/abilities/config-ability.php:96
+#: inc/abilities/config-ability.php:180
+msgid "Sender name."
+msgstr "Nazwa nadawcy."
+
+#: inc/abilities/config-ability.php:100
+#: inc/abilities/config-ability.php:184
+msgid "Force from email."
+msgstr "Wymuś adres e-mail nadawcy."
+
+#: inc/abilities/config-ability.php:104
+#: inc/abilities/config-ability.php:188
+msgid "Force from name."
+msgstr "Wymuś nazwę nadawcy."
+
+#: inc/abilities/config-ability.php:108
+#: inc/abilities/config-ability.php:192
+msgid "Creation date."
+msgstr "Data utworzenia."
+
+#: inc/abilities/config-ability.php:115
+msgid "Total connections count."
+msgstr "Łączna liczba połączeń."
+
+#: inc/abilities/config-ability.php:129
+msgid "Safe to call at any time. This is a read-only operation that returns no sensitive data. Use this first when the user asks about their email setup, before performing any connection modifications."
+msgstr "Bezpieczne do wywołania w dowolnym momencie. Jest to operacja tylko do odczytu, która nie zwraca poufnych danych. Użyj tego najpierw, gdy użytkownik pyta o swoje ustawienia e-mail, zanim dokonasz jakichkolwiek modyfikacji połączeń."
+
+#: inc/abilities/config-ability.php:139
+msgid "Get connection details"
+msgstr "Pobierz szczegóły połączenia"
+
+#: inc/abilities/config-ability.php:140
+msgid "Retrieves the full details of a single email connection by its unique ID. Returns the provider type, sender email, display name, title, priority, force-from flags, and creation date. Sensitive credentials (API keys, passwords, OAuth tokens) are stripped from the response and will never be exposed. Returns an error if the connection ID does not exist."
+msgstr "Pobiera pełne szczegóły pojedynczego połączenia e-mail według jego unikalnego identyfikatora. Zwraca typ dostawcy, adres e-mail nadawcy, nazwę wyświetlaną, tytuł, priorytet, flagi wymuszające nadawcę oraz datę utworzenia. Poufne dane uwierzytelniające (klucze API, hasła, tokeny OAuth) są usuwane z odpowiedzi i nigdy nie będą ujawniane. Zwraca błąd, jeśli identyfikator połączenia nie istnieje."
+
+#: inc/abilities/config-ability.php:151
+msgid "The connection ID. Obtain this from list-connections."
+msgstr "ID połączenia. Uzyskaj go z list-connections."
+
+#: inc/abilities/config-ability.php:176
+msgid "Connection priority."
+msgstr "Priorytet połączenia."
+
+#: inc/abilities/config-ability.php:206
+msgid "Safe to call at any time. Read-only lookup. If the user asks about a specific connection, call list-connections first to find the ID, then use this for details."
+msgstr "Bezpieczne do wywołania w dowolnym momencie. Tylko do odczytu. Jeśli użytkownik pyta o konkretne połączenie, najpierw wywołaj list-connections, aby znaleźć ID, a następnie użyj tego do szczegółów."
+
+#: inc/abilities/config-ability.php:216
+msgid "Get default connection"
+msgstr "Pobierz domyślne połączenie"
+
+#: inc/abilities/config-ability.php:217
+msgid "Returns the currently active default email connection that WordPress uses to send all outgoing emails. The default connection is the one with the highest priority (lowest sequence number). If no connections are configured, all fields will be empty strings. Use this to quickly check which provider and email address the site is currently sending from."
+msgstr "Zwraca aktualnie aktywne domyślne połączenie e-mail, którego WordPress używa do wysyłania wszystkich wychodzących wiadomości e-mail. Domyślne połączenie to to o najwyższym priorytecie (najniższy numer sekwencji). Jeśli nie skonfigurowano żadnych połączeń, wszystkie pola będą pustymi ciągami znaków. Użyj tego, aby szybko sprawdzić, z którego dostawcy i adresu e-mail witryna obecnie wysyła wiadomości."
+
+#: inc/abilities/config-ability.php:235
+msgid "Default sender email."
+msgstr "Domyślny adres e-mail nadawcy."
+
+#: inc/abilities/config-ability.php:257
+msgid "Safe to call at any time. Read-only. Use this as a quick health-check to see which connection is actively sending emails. If the result has empty fields, no connections are configured and the user should add one."
+msgstr "Bezpieczne do wywołania w dowolnym momencie. Tylko do odczytu. Użyj tego jako szybkiego testu stanu, aby zobaczyć, które połączenie aktywnie wysyła e-maile. Jeśli wynik zawiera puste pola, nie skonfigurowano żadnych połączeń i użytkownik powinien dodać jedno."
+
+#: inc/abilities/config-ability.php:267
+msgid "Delete connection"
+msgstr "Usuń połączenie"
+
+#: inc/abilities/config-ability.php:268
+msgid "Permanently deletes an email connection by its ID. This cannot be undone — the connection and all its credentials are removed immediately. If the deleted connection was the site's default, the remaining connection with the highest priority (lowest sequence number) automatically becomes the new default. If this was the only connection, the site will have no email-sending capability until a new connection is added."
+msgstr "Trwale usuwa połączenie e-mail według jego ID. Nie można tego cofnąć — połączenie i wszystkie jego dane uwierzytelniające są usuwane natychmiast. Jeśli usunięte połączenie było domyślne dla witryny, pozostałe połączenie o najwyższym priorytecie (najniższy numer sekwencji) automatycznie staje się nowym domyślnym. Jeśli było to jedyne połączenie, witryna nie będzie miała możliwości wysyłania e-maili, dopóki nie zostanie dodane nowe połączenie."
+
+#: inc/abilities/config-ability.php:280
+msgid "The connection ID to delete. Obtain this from list-connections."
+msgstr "ID połączenia do usunięcia. Uzyskaj go z list-connections."
+
+#: inc/abilities/config-ability.php:289
+msgid "Deleted connection ID."
+msgstr "Usunięte ID połączenia."
+
+#: inc/abilities/config-ability.php:293
+#: inc/abilities/config-ability.php:356
+#: inc/abilities/config-ability.php:438
+#: inc/abilities/config-ability.php:505
+#: inc/abilities/config-ability.php:754
+#: inc/abilities/config-ability.php:1038
+msgid "Result message."
+msgstr "Wiadomość z wynikiem."
+
+#: inc/abilities/config-ability.php:316
+msgid "DESTRUCTIVE — always ask the user to confirm before running this. Show them the connection title and email so they know exactly what will be deleted. Warn them that this cannot be undone and that deleting the only connection will stop all outgoing emails from the site."
+msgstr "DESTRUKCYJNE — zawsze poproś użytkownika o potwierdzenie przed wykonaniem. Pokaż mu tytuł połączenia i e-mail, aby dokładnie wiedział, co zostanie usunięte. Ostrzeż, że nie można tego cofnąć i że usunięcie jedynego połączenia zatrzyma wszystkie wychodzące e-maile z witryny."
+
+#: inc/abilities/config-ability.php:326
+msgid "Add new email connection"
+msgstr "Dodaj nowe połączenie e-mail"
+
+#: inc/abilities/config-ability.php:327
+msgid "Creates and authenticates a new email-sending connection on this WordPress site. The connection is validated against the external email provider during creation — invalid credentials will be rejected immediately. IMPORTANT: Gmail, Outlook, and Zoho Mail use OAuth and CANNOT be added through this ability — they require a browser-based authorization flow in the SureMails admin dashboard. If priority is omitted, it is auto-assigned as the next available sequence number. ALL providers require these common fields in provider_settings: connection_title (string, required), from_email (email, required), from_name (string, optional), force_from_email (boolean, optional), force_from_name (boolean, optional), priority (integer, optional). EXACT provider-specific fields (use these exact key names): PHPMAIL — no extra fields needed, only common fields above. SMTP — host (string, required), port (integer, required, e.g. 587), encryption (string, required, one of: none/ssl/tls), username (string, optional), password (string, optional), auto_tls (boolean, optional), return_path (boolean, optional). SENDGRID — api_key (string, required). MAILGUN — api_key (string, required), domain (string, required, e.g. mg.example.com), region (string, optional, US or EU). POSTMARK — server_token (string, required), message_stream (string, required, default: outbound). AWS (Amazon SES) — username (string, required, this is the AWS Access Key ID), password (string, required, this is the AWS Secret Access Key), region (string, required, e.g. us-east-1), return_path (boolean, optional). SPARKPOST — api_key (string, required), region (string, optional, US or EU). BREVO — api_key (string, required). MAILERSEND — api_key (string, required). MAILJET — api_key (string, required), secret_key (string, required). SMTP2GO — api_key (string, required). ELASTIC (Elastic Email) — api_key (string, required), mail_type (string, optional, transactional or marketing). EMAILIT — api_key (string, required). NETCORE — api_key (string, required), region (string, required)."
+msgstr "Tworzy i uwierzytelnia nowe połączenie do wysyłania e-maili na tej stronie WordPress. Połączenie jest weryfikowane u zewnętrznego dostawcy e-mail podczas tworzenia — nieprawidłowe dane uwierzytelniające zostaną odrzucone natychmiast. WAŻNE: Gmail, Outlook i Zoho Mail używają OAuth i NIE MOGĄ być dodane przez tę funkcję — wymagają autoryzacji w przeglądarce w panelu administracyjnym SureMails. Jeśli priorytet jest pominięty, jest automatycznie przypisywany jako następny dostępny numer sekwencji. WSZYSCY dostawcy wymagają tych wspólnych pól w provider_settings: connection_title (string, wymagane), from_email (email, wymagane), from_name (string, opcjonalne), force_from_email (boolean, opcjonalne), force_from_name (boolean, opcjonalne), priority (integer, opcjonalne). DOKŁADNE pola specyficzne dla dostawcy (używaj dokładnych nazw kluczy): PHPMAIL — nie wymaga dodatkowych pól, tylko powyższe wspólne. SMTP — host (string, wymagane), port (integer, wymagane, np. 587), encryption (string, wymagane, jedno z: none/ssl/tls), username (string, opcjonalne), password (string, opcjonalne), auto_tls (boolean, opcjonalne), return_path (boolean, opcjonalne). SENDGRID — api_key (string, wymagane). MAILGUN — api_key (string, wymagane), domain (string, wymagane, np. mg.example.com), region (string, opcjonalne, US lub EU). POSTMARK — server_token (string, wymagane), message_stream (string, wymagane, domyślnie: outbound). AWS (Amazon SES) — username (string, wymagane, to jest AWS Access Key ID), password (string, wymagane, to jest AWS Secret Access Key), region (string, wymagane, np. us-east-1), return_path (boolean, opcjonalne). SPARKPOST — api_key (string, wymagane), region (string, opcjonalne, US lub EU). BREVO — api_key (string, wymagane). MAILERSEND — api_key (string, wymagane). MAILJET — api_key (string, wymagane), secret_key (string, wymagane). SMTP2GO — api_key (string, wymagane). ELASTIC (Elastic Email) — api_key (string, wymagane), mail_type (string, opcjonalne, transactional lub marketing). EMAILIT — api_key (string, wymagane). NETCORE — api_key (string, wymagane), region (string, wymagane)."
+
+#: inc/abilities/config-ability.php:339
+msgid "Provider type. Must be one of: SMTP, PHPMAIL, SENDGRID, MAILGUN, POSTMARK, AWS, SPARKPOST, BREVO, MAILERSEND, MAILJET, SMTP2GO, ELASTIC, EMAILIT, NETCORE. OAuth providers (GMAIL, OUTLOOK, ZOHO) are not supported here."
+msgstr "Typ dostawcy. Musi być jednym z: SMTP, PHPMAIL, SENDGRID, MAILGUN, POSTMARK, AWS, SPARKPOST, BREVO, MAILERSEND, MAILJET, SMTP2GO, ELASTIC, EMAILIT, NETCORE. Dostawcy OAuth (GMAIL, OUTLOOK, ZOHO) nie są tutaj obsługiwani."
+
+#: inc/abilities/config-ability.php:343
+msgid "Provider-specific settings object. Must include common fields: connection_title (required), from_email (required). Plus provider-specific fields using the EXACT key names listed in the ability description — e.g. AWS uses \"username\" for Access Key ID and \"password\" for Secret Access Key (NOT access_key/secret_key); POSTMARK uses \"server_token\" and \"message_stream\"; MAILJET uses \"api_key\" and \"secret_key\"; most single-key providers use \"api_key\". See the ability description for the complete field reference per provider."
+msgstr "Obiekt ustawień specyficznych dla dostawcy. Musi zawierać wspólne pola: connection_title (wymagane), from_email (wymagane). Oraz pola specyficzne dla dostawcy, używając DOKŁADNYCH nazw kluczy wymienionych w opisie funkcji — np. AWS używa \"username\" dla Access Key ID i \"password\" dla Secret Access Key (NIE access_key/secret_key); POSTMARK używa \"server_token\" i \"message_stream\"; MAILJET używa \"api_key\" i \"secret_key\"; większość dostawców z jednym kluczem używa \"api_key\". Zobacz opis funkcji dla pełnej referencji pól dla każdego dostawcy."
+
+#: inc/abilities/config-ability.php:352
+msgid "Whether the connection was created and authenticated."
+msgstr "Czy połączenie zostało utworzone i uwierzytelnione."
+
+#: inc/abilities/config-ability.php:381
+msgid "This contacts an external email provider to authenticate credentials, so it reaches the internet. Always confirm the provider type and credentials with the user before running. CRITICAL: Use the EXACT field key names from the description — e.g. AWS uses \"username\" and \"password\" (NOT access_key/secret_key), POSTMARK uses \"server_token\" (NOT api_key), MAILJET needs both \"api_key\" and \"secret_key\". If the user asks to add a Gmail, Outlook, or Zoho Mail connection, do NOT attempt this ability — explain that those providers require OAuth browser-based authentication and must be set up in the SureMails dashboard at wp-admin. Running this multiple times with the same settings will create duplicate connections. If this is the first connection being added, it will automatically become the site's default sending connection."
+msgstr "To kontaktuje się z zewnętrznym dostawcą poczty e-mail w celu uwierzytelnienia poświadczeń, więc wymaga dostępu do internetu. Zawsze potwierdź typ dostawcy i poświadczenia z użytkownikiem przed uruchomieniem. KRYTYCZNE: Używaj DOKŁADNYCH nazw kluczy pól z opisu — np. AWS używa \"username\" i \"password\" (NIE access_key/secret_key), POSTMARK używa \"server_token\" (NIE api_key), MAILJET potrzebuje zarówno \"api_key\", jak i \"secret_key\". Jeśli użytkownik poprosi o dodanie połączenia Gmail, Outlook lub Zoho Mail, NIE próbuj tej funkcji — wyjaśnij, że ci dostawcy wymagają uwierzytelniania OAuth w przeglądarce i muszą być skonfigurowani w panelu SureMails w wp-admin. Uruchomienie tego wielokrotnie z tymi samymi ustawieniami spowoduje utworzenie duplikatów połączeń. Jeśli to pierwsze dodawane połączenie, automatycznie stanie się domyślnym połączeniem wysyłkowym witryny."
+
+#: inc/abilities/config-ability.php:391
+msgid "Update connection metadata"
+msgstr "Aktualizuj metadane połączenia"
+
+#: inc/abilities/config-ability.php:392
+msgid "Updates the non-credential metadata of an existing email connection. Only these fields can be changed: from_email (sender address), from_name (sender display name), connection_title (label shown in dashboard), force_from_email (override other plugins' From address), and force_from_name (override other plugins' From name). Credentials like API keys, passwords, and OAuth tokens cannot be changed through this ability — the connection must be re-created for that. Only the fields you provide will be updated; omitted fields remain unchanged. If this connection is the site's default, the default connection info is updated automatically."
+msgstr "Aktualizuje metadane istniejącego połączenia e-mail bez zmiany poświadczeń. Można zmienić tylko te pola: from_email (adres nadawcy), from_name (nazwa wyświetlana nadawcy), connection_title (etykieta wyświetlana w panelu), force_from_email (nadpisuje adres From innych wtyczek) oraz force_from_name (nadpisuje nazwę From innych wtyczek). Poświadczenia takie jak klucze API, hasła i tokeny OAuth nie mogą być zmieniane przez tę funkcję — połączenie musi zostać utworzone ponownie. Aktualizowane są tylko podane pola; pominięte pozostają bez zmian. Jeśli to połączenie jest domyślne dla witryny, informacje o domyślnym połączeniu są aktualizowane automatycznie."
+
+#: inc/abilities/config-ability.php:404
+msgid "The connection ID to update. Obtain this from list-connections."
+msgstr "Identyfikator połączenia do aktualizacji. Uzyskaj go z list-connections."
+
+#: inc/abilities/config-ability.php:409
+msgid "New sender email address."
+msgstr "Nowy adres e-mail nadawcy."
+
+#: inc/abilities/config-ability.php:413
+msgid "New sender display name."
+msgstr "Nowa nazwa wyświetlana nadawcy."
+
+#: inc/abilities/config-ability.php:417
+msgid "New connection title shown in the dashboard."
+msgstr "Nowy tytuł połączenia wyświetlany na pulpicie nawigacyjnym."
+
+#: inc/abilities/config-ability.php:421
+msgid "When true, all outgoing emails will use this connection's from_email, overriding any from address set by other plugins or themes."
+msgstr "Jeśli prawda, wszystkie wychodzące e-maile będą używać from_email tego połączenia, zastępując dowolny adres nadawcy ustawiony przez inne wtyczki lub motywy."
+
+#: inc/abilities/config-ability.php:425
+msgid "When true, all outgoing emails will use this connection's from_name, overriding any sender name set by other plugins or themes."
+msgstr "Jeśli prawda, wszystkie wychodzące e-maile będą używać from_name tego połączenia, zastępując dowolną nazwę nadawcy ustawioną przez inne wtyczki lub motywy."
+
+#: inc/abilities/config-ability.php:434
+msgid "Whether the update succeeded."
+msgstr "Czy aktualizacja powiodła się."
+
+#: inc/abilities/config-ability.php:464
+msgid "Confirm the changes with the user before applying. This does not change credentials — if the user wants to update an API key or password, they must delete and re-create the connection. Changing the from_email on the default connection affects all outgoing site emails immediately. Safe to run multiple times with the same values (idempotent)."
+msgstr "Potwierdź zmiany z użytkownikiem przed zastosowaniem. To nie zmienia poświadczeń — jeśli użytkownik chce zaktualizować klucz API lub hasło, musi usunąć i ponownie utworzyć połączenie. Zmiana from_email na domyślnym połączeniu natychmiast wpływa na wszystkie wychodzące e-maile witryny. Bezpieczne do wielokrotnego uruchamiania z tymi samymi wartościami (idempotentne)."
+
+#: inc/abilities/config-ability.php:474
+msgid "Send test email"
+msgstr "Wyślij e-mail testowy"
+
+#: inc/abilities/config-ability.php:475
+msgid "Sends a real test email through a specific connection to a given recipient address. This actually delivers an email to the recipient's inbox — it is not a dry run or simulation. The email is sent using the connection's configured provider and from address. Use this to verify a connection is working correctly after setup. The email will appear in the recipient's inbox with the subject \"SureMail: Test Email\" and the site name."
+msgstr "Wysyła prawdziwy e-mail testowy przez określone połączenie na podany adres odbiorcy. E-mail jest faktycznie dostarczany do skrzynki odbiorczej odbiorcy — to nie jest suchy bieg ani symulacja. E-mail jest wysyłany za pomocą skonfigurowanego dostawcy i adresu from połączenia. Użyj tego, aby zweryfikować poprawność działania połączenia po konfiguracji. E-mail pojawi się w skrzynce odbiorczej odbiorcy z tematem \"SureMail: Test Email\" oraz nazwą witryny."
+
+#: inc/abilities/config-ability.php:487
+msgid "The connection ID to send through. Obtain this from list-connections."
+msgstr "Identyfikator połączenia, przez które ma zostać wysłany e-mail. Uzyskaj go z list-connections."
+
+#: inc/abilities/config-ability.php:491
+msgid "Recipient email address that will receive the test email."
+msgstr "Adres e-mail odbiorcy, który otrzyma e-mail testowy."
+
+#: inc/abilities/config-ability.php:501
+msgid "Whether the test email was sent successfully."
+msgstr "Czy e-mail testowy został wysłany pomyślnie."
+
+#: inc/abilities/config-ability.php:519
+msgid "This sends a REAL email to a real inbox — always confirm the recipient address with the user before sending. Do not send test emails to addresses the user has not explicitly provided. Each call sends a new email, so avoid calling this repeatedly. If the send fails, the connection credentials may be invalid or the provider may be unreachable."
+msgstr "To wysyła PRAWDZIWY e-mail do prawdziwej skrzynki odbiorczej — zawsze potwierdź adres odbiorcy z użytkownikiem przed wysłaniem. Nie wysyłaj e-maili testowych na adresy, których użytkownik nie podał wyraźnie. Każde wywołanie wysyła nowy e-mail, więc unikaj wielokrotnego wywoływania. Jeśli wysyłka się nie powiedzie, poświadczenia połączenia mogą być nieprawidłowe lub dostawca może być niedostępny."
+
+#: inc/abilities/config-ability.php:533
+msgid "List email logs"
+msgstr "Wyświetl dzienniki e-maili"
+
+#: inc/abilities/config-ability.php:534
+msgid "Returns a paginated list of email log records stored by SureMails. Each log entry contains the sender, recipient(s), subject, delivery status (sent, failed, pending, or blocked), which connection was used, and the send date. Supports filtering by status, date range (start_date and end_date in YYYY-MM-DD format), and a search term that matches against the subject line and recipient email. Results are ordered newest-first and paginated with configurable page size (default 20, max 100). Use this to investigate delivery issues, audit email activity, or find specific log IDs for resend/delete operations."
+msgstr "Zwraca stronicowaną listę rekordów dziennika e-maili przechowywanych przez SureMails. Każdy wpis zawiera nadawcę, odbiorcę(ów), temat, status dostarczenia (wysłano, niepowodzenie, oczekujące lub zablokowane), użyte połączenie oraz datę wysłania. Obsługuje filtrowanie według statusu, zakresu dat (start_date i end_date w formacie RRRR-MM-DD) oraz terminu wyszukiwania dopasowującego się do tematu i adresu e-mail odbiorcy. Wyniki są sortowane od najnowszych i stronicowane z konfigurowalnym rozmiarem strony (domyślnie 20, maksymalnie 100). Użyj tego do badania problemów z dostarczeniem, audytu aktywności e-maili lub znalezienia konkretnych identyfikatorów dziennika do ponownego wysłania/usunięcia."
+
+#: inc/abilities/config-ability.php:545
+msgid "Filter by delivery status."
+msgstr "Filtruj według statusu dostawy."
+
+#: inc/abilities/config-ability.php:550
+msgid "Include only logs on or after this date (YYYY-MM-DD)."
+msgstr "Uwzględnij tylko logi od tej daty (RRRR-MM-DD)."
+
+#: inc/abilities/config-ability.php:555
+msgid "Include only logs on or before this date (YYYY-MM-DD). Defaults to start_date if omitted."
+msgstr "Uwzględnij tylko logi do tej daty (RRRR-MM-DD). Domyślnie start_date, jeśli pominięte."
+
+#: inc/abilities/config-ability.php:559
+msgid "Free-text search across subject line and recipient email address."
+msgstr "Wyszukiwanie pełnotekstowe w temacie i adresie e-mail odbiorcy."
+
+#: inc/abilities/config-ability.php:563
+msgid "Page number, 1-based. Defaults to 1."
+msgstr "Numer strony, numeracja od 1. Domyślnie 1."
+
+#: inc/abilities/config-ability.php:568
+msgid "Number of results per page. Minimum 1, maximum 100. Defaults to 20."
+msgstr "Liczba wyników na stronę. Minimum 1, maksimum 100. Domyślnie 20."
+
+#: inc/abilities/config-ability.php:583
+#: inc/abilities/config-ability.php:663
+msgid "Log ID."
+msgstr "ID logu."
+
+#: inc/abilities/config-ability.php:591
+#: inc/abilities/config-ability.php:671
+msgid "Recipient email(s)."
+msgstr "Adres(y) e-mail odbiorcy."
+
+#: inc/abilities/config-ability.php:595
+#: inc/abilities/config-ability.php:675
+msgid "Email subject."
+msgstr "Temat e-maila."
+
+#: inc/abilities/config-ability.php:599
+msgid "Delivery status."
+msgstr "Status dostawy."
+
+#: inc/abilities/config-ability.php:603
+msgid "Connection ID used."
+msgstr "Użyte ID połączenia."
+
+#: inc/abilities/config-ability.php:607
+msgid "Send date."
+msgstr "Data wysłania."
+
+#: inc/abilities/config-ability.php:614
+msgid "Total matching logs across all pages."
+msgstr "Łączna liczba pasujących logów na wszystkich stronach."
+
+#: inc/abilities/config-ability.php:618
+msgid "Total number of pages."
+msgstr "Łączna liczba stron."
+
+#: inc/abilities/config-ability.php:632
+msgid "Safe to call at any time. Read-only database query. Start with a small per_page (e.g. 5) to keep responses concise. Use status=\"failed\" to quickly find delivery issues. Use this to obtain log IDs before calling resend-email or delete-email-logs."
+msgstr "Bezpieczne do wywołania w dowolnym momencie. Zapytanie tylko do odczytu. Zacznij od małej wartości per_page (np. 5), aby odpowiedzi były zwięzłe. Użyj status=\"failed\", aby szybko znaleźć problemy z dostawą. Użyj tego, aby uzyskać ID logów przed wywołaniem resend-email lub delete-email-logs."
+
+#: inc/abilities/config-ability.php:642
+msgid "Get email log details"
+msgstr "Pobierz szczegóły logu e-mail"
+
+#: inc/abilities/config-ability.php:643
+msgid "Retrieves the full details of a single email log entry by its ID. Returns everything stored about that email: sender, recipient(s), subject, full HTML body, headers, delivery status, the provider's response message, which connection was used, and timestamps. The body may contain full HTML email content. Use this to investigate why a specific email failed or to inspect the exact content that was sent."
+msgstr "Pobiera pełne szczegóły pojedynczego wpisu logu e-mail według jego ID. Zwraca wszystko, co jest przechowywane o tym e-mailu: nadawcę, odbiorcę(ów), temat, pełną treść HTML, nagłówki, status dostawy, wiadomość zwrotną od dostawcy, które połączenie było użyte oraz znaczniki czasu. Treść może zawierać pełną zawartość HTML e-maila. Użyj tego, aby zbadać, dlaczego konkretny e-mail nie powiódł się lub aby sprawdzić dokładną wysłaną treść."
+
+#: inc/abilities/config-ability.php:654
+msgid "The email log ID. Obtain this from list-email-logs."
+msgstr "ID logu e-mail. Uzyskaj je z list-email-logs."
+
+#: inc/abilities/config-ability.php:679
+msgid "Full email body content (may be HTML)."
+msgstr "Pełna treść e-maila (może zawierać HTML)."
+
+#: inc/abilities/config-ability.php:683
+msgid "Email headers as stored by the logger."
+msgstr "Nagłówki e-maila zapisane przez logger."
+
+#: inc/abilities/config-ability.php:687
+msgid "Delivery status (sent, failed, pending, or blocked)."
+msgstr "Status dostawy (wysłany, nieudany, oczekujący lub zablokowany)."
+
+#: inc/abilities/config-ability.php:691
+msgid "Response from the email provider (useful for diagnosing failures)."
+msgstr "Odpowiedź od dostawcy e-maila (przydatna do diagnozowania błędów)."
+
+#: inc/abilities/config-ability.php:695
+msgid "Connection ID that was used to send."
+msgstr "ID połączenia użytego do wysłania."
+
+#: inc/abilities/config-ability.php:699
+msgid "When the email was originally sent."
+msgstr "Kiedy e-mail został pierwotnie wysłany."
+
+#: inc/abilities/config-ability.php:703
+msgid "When the log was last updated (e.g. after a resend)."
+msgstr "Kiedy log był ostatnio aktualizowany (np. po ponownym wysłaniu)."
+
+#: inc/abilities/config-ability.php:717
+msgid "Safe to call at any time. Read-only. Be aware the response may be large if the email body contains full HTML. When debugging a failed email, check the \"response\" field for the provider error message."
+msgstr "Bezpieczne do wywołania w dowolnym momencie. Tylko do odczytu. Uwaga, odpowiedź może być duża, jeśli treść e-maila zawiera pełny HTML. Podczas debugowania nieudanego e-maila sprawdź pole \"response\" z komunikatem błędu dostawcy."
+
+#: inc/abilities/config-ability.php:727
+msgid "Delete email logs"
+msgstr "Usuń logi e-maili"
+
+#: inc/abilities/config-ability.php:728
+msgid "Permanently deletes one or more email log entries by their IDs. This cannot be undone — the log records and any orphaned file attachments associated exclusively with these logs are removed from the database and disk. Logs that are still referenced by other entries are preserved. Returns the count of actually deleted records."
+msgstr "Trwale usuwa jeden lub więcej wpisów logów e-mail według ich ID. Nie można tego cofnąć — rekordy logów oraz wszelkie osierocone załączniki plików powiązane wyłącznie z tymi logami są usuwane z bazy danych i dysku. Logi nadal powiązane z innymi wpisami są zachowywane. Zwraca liczbę faktycznie usuniętych rekordów."
+
+#: inc/abilities/config-ability.php:741
+msgid "Array of log IDs to permanently delete. Obtain IDs from list-email-logs."
+msgstr "Tablica identyfikatorów dzienników do trwałego usunięcia. Pobierz identyfikatory z list-email-logs."
+
+#: inc/abilities/config-ability.php:750
+msgid "Number of log records actually deleted."
+msgstr "Liczba faktycznie usuniętych rekordów dziennika."
+
+#: inc/abilities/config-ability.php:768
+msgid "DESTRUCTIVE — always ask the user to confirm before running this. Show them the number of logs and their subjects so they understand what will be permanently removed. Once deleted, these email records cannot be recovered. If the user wants to delete all logs, use list-email-logs first to get the IDs — there is no \"delete all\" shortcut."
+msgstr "DESTRUKCYJNE — zawsze poproś użytkownika o potwierdzenie przed wykonaniem. Pokaż mu liczbę dzienników i ich tematy, aby zrozumiał, co zostanie trwale usunięte. Po usunięciu te rekordy e-mail nie mogą zostać odzyskane. Jeśli użytkownik chce usunąć wszystkie dzienniki, najpierw użyj list-email-logs, aby uzyskać identyfikatory — nie ma skrótu „usuń wszystko”."
+
+#: inc/abilities/config-ability.php:778
+msgid "Resend email from log"
+msgstr "Wyślij ponownie e-mail z dziennika"
+
+#: inc/abilities/config-ability.php:779
+msgid "Re-sends one or more previously logged emails to their original recipients using the original subject, body, headers, and attachments. This sends REAL emails — each recipient will receive the email again in their inbox. The original log entry is updated with the new send result. Use this to retry failed emails or re-deliver emails that were not received. Each log ID is processed independently, so partial success is possible when resending multiple emails."
+msgstr "Ponownie wysyła jeden lub więcej wcześniej zarejestrowanych e-maili do ich oryginalnych odbiorców, używając oryginalnego tematu, treści, nagłówków i załączników. To wysyła PRAWDZIWE e-maile — każdy odbiorca otrzyma e-mail ponownie w swojej skrzynce odbiorczej. Oryginalny wpis w dzienniku jest aktualizowany o nowy wynik wysyłki. Użyj tego, aby ponowić nieudane e-maile lub dostarczyć e-maile, które nie zostały odebrane. Każdy identyfikator dziennika jest przetwarzany niezależnie, więc przy ponownym wysyłaniu wielu e-maili możliwy jest częściowy sukces."
+
+#: inc/abilities/config-ability.php:792
+msgid "Array of email log IDs to resend. Obtain IDs from list-email-logs."
+msgstr "Tablica identyfikatorów dzienników e-mail do ponownego wysłania. Pobierz identyfikatory z list-email-logs."
+
+#: inc/abilities/config-ability.php:806
+msgid "The log ID that was resent."
+msgstr "Identyfikator dziennika, który został ponownie wysłany."
+
+#: inc/abilities/config-ability.php:810
+msgid "Whether the resend was successful."
+msgstr "Czy ponowne wysłanie zakończyło się sukcesem."
+
+#: inc/abilities/config-ability.php:814
+msgid "Result or error message for this resend."
+msgstr "Wynik lub komunikat o błędzie dla tego ponownego wysłania."
+
+#: inc/abilities/config-ability.php:831
+msgid "This sends REAL emails to real recipients — always confirm with the user before resending. Show them the subject and recipient from the log so they know exactly what will be re-delivered. Each call sends new emails, so never call this repeatedly for the same log IDs without the user explicitly asking. If resending a failed email, let the user know the underlying issue (bad connection, etc.) may still exist."
+msgstr "To wysyła PRAWDZIWE e-maile do prawdziwych odbiorców — zawsze potwierdź z użytkownikiem przed ponownym wysłaniem. Pokaż mu temat i odbiorcę z dziennika, aby dokładnie wiedział, co zostanie ponownie dostarczone. Każde wywołanie wysyła nowe e-maile, więc nigdy nie wywołuj tego wielokrotnie dla tych samych identyfikatorów dziennika bez wyraźnej prośby użytkownika. Jeśli ponawiasz nieudany e-mail, poinformuj użytkownika, że podstawowy problem (złe połączenie itp.) może nadal występować."
+
+#: inc/abilities/config-ability.php:845
+msgid "Get email delivery statistics"
+msgstr "Pobierz statystyki dostarczania e-maili"
+
+#: inc/abilities/config-ability.php:846
+msgid "Returns aggregate email delivery statistics for a given date range. Provides the total count of successfully sent emails and failed emails, plus a daily breakdown (chart_data) with per-day sent/failed counts. The date range is inclusive. If end_date is omitted, statistics for the single start_date are returned. Use this to get a high-level overview of email health, spot delivery problems, or generate reports. Does not return individual email details — use list-email-logs for that."
+msgstr "Zwraca zbiorcze statystyki dostarczania e-maili dla podanego zakresu dat. Dostarcza łączną liczbę pomyślnie wysłanych i nieudanych e-maili oraz dzienny podział (chart_data) z liczbą wysłanych/nieudanych na dzień. Zakres dat jest włącznie. Jeśli end_date jest pominięty, zwracane są statystyki dla pojedynczej daty start_date. Użyj tego, aby uzyskać ogólny przegląd stanu e-maili, wykryć problemy z dostarczaniem lub wygenerować raporty. Nie zwraca szczegółów pojedynczych e-maili — do tego użyj list-email-logs."
+
+#: inc/abilities/config-ability.php:858
+msgid "Start date for the range (YYYY-MM-DD). Required."
+msgstr "Data początkowa zakresu (RRRR-MM-DD). Wymagane."
+
+#: inc/abilities/config-ability.php:863
+msgid "End date for the range (YYYY-MM-DD). If omitted, defaults to the same day as start_date."
+msgstr "Data końcowa zakresu (RRRR-MM-DD). Jeśli pominięta, domyślnie ustawiana na ten sam dzień co start_date."
+
+#: inc/abilities/config-ability.php:872
+msgid "Total emails successfully sent in the range."
+msgstr "Łączna liczba pomyślnie wysłanych e-maili w zakresie."
+
+#: inc/abilities/config-ability.php:876
+msgid "Total emails that failed to send in the range."
+msgstr "Łączna liczba e-maili, których wysłanie nie powiodło się w zakresie."
+
+#: inc/abilities/config-ability.php:885
+msgid "Date (YYYY-MM-DD)."
+msgstr "Data (RRRR-MM-DD)."
+
+#: inc/abilities/config-ability.php:889
+msgid "Emails sent on this date."
+msgstr "E-maile wysłane w tym dniu."
+
+#: inc/abilities/config-ability.php:893
+msgid "Emails failed on this date."
+msgstr "E-maile, których wysłanie nie powiodło się w tym dniu."
+
+#: inc/abilities/config-ability.php:910
+msgid "Safe to call at any time. Read-only aggregate query. Use this when the user asks about email delivery health, success rates, or failure trends. For the last 7 days, set start_date to 7 days ago and end_date to today."
+msgstr "Bezpieczne do wywołania w dowolnym momencie. Zapytanie tylko do odczytu. Używaj tego, gdy użytkownik pyta o stan dostarczania e-maili, wskaźniki sukcesu lub trendy awarii. Dla ostatnich 7 dni ustaw start_date na 7 dni temu, a end_date na dzisiaj."
+
+#: inc/abilities/config-ability.php:924
+msgid "Get plugin settings"
+msgstr "Pobierz ustawienia wtyczki"
+
+#: inc/abilities/config-ability.php:925
+msgid "Returns the current SureMails plugin configuration. Includes: the default sending connection (type, email, ID, title), whether email logging is enabled (log_emails), whether simulation mode is active (email_simulation — when \"yes\", emails are logged but NOT actually sent), the log retention period (delete_email_logs_after), weekly email summary preferences (email_summary_active, email_summary_day), admin sidebar visibility (show_in_sidebar), and the total number of configured connections. Use this to understand the current plugin state before making changes."
+msgstr "Zwraca aktualną konfigurację wtyczki SureMails. Zawiera: domyślne połączenie wysyłkowe (typ, e-mail, ID, tytuł), czy logowanie e-maili jest włączone (log_emails), czy tryb symulacji jest aktywny (email_simulation — gdy \"yes\", e-maile są logowane, ale NIE są faktycznie wysyłane), okres przechowywania logów (delete_email_logs_after), preferencje cotygodniowego podsumowania e-maili (email_summary_active, email_summary_day), widoczność w panelu administratora (show_in_sidebar) oraz łączną liczbę skonfigurowanych połączeń. Użyj tego, aby zrozumieć aktualny stan wtyczki przed wprowadzeniem zmian."
+
+#: inc/abilities/config-ability.php:948
+msgid "Whether email logging is enabled (\"yes\" or \"no\")."
+msgstr "Czy logowanie e-maili jest włączone (\"yes\" lub \"no\")."
+
+#: inc/abilities/config-ability.php:952
+msgid "Whether simulation mode is active (\"yes\" or \"no\"). When enabled, emails are logged but never actually sent."
+msgstr "Czy tryb symulacji jest aktywny (\"yes\" lub \"no\"). Gdy włączony, e-maile są logowane, ale nigdy faktycznie nie są wysyłane."
+
+#: inc/abilities/config-ability.php:956
+msgid "Automatic log retention period (e.g. \"none\", \"7_days\", \"30_days\")."
+msgstr "Automatyczny okres przechowywania logów (np. \"none\", \"7_days\", \"30_days\")."
+
+#: inc/abilities/config-ability.php:960
+msgid "Whether the weekly email summary report is enabled (\"yes\" or \"no\")."
+msgstr "Czy cotygodniowy raport podsumowujący e-maile jest włączony (\"yes\" lub \"no\")."
+
+#: inc/abilities/config-ability.php:964
+msgid "Day of the week when the summary report is sent."
+msgstr "Dzień tygodnia, w którym wysyłany jest raport podsumowujący."
+
+#: inc/abilities/config-ability.php:968
+msgid "Whether SureMails appears in the WordPress admin sidebar (\"yes\" or \"no\")."
+msgstr "Czy SureMails pojawia się w bocznym panelu administratora WordPressa (\"yes\" lub \"no\")."
+
+#: inc/abilities/config-ability.php:982
+msgid "Safe to call at any time. Read-only. Call this before update-settings so you can show the user their current values and only change what they ask for. Pay attention to email_simulation — if it is \"yes\", no emails are actually being delivered."
+msgstr "Bezpieczne do wywołania w dowolnym momencie. Tylko do odczytu. Wywołaj to przed update-settings, aby pokazać użytkownikowi jego aktualne wartości i zmienić tylko to, o co prosi. Zwróć uwagę na email_simulation — jeśli jest \"yes\", żadne e-maile nie są faktycznie dostarczane."
+
+#: inc/abilities/config-ability.php:992
+msgid "Update plugin settings"
+msgstr "Aktualizuj ustawienia wtyczki"
+
+#: inc/abilities/config-ability.php:993
+msgid "Changes one or more SureMails plugin settings. Only the settings you provide will be updated — omitted settings remain unchanged. Available settings: log_emails (\"yes\"/\"no\" — controls whether outgoing emails are recorded in the log), email_simulation (\"yes\"/\"no\" — when enabled, emails are logged but NOT delivered to recipients), delete_email_logs_after (auto-delete old logs: \"none\", \"1_day\", \"7_days\", \"30_days\", \"365_days\", \"730_days\"), email_summary_active (\"yes\"/\"no\" — weekly delivery report), email_summary_day (day of the week for the summary). Changes take effect immediately and affect all future emails sent from the site."
+msgstr "Zmienia jedno lub więcej ustawień wtyczki SureMails. Aktualizowane są tylko podane ustawienia — pominięte pozostają bez zmian. Dostępne ustawienia: log_emails (\"yes\"/\"no\" — kontroluje, czy wychodzące e-maile są zapisywane w logu), email_simulation (\"yes\"/\"no\" — gdy włączony, e-maile są logowane, ale NIE są dostarczane odbiorcom), delete_email_logs_after (automatyczne usuwanie starych logów: \"none\", \"1_day\", \"7_days\", \"30_days\", \"365_days\", \"730_days\"), email_summary_active (\"yes\"/\"no\" — cotygodniowy raport dostawy), email_summary_day (dzień tygodnia dla podsumowania). Zmiany wchodzą w życie natychmiast i dotyczą wszystkich przyszłych e-maili wysyłanych z witryny."
+
+#: inc/abilities/config-ability.php:1005
+msgid "Enable (\"yes\") or disable (\"no\") email logging. When disabled, no email records are saved."
+msgstr "Włącz (\"tak\") lub wyłącz (\"nie\") rejestrowanie e-maili. Po wyłączeniu żadne rekordy e-maili nie są zapisywane."
+
+#: inc/abilities/config-ability.php:1010
+msgid "Enable (\"yes\") or disable (\"no\") email simulation mode. WARNING: When enabled, NO emails will actually be delivered — they are only logged."
+msgstr "Włącz (\"tak\") lub wyłącz (\"nie\") tryb symulacji e-maili. UWAGA: Po włączeniu ŻADNE e-maile nie będą faktycznie dostarczane — są tylko rejestrowane."
+
+#: inc/abilities/config-ability.php:1015
+msgid "Automatically delete email logs older than this period. \"none\" keeps logs indefinitely."
+msgstr "Automatycznie usuwaj logi e-maili starsze niż ten okres. \"none\" zachowuje logi bezterminowo."
+
+#: inc/abilities/config-ability.php:1020
+msgid "Enable (\"yes\") or disable (\"no\") the weekly email delivery summary report."
+msgstr "Włącz (\"tak\") lub wyłącz (\"nie\") cotygodniowy raport podsumowujący dostarczanie e-maili."
+
+#: inc/abilities/config-ability.php:1025
+msgid "Day of the week to send the weekly summary report."
+msgstr "Dzień tygodnia, w którym wysyłany jest cotygodniowy raport podsumowujący."
+
+#: inc/abilities/config-ability.php:1034
+msgid "Whether settings were updated."
+msgstr "Czy ustawienia zostały zaktualizowane."
+
+#: inc/abilities/config-ability.php:1052
+msgid "Confirm changes with the user before applying. Be especially careful with email_simulation — enabling it will STOP all real email delivery from the site (emails are logged but never sent). Disabling log_emails means delivery failures won't be recorded. Always call get-settings first to show the user their current values. Safe to run multiple times with the same values (idempotent)."
+msgstr "Potwierdź zmiany z użytkownikiem przed zastosowaniem. Zachowaj szczególną ostrożność z email_simulation — włączenie go ZATRZYMA wszelkie rzeczywiste dostarczanie e-maili z witryny (e-maile są rejestrowane, ale nigdy nie wysyłane). Wyłączenie log_emails oznacza, że nie będą rejestrowane błędy dostarczania. Zawsze najpierw wywołaj get-settings, aby pokazać użytkownikowi jego aktualne wartości. Bezpieczne do wielokrotnego uruchamiania z tymi samymi wartościami (idempotentne)."
+
+#: inc/api/content-guard.php:153
+msgid "Email address is required."
+msgstr "Adres e-mail jest wymagany."
+
+#: inc/api/save-test-connection.php:108
+msgid "Validation failed."
+msgstr "Weryfikacja nie powiodła się."
+
+#: inc/emails/providers/emailit/emailit-handler.php:71
+msgid "Emailit connection saved successfully."
+msgstr "Połączenie Emailit zostało pomyślnie zapisane."
+
+#. translators: 1: provider name, 2: error message
+#: inc/error-response.php:104
+msgid "Email sending failed via %1$s. Error: %2$s"
+msgstr "Wysyłanie e-maila przez %1$s nie powiodło się. Błąd: %2$s"
+
+#: build/main.js:2
+msgid "Contribute to SureMail"
+msgstr "Wspieraj SureMail"
+
+#: build/main.js:2
+msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
+msgstr "Zbieraj niepoufne informacje z Twojej strony internetowej, takie jak wersja PHP i używane funkcje, aby pomóc nam szybciej naprawiać błędy, podejmować mądrzejsze decyzje i tworzyć funkcje, które naprawdę mają dla Ciebie znaczenie. "
+
+#: build/main.js:2
+msgid "Stay in the loop and help shape SureMail! Get feature updates, and help us build a better SureMail by sharing how you use the plugin. <a>Privacy Policy</a>"
+msgstr "Bądź na bieżąco i pomóż kształtować SureMail! Otrzymuj aktualizacje funkcji i pomagaj nam tworzyć lepszy SureMail, dzieląc się tym, jak używasz wtyczki. <a>Polityka prywatności</a>"

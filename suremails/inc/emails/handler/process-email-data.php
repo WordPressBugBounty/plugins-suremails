@@ -31,14 +31,14 @@ class ProcessEmailData {
 	/**
 	 * Array of primary recipients with 'name' and 'email'.
 	 *
-	 * @var array
+	 * @var array<int, array{name: string, email: string}>
 	 */
 	private $to = [];
 
 	/**
 	 * Associative array containing 'name' and 'email' for the sender.
 	 *
-	 * @var array
+	 * @var array{name: string, email: string}
 	 */
 	private $from = [
 		'name'  => '',
@@ -48,21 +48,21 @@ class ProcessEmailData {
 	/**
 	 * Array of CC recipients with 'name' and 'email'.
 	 *
-	 * @var array
+	 * @var array<int, array{name: string, email: string}>
 	 */
 	private $cc = [];
 
 	/**
 	 * Array of BCC recipients with 'name' and 'email'.
 	 *
-	 * @var array
+	 * @var array<int, array{name: string, email: string}>
 	 */
 	private $bcc = [];
 
 	/**
 	 * Array of Reply-To addresses with 'name' and 'email'.
 	 *
-	 * @var array
+	 * @var array<int, array{name: string, email: string}>
 	 */
 	private $reply_to = [];
 
@@ -97,7 +97,7 @@ class ProcessEmailData {
 	/**
 	 * Associative array for any additional headers.
 	 *
-	 * @var array
+	 * @var array<string, string>
 	 */
 	private $extra_headers = [];
 
@@ -111,7 +111,7 @@ class ProcessEmailData {
 	/**
 	 * Array of file paths to be attached.
 	 *
-	 * @var array
+	 * @var array<int, string>
 	 */
 	private $attachments = [];
 
@@ -142,8 +142,8 @@ class ProcessEmailData {
 	/**
 	 * Process the recipients ($to).
 	 *
-	 * @param string|array $to Recipients as a comma-separated string or an array.
-	 * @return array Array of recipients with 'name' and 'email'.
+	 * @param string|array<int, string> $to Recipients as a comma-separated string or an array.
+	 * @return array<int, array{name: string, email: string}> Array of recipients with 'name' and 'email'.
 	 */
 	public function process_to( $to ) {
 		$recipients = [];
@@ -184,8 +184,8 @@ class ProcessEmailData {
 	/**
 	 * Process the headers ($headers).
 	 *
-	 * @param string|array $headers Headers as a string or an array.
-	 * @return array Associative array of processed headers.
+	 * @param string|array<int, string> $headers Headers as a string or an array.
+	 * @return array{bcc: array<int, array{name: string, email: string}>, cc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>, from: array{name: string, email: string}} Associative array of processed headers.
 	 */
 	public function process_headers( $headers ) {
 		$processed_headers = [
@@ -326,8 +326,8 @@ class ProcessEmailData {
 	/**
 	 * Process the attachments ($attachments).
 	 *
-	 * @param string|array $attachments Attachments as a string or an array.
-	 * @return array Array of sanitized attachment file paths.
+	 * @param string|array<int, string> $attachments Attachments as a string or an array.
+	 * @return array<int, string> Array of sanitized attachment file paths.
 	 */
 	public function process_attachments( $attachments ) {
 		$processed_attachments          = [];
@@ -348,7 +348,7 @@ class ProcessEmailData {
 			}
 			if ( $this->is_resend === true ) {
 				$path = Uploads::get_suremails_base_dir();
-				if ( ! is_wp_error( $path ) && isset( $path['path'] ) ) {
+				if ( ! is_wp_error( $path ) ) {
 					$attachment = $path['path'] . '/attachments/' . $attachment;
 				}
 			}
@@ -407,8 +407,8 @@ class ProcessEmailData {
 	/**
 	 * Formats the processed headers into a suitable format for sending.
 	 *
-	 * @param array $headers Processed headers.
-	 * @return array Formatted headers.
+	 * @param array{bcc: array<int, array{name: string, email: string}>, cc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>, from: array{name: string, email: string}} $headers Processed headers.
+	 * @return array<int, string> Formatted headers.
 	 */
 	public function format_processed_headers( array $headers ) {
 		$formatted_headers = [];
@@ -473,7 +473,7 @@ class ProcessEmailData {
 		}
 
 		// Extra Headers.
-		if ( ! empty( $headers['extra_headers'] ) && is_array( $headers['extra_headers'] ) ) {
+		if ( ! empty( $headers['extra_headers'] ) && is_array( $headers['extra_headers'] ) ) { // @phpstan-ignore booleanAnd.rightAlwaysTrue
 			foreach ( $headers['extra_headers'] as $name => $content ) {
 				$formatted_headers[] = "{$name}: {$content}";
 			}
@@ -486,7 +486,7 @@ class ProcessEmailData {
 	/**
 	 * Formats email recipients for logging.
 	 *
-	 * @param array|string $recipients The email recipients.
+	 * @param array<int, array{name: string, email: string}>|string $recipients The email recipients.
 	 * @return string Formatted recipients.
 	 */
 	public function format_email_recipients( $recipients ) {
@@ -510,12 +510,12 @@ class ProcessEmailData {
 	/**
 	 * Comprehensive processing of all email components.
 	 *
-	 * @param string|array $to          Recipients as a comma-separated string or an array.
-	 * @param string|array $headers     Headers as a string or an array.
-	 * @param string       $message     The email message.
-	 * @param string|array $attachments Attachments as a string or an array.
-	 * @param string       $subject     The email subject.
-	 * @return array Processed email data.
+	 * @param string|array<int, string> $to          Recipients as a comma-separated string or an array.
+	 * @param string|array<int, string> $headers     Headers as a string or an array.
+	 * @param string                    $message     The email message.
+	 * @param string|array<int, string> $attachments Attachments as a string or an array.
+	 * @param string                    $subject     The email subject.
+	 * @return array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} Processed email data.
 	 */
 	public function process_all( $to, $headers, $message, $attachments, $subject ) {
 		// Process each component.
@@ -676,7 +676,7 @@ class ProcessEmailData {
 	/**
 	 * Get the primary recipients.
 	 *
-	 * @return array Array of recipients with 'name' and 'email'.
+	 * @return array<int, array{name: string, email: string}> Array of recipients with 'name' and 'email'.
 	 */
 	public function get_to() {
 		return $this->to;
@@ -685,7 +685,7 @@ class ProcessEmailData {
 	/**
 	 * Set the primary recipients.
 	 *
-	 * @param array $to Array of recipients with 'name' and 'email'.
+	 * @param array<int, array{name: string, email: string}> $to Array of recipients with 'name' and 'email'.
 	 * @return void
 	 */
 	public function set_to( array $to ) {
@@ -695,7 +695,7 @@ class ProcessEmailData {
 	/**
 	 * Get the 'from' details.
 	 *
-	 * @return array Associative array with 'name' and 'email'.
+	 * @return array{name: string, email: string} Associative array with 'name' and 'email'.
 	 */
 	public function get_from() {
 		return $this->from;
@@ -704,7 +704,7 @@ class ProcessEmailData {
 	/**
 	 * Set the 'from' details.
 	 *
-	 * @param array $from Associative array with 'name' and 'email'.
+	 * @param array{name: string, email: string} $from Associative array with 'name' and 'email'.
 	 * @return void
 	 */
 	public function set_from( array $from ) {
@@ -714,7 +714,7 @@ class ProcessEmailData {
 	/**
 	 * Get the CC recipients.
 	 *
-	 * @return array Array of CC recipients with 'name' and 'email'.
+	 * @return array<int, array{name: string, email: string}> Array of CC recipients with 'name' and 'email'.
 	 */
 	public function get_cc() {
 		return $this->cc;
@@ -723,7 +723,7 @@ class ProcessEmailData {
 	/**
 	 * Set the CC recipients.
 	 *
-	 * @param array $cc Array of CC recipients with 'name' and 'email'.
+	 * @param array<int, array{name: string, email: string}> $cc Array of CC recipients with 'name' and 'email'.
 	 * @return void
 	 */
 	public function set_cc( array $cc ) {
@@ -733,7 +733,7 @@ class ProcessEmailData {
 	/**
 	 * Get the BCC recipients.
 	 *
-	 * @return array Array of BCC recipients with 'name' and 'email'.
+	 * @return array<int, array{name: string, email: string}> Array of BCC recipients with 'name' and 'email'.
 	 */
 	public function get_bcc() {
 		return $this->bcc;
@@ -742,7 +742,7 @@ class ProcessEmailData {
 	/**
 	 * Set the BCC recipients.
 	 *
-	 * @param array $bcc Array of BCC recipients with 'name' and 'email'.
+	 * @param array<int, array{name: string, email: string}> $bcc Array of BCC recipients with 'name' and 'email'.
 	 * @return void
 	 */
 	public function set_bcc( array $bcc ) {
@@ -752,7 +752,7 @@ class ProcessEmailData {
 	/**
 	 * Get the Reply-To addresses.
 	 *
-	 * @return array Array of Reply-To addresses with 'name' and 'email'.
+	 * @return array<int, array{name: string, email: string}> Array of Reply-To addresses with 'name' and 'email'.
 	 */
 	public function get_reply_to() {
 		return $this->reply_to;
@@ -761,7 +761,7 @@ class ProcessEmailData {
 	/**
 	 * Set the Reply-To addresses.
 	 *
-	 * @param array $reply_to Array of Reply-To addresses with 'name' and 'email'.
+	 * @param array<int, array{name: string, email: string}> $reply_to Array of Reply-To addresses with 'name' and 'email'.
 	 * @return void
 	 */
 	public function set_reply_to( array $reply_to ) {
@@ -847,7 +847,7 @@ class ProcessEmailData {
 	/**
 	 * Get the extra headers.
 	 *
-	 * @return array Associative array of extra headers.
+	 * @return array<string, string> Associative array of extra headers.
 	 */
 	public function get_extra_headers() {
 		return $this->extra_headers;
@@ -856,7 +856,7 @@ class ProcessEmailData {
 	/**
 	 * Set the extra headers.
 	 *
-	 * @param array $extra_headers Associative array of extra headers.
+	 * @param array<string, string> $extra_headers Associative array of extra headers.
 	 * @return void
 	 */
 	public function set_extra_headers( array $extra_headers ) {
@@ -885,7 +885,7 @@ class ProcessEmailData {
 	/**
 	 * Get the attachments.
 	 *
-	 * @return array Array of attachment file paths.
+	 * @return array<int, string> Array of attachment file paths.
 	 */
 	public function get_attachments() {
 		return $this->attachments;
@@ -894,7 +894,7 @@ class ProcessEmailData {
 	/**
 	 * Set the attachments.
 	 *
-	 * @param array $attachments Array of attachment file paths.
+	 * @param array<int, string> $attachments Array of attachment file paths.
 	 * @return void
 	 */
 	public function set_attachments( array $attachments ) {
@@ -924,7 +924,7 @@ class ProcessEmailData {
 	 * Parse a string of email addresses into an array.
 	 *
 	 * @param string $emails Comma-separated email addresses.
-	 * @return array Array of sanitized email addresses.
+	 * @return array<int, array{name: string, email: string}> Array of sanitized email addresses.
 	 */
 	private function parse_emails( string $emails ) {
 		$parsed_emails = [];

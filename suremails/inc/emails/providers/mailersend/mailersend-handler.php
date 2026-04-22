@@ -26,7 +26,7 @@ class MailersendHandler implements ConnectionHandler {
 	/**
 	 * MailerSend connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
@@ -52,7 +52,7 @@ class MailersendHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -64,7 +64,7 @@ class MailersendHandler implements ConnectionHandler {
 	 * Since MailerSend does not provide a direct authentication endpoint, this function
 	 * simply saves the connection data and returns a success message.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code: int}
 	 */
 	public function authenticate() {
 		return [
@@ -77,12 +77,12 @@ class MailersendHandler implements ConnectionHandler {
 	/**
 	 * Send email using MailerSend.
 	 *
-	 * @param array $atts           The email attributes.
-	 * @param int   $log_id         The log ID.
-	 * @param array $connection     The connection details.
-	 * @param array $processed_data The processed email data.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The log ID.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data.
 	 *
-	 * @return array The result of the sending attempt.
+	 * @return array{success: bool, message: string, send: bool, email_id?: string, error_code?: int|string}
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
 		$result = [
@@ -92,23 +92,25 @@ class MailersendHandler implements ConnectionHandler {
 		];
 
 		// Prepare the email "from" details.
-		$from_name  = $connection['from_name'] ?? '';
-		$from_email = sanitize_email( $connection['from_email'] ?? '' );
+		$from_name  = (string) ( $connection['from_name'] ?? '' );
+		$from_email = sanitize_email( (string) ( $connection['from_email'] ?? '' ) );
 
 		// Build the recipient arrays.
-		$to  = $this->format_recipients_array( $processed_data['to'] ?? [] );
-		$cc  = $this->format_recipients_array( $processed_data['headers']['cc'] ?? [] );
-		$bcc = $this->format_recipients_array( $processed_data['headers']['bcc'] ?? [] );
+		$to  = $this->format_recipients_array( $processed_data['to'] );
+		$cc  = $this->format_recipients_array( $processed_data['headers']['cc'] );
+		$bcc = $this->format_recipients_array( $processed_data['headers']['bcc'] );
 
 		// Build the content array.
 		// At least one of text or html must be provided (per API docs).
+		/**
+		 * The html body.
+		 *
+		 * @var string $html */
 		$html = $atts['message'] ?? '';
-		$text = wp_strip_all_tags( $atts['message'] ?? '' );
+		$text = wp_strip_all_tags( $html );
 
 		// Build the JSON body as per MailerSend specifications.
-		$content_type = isset( $processed_data['headers']['content_type'] )
-			? strtolower( $processed_data['headers']['content_type'] )
-			: 'text/html';
+		$content_type = strtolower( $processed_data['headers']['content_type'] );
 
 		$body = [
 			'from'    => [
@@ -136,16 +138,16 @@ class MailersendHandler implements ConnectionHandler {
 		// Add reply_to if provided.
 		if ( ! empty( $processed_data['headers']['reply_to'] ) ) {
 			$reply_to = $this->get_reply_to( $processed_data['headers']['reply_to'] );
-			if ( $reply_to && isset( $reply_to[0]['email'] ) ) {
+			if ( $reply_to && isset( $reply_to[0]['email'] ) ) { // @phpstan-ignore booleanAnd.rightAlwaysTrue
 				$body['reply_to'] = [
 					'email' => $reply_to[0]['email'],
-					'name'  => $reply_to[0]['name'] ?? '',
+					'name'  => $reply_to[0]['name'] ?? '', // @phpstan-ignore nullCoalesce.offset
 				];
 			}
 		}
 
 		// Add attachments if any.
-		if ( ! empty( $processed_data['attachments'] ) && is_array( $processed_data['attachments'] ) ) {
+		if ( ! empty( $processed_data['attachments'] ) ) { // @phpstan-ignore booleanAnd.rightAlwaysTrue
 			$body['attachments'] = $this->get_attachments( $processed_data['attachments'] );
 		}
 
@@ -210,7 +212,7 @@ class MailersendHandler implements ConnectionHandler {
 	/**
 	 * Get the options for the MailerSend connection.
 	 *
-	 * @return array The options for the MailerSend connection.
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, icon: string, display_name: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -228,7 +230,7 @@ class MailersendHandler implements ConnectionHandler {
 	/**
 	 * Get the specific fields for the MailerSend connection.
 	 *
-	 * @return array The specific fields for the MailerSend connection.
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [
@@ -246,15 +248,15 @@ class MailersendHandler implements ConnectionHandler {
 	/**
 	 * Format recipients as an array of arrays with name and email.
 	 *
-	 * @param array $recipients The recipients.
-	 * @return array The formatted recipients.
+	 * @param array<int, array{name: string, email: string}> $recipients The recipients.
+	 * @return array<int, array{name: string, email: string}> The formatted recipients.
 	 */
 	protected function format_recipients_array( array $recipients ) {
 		$result = [];
 		foreach ( $recipients as $recipient ) {
 			if ( is_array( $recipient ) && ! empty( $recipient['email'] ) ) {
 				$result[] = [
-					'name'  => $recipient['name'] ?? '',
+					'name'  => $recipient['name'] ?? '', // @phpstan-ignore nullCoalesce.offset
 					'email' => sanitize_email( $recipient['email'] ),
 				];
 			}
@@ -265,8 +267,8 @@ class MailersendHandler implements ConnectionHandler {
 	/**
 	 * Retrieve the reply-to email address.
 	 *
-	 * @param mixed $reply_to The reply-to data.
-	 * @return array|false The reply-to email address.
+	 * @param array<int, array{name: string, email: string}>|string $reply_to The reply-to data.
+	 * @return array<int, array{name: string, email: string}>|false The reply-to email address.
 	 */
 	protected function get_reply_to( $reply_to ) {
 		$result = [];
@@ -274,7 +276,7 @@ class MailersendHandler implements ConnectionHandler {
 			$first = reset( $reply_to );
 			if ( is_array( $first ) && ! empty( $first['email'] ) ) {
 				$result[] = [
-					'name'  => $first['name'] ?? '',
+					'name'  => $first['name'] ?? '', // @phpstan-ignore nullCoalesce.offset
 					'email' => sanitize_email( $first['email'] ),
 				];
 				return $result;
@@ -286,8 +288,8 @@ class MailersendHandler implements ConnectionHandler {
 	/**
 	 * Process attachments to be MailerSend-compatible.
 	 *
-	 * @param array $attachments The attachments.
-	 * @return array The processed attachments.
+	 * @param array<int, string> $attachments The attachments.
+	 * @return array<int, array{content: string|false, disposition: string, filename: string|false}> The processed attachments.
 	 */
 	private function get_attachments( array $attachments ) {
 		$result = [];

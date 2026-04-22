@@ -29,7 +29,7 @@ class Providers {
 	 * If `$provider` is empty or null, returns details of all providers.
 	 *
 	 * @param string|null $provider The provider key (e.g., 'aws', 'smtp'). Optional.
-	 * @return array|null The merged options array for a single provider or all providers, or null if no match found.
+	 * @return array<string, array<string, mixed>>|null The merged options array for a single provider or all providers, or null if no match found.
 	 */
 	public function get_provider_options( $provider = null ) {
 		$handlers = $this->get_handler_classes();
@@ -64,7 +64,7 @@ class Providers {
 	/**
 	 * Get the base fields applicable to all providers.
 	 *
-	 * @return array The base fields.
+	 * @return array<string, array<string, string|bool|int|array<int, string>>>
 	 */
 	private function get_base_fields() {
 		return [
@@ -131,7 +131,7 @@ class Providers {
 	/**
 	 * Mapping of provider keys to handler classes.
 	 *
-	 * @return array
+	 * @return array<string, class-string>
 	 */
 	private function get_handler_classes() {
 		$handlers = [];

@@ -54,23 +54,32 @@ export const saveSettings = async ( updatedSettings ) => {
 };
 
 /**
- * Authenticate the Content Guard
+ * Set the Reputation Shield (Content Guard) activation status.
  *
+ * When a boolean `status` is passed, the backend is instructed to set the
+ * option to that exact value. If omitted, the endpoint preserves its legacy
+ * toggle behavior for backward compatibility.
+ *
+ * @param {boolean} [status] Desired activation state.
  * @return {Object} The response
  */
-export const activateContentGuard = async () => {
+export const activateContentGuard = async ( status ) => {
 	try {
+		const hasStatus = typeof status === 'boolean';
 		return await apiFetch( {
 			path: '/suremails/v1/content-guard/activate',
-			method: 'GET',
+			method: hasStatus ? 'POST' : 'GET',
 			headers: {
 				'Content-Type': 'application/json',
 				'X-WP-Nonce': suremails.nonce,
 			},
+			...( hasStatus && {
+				data: { status: status ? 'yes' : 'no' },
+			} ),
 		} );
 	} catch ( error ) {
 		throw new Error(
-			error.data.message ||
+			error?.data?.message ||
 				__( 'Error activating Reputation Shield', 'suremails' )
 		);
 	}

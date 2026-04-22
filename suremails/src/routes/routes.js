@@ -9,7 +9,6 @@ import {
 	OnboardingLayout,
 	SafeGuard,
 	Welcome,
-	AddOns as OnboardingAddOns,
 	Done,
 } from '@screens/onboarding';
 import AddOns from '@screens/add-ons/add-ons';
@@ -41,7 +40,6 @@ const ContentArea = () => {
 						element={ <ConnectionProviders /> }
 					/>
 					<Route path="reputation-shield" element={ <SafeGuard /> } />
-					<Route path="add-ons" element={ <OnboardingAddOns /> } />
 					<Route path="done" element={ <Done /> } />
 				</Route>
 			</Routes>

@@ -26,7 +26,7 @@ class NetcoreHandler implements ConnectionHandler {
 	/**
 	 * Netcore connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
@@ -40,7 +40,7 @@ class NetcoreHandler implements ConnectionHandler {
 	/**
 	 * API endpoints for different regions.
 	 *
-	 * @var array
+	 * @var array<string, string>
 	 */
 	protected $api_urls = [
 		'US' => 'https://emailapi.netcorecloud.net/v5.1/mail/send',
@@ -52,7 +52,7 @@ class NetcoreHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -64,7 +64,7 @@ class NetcoreHandler implements ConnectionHandler {
 	 * Since Netcore does not provide a direct authentication endpoint, this function
 	 * simply saves the connection data and returns a success message.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code: int}
 	 */
 	public function authenticate() {
 		return [
@@ -77,12 +77,12 @@ class NetcoreHandler implements ConnectionHandler {
 	/**
 	 * Send email using Netcore.
 	 *
-	 * @param array $atts           The email attributes.
-	 * @param int   $log_id         The log ID.
-	 * @param array $connection     The connection details.
-	 * @param array $processed_data The processed email data.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The log ID.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data.
 	 *
-	 * @return array The result of the sending attempt.
+	 * @return array{success: bool, message: string, send: bool, email_id?: string, error_code?: int|string}
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
 		$result = [
@@ -92,22 +92,34 @@ class NetcoreHandler implements ConnectionHandler {
 		];
 
 		// Determine API endpoint based on region setting.
-		$region  = isset( $connection['region'] ) ? strtoupper( $connection['region'] ) : 'US';
+		$region  = isset( $connection['region'] ) ? strtoupper( (string) $connection['region'] ) : 'US';
 		$api_url = $this->api_urls[ $region ] ?? $this->api_urls['US'];
 
-		$from_name  = $connection['from_name'] ?? '';
-		$from_email = sanitize_email( $connection['from_email'] );
+		$from_name  = (string) ( $connection['from_name'] ?? '' );
+		$from_email = sanitize_email( (string) ( $connection['from_email'] ?? '' ) );
 
 		$personalizations = [
-			'to'  => $this->format_recipients_array( $processed_data['to'] ?? [] ),
-			'cc'  => $this->format_recipients_array( $processed_data['headers']['cc'] ?? [] ),
-			'bcc' => $this->format_recipients_array( $processed_data['headers']['bcc'] ?? [] ),
+			'to'  => $this->format_recipients_array( $processed_data['to'] ),
+			'cc'  => $this->format_recipients_array( $processed_data['headers']['cc'] ),
+			'bcc' => $this->format_recipients_array( $processed_data['headers']['bcc'] ),
 		];
 
-		$content = [
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
+		$message = $atts['message'] ?? '';
+		/**
+		 * The raw email subject.
+		 *
+		 * @var string $raw_subject
+		 */
+		$raw_subject = $atts['subject'] ?? '';
+		$content     = [
 			[
 				'type'  => 'html',
-				'value' => $atts['message'] ?? '',
+				'value' => $message,
 			],
 		];
 
@@ -115,7 +127,7 @@ class NetcoreHandler implements ConnectionHandler {
 		if ( ! empty( $content_type ) && ProviderHelper::is_html( $content_type ) ) {
 			$content[] = [
 				'type'  => 'amp',
-				'value' => wp_strip_all_tags( $atts['message'] ?? '' ),
+				'value' => wp_strip_all_tags( $message ),
 			];
 		}
 
@@ -125,7 +137,7 @@ class NetcoreHandler implements ConnectionHandler {
 				'email' => $from_email,
 			],
 			'personalizations' => [ $personalizations ],
-			'subject'          => sanitize_text_field( $atts['subject'] ?? '' ),
+			'subject'          => sanitize_text_field( $raw_subject ),
 			'content'          => $content,
 			'headers'          => [],
 		];
@@ -139,7 +151,7 @@ class NetcoreHandler implements ConnectionHandler {
 		}
 
 		// Add attachments if any.
-		if ( ! empty( $processed_data['attachments'] ) && is_array( $processed_data['attachments'] ) ) {
+		if ( ! empty( $processed_data['attachments'] ) ) { // @phpstan-ignore booleanAnd.rightAlwaysTrue
 			$body['attachments'] = $this->get_attachments( $processed_data['attachments'] );
 		}
 
@@ -189,7 +201,7 @@ class NetcoreHandler implements ConnectionHandler {
 	/**
 	 * Get the options for the Netcore connection.
 	 *
-	 * @return array The options for the Netcore connection.
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, icon: string, display_name: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -207,7 +219,7 @@ class NetcoreHandler implements ConnectionHandler {
 	/**
 	 * Get the specific fields for the Netcore connection.
 	 *
-	 * @return array The specific fields for the Netcore connection.
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [
@@ -244,15 +256,15 @@ class NetcoreHandler implements ConnectionHandler {
 	/**
 	 * Format recipients as an array of arrays with name and email.
 	 *
-	 * @param array $recipients The recipients.
-	 * @return array The formatted recipients.
+	 * @param array<int, array{name: string, email: string}> $recipients The recipients.
+	 * @return array<int, array{name: string, email: string}> The formatted recipients.
 	 */
 	protected function format_recipients_array( array $recipients ) {
 		$result = [];
 		foreach ( $recipients as $recipient ) {
 			if ( is_array( $recipient ) && ! empty( $recipient['email'] ) ) {
 				$result[] = [
-					'name'  => $recipient['name'] ?? '',
+					'name'  => $recipient['name'] ?? '', // @phpstan-ignore nullCoalesce.offset
 					'email' => sanitize_email( $recipient['email'] ),
 				];
 			}
@@ -279,8 +291,8 @@ class NetcoreHandler implements ConnectionHandler {
 	/**
 	 * Process attachments to be Netcore-compatible.
 	 *
-	 * @param array $attachments The attachments.
-	 * @return array The processed attachments.
+	 * @param array<int, string> $attachments The attachments.
+	 * @return array<int, array{name: string|false, content: string|false}> The processed attachments.
 	 */
 	private function get_attachments( array $attachments ) {
 		$result = [];

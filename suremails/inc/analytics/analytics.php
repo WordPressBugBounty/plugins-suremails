@@ -9,7 +9,7 @@
 namespace SureMails\Inc\Analytics;
 
 use SureMails\Inc\DB\EmailLog;
-use SureMails\Inc\Settings;
+use SureMails\Inc\Onboarding;
 use SureMails\Inc\Traits\Instance;
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -24,151 +24,229 @@ class Analytics {
 	use Instance;
 
 	/**
-	 * Constructor: hook analytics filter.
+	 * Shared events instance.
+	 *
+	 * @var \BSF_Analytics_Events|null
+	 */
+	private static $events = null;
+
+	/**
+	 * Constructor: hook analytics filter and state events.
 	 */
 	public function __construct() {
+		// BSF Analytics hooks `maybe_track_analytics()` on `init`, which runs
+		// on every request (frontend, cron, REST). Register the stats filter
+		// unconditionally so `plugin_data.suremails` is always present when the
+		// library decides to POST — otherwise a frontend request can win the
+		// 2-day throttle and ship an empty payload, suppressing telemetry.
 		add_filter( 'bsf_core_stats', [ $this, 'add_analytics_data' ] );
+
+		// Plugin version change detection — hook into the update lifecycle so the
+		// event is queued regardless of which request (admin, frontend, cron) wins
+		// the race to run Update::init(). Registered outside the is_admin() gate
+		// so the listener is bound on every request.
+		add_action( 'suremails_update_before', [ $this, 'handle_plugin_updated' ], 10, 2 );
+
+		// State-event detection only needs to run in admin context.
+		if ( ! is_admin() ) {
+			return;
+		}
+
+		// State-based events — throttled to once per day.
+		// IMPORTANT: Transient is set INSIDE detect_state_events() after confirming
+		// BSF_Analytics_Events class is loaded. If class isn't ready, it retries next load.
+		if ( get_transient( 'suremails_state_events_checked' ) === false ) {
+			$this->detect_state_events();
+		}
+	}
+
+	/**
+	 * Get shared events tracker.
+	 *
+	 * @return \BSF_Analytics_Events|null
+	 */
+	public static function events() {
+		if ( null === self::$events ) {
+			if ( ! class_exists( 'BSF_Analytics_Events' ) ) {
+				return null;
+			}
+
+			self::$events = new \BSF_Analytics_Events( 'suremails' );
+		}
+
+		return self::$events;
 	}
 
 	/**
 	 * Add analytics data to bsf_core_stats.
 	 *
-	 * @param array $stats_data Existing stats data.
-	 * @return array Modified stats data with SureMails metrics.
+	 * @param array<string, mixed> $stats_data Existing stats data.
+	 * @return array<string, mixed>
 	 */
 	public function add_analytics_data( $stats_data ) {
-		$settings         = Settings::instance()->get_settings();
-		$connections_data = isset( $settings['connections'] ) && is_array( $settings['connections'] ) ? $settings['connections'] : [];
-
-		$email_simulation  = Settings::instance()->get_email_simulation_status();
-		$log_email         = ( isset( $settings['log_emails'] ) && $settings['log_emails'] === 'yes' );
-		$backup_connection = $this->get_backup_connection_status( $connections_data );
-		$connections       = $this->get_connection_counts_by_type( $connections_data );
-		$content_guard     = Settings::instance()->get_content_guard_status();
+		$events = self::events();
 
 		$stats_data['plugin_data']['suremails'] = [
-			'version'        => SUREMAILS_VERSION,
-			'site_language'  => get_locale(),
-			'php_version'    => phpversion(),
-			'array_values'   => [
-				'connections'  => $connections,
-				'form_plugins' => $this->get_form_plugins(),
-			],
-			'boolean_values' => [
-				'email_simulation'    => $email_simulation,
-				'log_email'           => $log_email,
-				'content_guard'       => $content_guard,
-				'ottokit_integration' => apply_filters( 'suretriggers_is_user_connected', '' ),
-				'backup_connection'   => $backup_connection,
-			],
-			'site_type'      => $this->get_site_type(),
+			'version'       => SUREMAILS_VERSION,
+			'site_language' => get_locale(),
+
+			// Daily KPIs (last 2 days).
+			'kpi_records'   => $this->get_kpi_tracking_data(),
+
+			// One-time events (flushed from pending queue).
+			'events_record' => $events ? $events->flush_pending() : [],
 		];
 
 		return $stats_data;
 	}
 
 	/**
-	 * Get active form plugin slugs.
+	 * Get number of days since plugin installation.
+	 *
+	 * @since 1.9.4
+	 * @return int Days since install (0 if unknown).
 	 */
-	private function get_form_plugins(): array {
-		$forms = [];
+	public static function get_days_since_install(): int {
+		$install_time = (int) get_site_option( 'suremails_usage_installed_time', 0 );
 
-		$known_form_plugins = [
-			'gravityforms/gravityforms.php' => 'gravityforms',
-			'fluentform/fluentform.php'     => 'fluentforms',
-			'wpforms-lite/wpforms-lite.php' => 'wpforms',
-			'wpforms/wpforms.php'           => 'wpforms',
-			'ws-form/ws-form.php'           => 'wsform',
-			'sureforms/sureforms.php'       => 'sureforms',
-		];
-
-		$active_plugins = get_option( 'active_plugins', [] );
-
-		foreach ( $known_form_plugins as $plugin_file => $slug ) {
-			if ( in_array( $plugin_file, $active_plugins, true ) ) {
-				$forms[] = $slug;
-			}
+		if ( $install_time <= 0 ) {
+			return 0;
 		}
 
-		return array_values( array_unique( $forms ) );
+		return (int) floor( ( time() - $install_time ) / DAY_IN_SECONDS );
 	}
 
 	/**
-	 * Count email connections by type.
+	 * Handle the plugin update lifecycle event.
 	 *
-	 * @param array $connections Connections data.
-	 * @return array Count of connections by type.
+	 * Hooked to `suremails_update_before`, which fires from Update::init() right
+	 * before `suremails-version` is rewritten — so `$from_version` is still the
+	 * pre-upgrade value. Queues a `plugin_updated` analytics event and clears
+	 * the state-events throttle so other state events re-evaluate on the next
+	 * admin load instead of waiting up to 24h.
+	 *
+	 * @param string $from_version Previously stored plugin version.
+	 * @param string $to_version   New plugin version.
+	 * @return void
 	 */
-	private function get_connection_counts_by_type( array $connections ): array {
-		$counts = [];
-
-		foreach ( $connections as $conn ) {
-			if ( isset( $conn['type'] ) ) {
-				$type            = strtolower( $conn['type'] );
-				$counts[ $type ] = isset( $counts[ $type ] ) ? $counts[ $type ] + 1 : 1;
-			}
+	public function handle_plugin_updated( string $from_version, string $to_version ): void {
+		if ( empty( $from_version ) || $from_version === $to_version ) {
+			return;
 		}
 
-		return $counts;
+		delete_transient( 'suremails_state_events_checked' );
+
+		$events = self::events();
+		if ( null === $events ) {
+			return;
+		}
+
+		$events->flush_pushed( [ 'plugin_updated' ] );
+		$events->track(
+			'plugin_updated',
+			$to_version,
+			[ 'from_version' => $from_version ]
+		);
 	}
 
 	/**
-	 * Check for duplicate from_email (used for backup detection).
+	 * Detect and queue state-based events on admin page load.
 	 *
-	 * @param array $connections Connections data.
-	 * @return bool True if a duplicate from_email is found, otherwise false.
+	 * Runs on every admin load but throttled by a daily transient.
+	 * BSF_Analytics_Events dedup prevents duplicate tracking.
+	 *
+	 * @since 1.9.4
+	 * @return void
 	 */
-	private function get_backup_connection_status( array $connections ): bool {
-		$from_emails = [];
+	private function detect_state_events(): void {
+		$events = self::events();
 
-		foreach ( $connections as $conn ) {
-			if ( isset( $conn['from_email'] ) ) {
-				$email = $conn['from_email'];
-				if ( in_array( $email, $from_emails, true ) ) {
-					return true;
-				}
-				$from_emails[] = $email;
-			}
+		if ( null === $events ) {
+			// BSF_Analytics_Events class not loaded — do NOT set transient; retry next load.
+			return;
 		}
 
-		return false;
+		// Class is available — set throttle transient so we don't re-run for 24h.
+		set_transient( 'suremails_state_events_checked', 1, DAY_IN_SECONDS );
+
+		// ── 1. plugin_activated ──────────────────────────────────────────
+		$bsf_referrers = get_option( 'bsf_product_referers', [] );
+		$source        = ! empty( $bsf_referrers['suremails'] )
+			? sanitize_text_field( $bsf_referrers['suremails'] )
+			: 'self';
+		$events->track( 'plugin_activated', SUREMAILS_VERSION, [ 'source' => $source ] );
+
+		// ── 2. onboarding_skipped ────────────────────────────────────────
+		$onboarding_skipped = Onboarding::instance()->get_onboarding_skipped_status();
+		if ( $onboarding_skipped ) {
+			$events->track( 'onboarding_skipped', 'yes' );
+		}
+
+		// ── 3. onboarding_completed ──────────────────────────────────────
+		$onboarding_done = Onboarding::instance()->get_onboarding_status();
+		if ( $onboarding_done ) {
+			$events->flush_pushed( [ 'onboarding_completed' ] );
+			$events->track(
+				'onboarding_completed',
+				'completed',
+				[ 'previously_skipped' => (string) (int) $onboarding_skipped ]
+			);
+		}
 	}
 
 	/**
-	 * Get site type based on email activity in the last 30 days.
+	 * Get KPI tracking data for the last 2 days (excluding today).
 	 *
-	 * - super: Site sends at least 50 emails in the last 30 days.
-	 * - active: Site sends at least 10 emails in the last 30 days.
-	 * - inactive: Site sends less than 10 emails in the last 30 days.
-	 *
-	 * @return string Site type: 'super', 'active', or 'inactive'.
+	 * @since 1.9.4
+	 * @return array<string, array<string, array<string, int>>> KPI records keyed by date.
 	 */
-	private function get_site_type(): string {
+	private function get_kpi_tracking_data(): array {
+		$kpi_records = [];
+
+		for ( $i = 1; $i <= 2; $i++ ) {
+			$date = wp_date( 'Y-m-d', strtotime( "-{$i} days" ) );
+
+			if ( ! $date ) {
+				continue;
+			}
+
+			$kpi_records[ $date ] = [
+				'numeric_values' => [
+					'emails_processed' => $this->get_emails_log_count( $date ),
+				],
+			];
+		}
+
+		return $kpi_records;
+	}
+
+	/**
+	 * Get daily emails entry count for a specific date.
+	 *
+	 * @param string $date Date in Y-m-d format.
+	 * @since 1.9.4
+	 * @return int Count of emails processed for that date.
+	 */
+	private function get_emails_log_count( string $date ): int {
 		global $wpdb;
-
-		$thirty_days_ago = gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) );
 
 		$table_name = EmailLog::instance()->get_table_name();
 
 		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
-		$count = $wpdb->get_var(
-			$wpdb->prepare(
-				// phpcs:ignore
-				"SELECT COUNT(*) FROM `{$table_name}` WHERE `created_at` >= %s",
-				$thirty_days_ago
-			)
+		$table_exists = $wpdb->get_var(
+			$wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name )
 		);
 
-		$email_count = (int) $count;
-
-		if ( $email_count >= 50 ) {
-			return 'super';
+		if ( $table_exists !== $table_name ) {
+			return 0;
 		}
 
-		if ( $email_count >= 10 ) {
-			return 'active';
-		}
-
-		return 'inactive';
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		return (int) $wpdb->get_var(
+			$wpdb->prepare(
+				"SELECT COUNT(*) FROM `{$table_name}` WHERE DATE(`created_at`) = %s", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$date
+			)
+		);
 	}
 }

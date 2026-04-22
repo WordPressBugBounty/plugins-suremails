@@ -39,7 +39,7 @@ class GmailHandler implements ConnectionHandler {
 	/**
 	 * Gmail connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	private $connection_data;
 
@@ -48,7 +48,7 @@ class GmailHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		// Ensure our connection data is available.
@@ -60,7 +60,7 @@ class GmailHandler implements ConnectionHandler {
 	 *
 	 * This method handles the entire OAuth flow using direct API calls.
 	 *
-	 * @return void|array
+	 * @return array{success: bool, message: string, expire_stamp?: int, access_token?: string, refresh_token?: string, expires_in?: int}|void
 	 */
 	public function authenticate() {
 		$result = [
@@ -107,22 +107,22 @@ class GmailHandler implements ConnectionHandler {
 
 		// Merge in token data and timestamps.
 		$result                 = array_merge( $result, $tokens );
-		$result['expire_stamp'] = time() + $tokens['expires_in'];
+		$result['expire_stamp'] = time() + (int) $tokens['expires_in'];
 		$result['success']      = true;
 		$result['message']      = __( 'Successfully authenticated with Gmail.', 'suremails' );
 
-		return $result;
+		return $result; // @phpstan-ignore return.type
 	}
 
 	/**
 	 * Send email using Gmail via direct API call.
 	 *
-	 * @param array $atts             Email attributes.
-	 * @param int   $log_id           Log ID.
-	 * @param array $connection_data  Connection data.
-	 * @param array $processed_data   Processed email data.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts Email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id Log ID.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection_data Connection data.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data Processed email data.
 	 *
-	 * @return array The result of the sending attempt.
+	 * @return array{success: bool, message: string, email_id?: string}
 	 */
 	public function send( array $atts, $log_id, array $connection_data, $processed_data ) {
 
@@ -132,14 +132,14 @@ class GmailHandler implements ConnectionHandler {
 		];
 
 		$response = $this->check_tokens();
-		if ( isset( $response['success'] ) && $response['success'] === false ) {
+		if ( $response['success'] === false ) {
 			return $response;
 		}
 
 		$phpmailer = ConnectionManager::instance()->get_phpmailer();
-		$phpmailer->setFrom( $this->connection_data['from_email'], $this->connection_data['from_name'] );
+		$phpmailer->setFrom( (string) $this->connection_data['from_email'], (string) ( $this->connection_data['from_name'] ?? '' ) );
 		if ( ! empty( $this->connection_data['return_path'] ) && $this->connection_data['return_path'] === true ) {
-			$phpmailer->Sender = $this->connection_data['from_email']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
+			$phpmailer->Sender = (string) $this->connection_data['from_email']; // phpcs:ignore WordPress.NamingConventions.ValidVariableName.UsedPropertyNotSnakeCase
 		}
 
 		$phpmailer->preSend();
@@ -195,8 +195,8 @@ class GmailHandler implements ConnectionHandler {
 	/**
 	 * Get Gmail authorization URL.
 	 *
-	 * @param array $params The parameters passed in the API request.
-	 * @return array Returns the Gmail auth URL or an error response.
+	 * @param array{client_id?: string, client_secret?: string, redirect_url?: string} $params The parameters passed in the API request.
+	 * @return array{auth_url?: string, error?: string}
 	 */
 	public static function get_auth_url( $params ) {
 		$client_id     = isset( $params['client_id'] ) ? sanitize_text_field( $params['client_id'] ) : '';
@@ -229,7 +229,7 @@ class GmailHandler implements ConnectionHandler {
 	/**
 	 * Get the Gmail connection options.
 	 *
-	 * @return array The Gmail connection options.
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, icon: string, display_name: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -260,7 +260,7 @@ class GmailHandler implements ConnectionHandler {
 	/**
 	 * Get the Gmail connection specific fields.
 	 *
-	 * @return array The Gmail specific fields.
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		$redirect_uri = Utils::get_admin_url();
@@ -344,11 +344,11 @@ class GmailHandler implements ConnectionHandler {
 	/**
 	 * Make an API call.
 	 *
-	 * @param string $url   The URL to call.
-	 * @param array  $body  The body arguments.
-	 * @param string $type  The HTTP method to use.
+	 * @param string                         $url  The URL to call.
+	 * @param array<string, string|int|bool> $body The body arguments.
+	 * @param string                         $type The HTTP method to use.
 	 *
-	 * @return array|WP_Error The API response.
+	 * @return array<string, string|int>|WP_Error The API response.
 	 */
 	private function api_call( $url, $body = [], $type = 'GET' ) {
 		$args = [
@@ -391,7 +391,7 @@ class GmailHandler implements ConnectionHandler {
 	 *
 	 * @since 1.4.0
 	 *
-	 * @return array The result of the token check.
+	 * @return array{success: bool, message: string}
 	 */
 	private function check_tokens() {
 		$result = [
@@ -407,8 +407,8 @@ class GmailHandler implements ConnectionHandler {
 			return $result;
 		}
 
-		if ( time() > $this->connection_data['expire_stamp'] - 500 ) {
-			$new = $this->client_refresh_token( $this->connection_data['refresh_token'] );
+		if ( time() > (int) $this->connection_data['expire_stamp'] - 500 ) {
+			$new = $this->client_refresh_token( (string) $this->connection_data['refresh_token'] );
 			if ( is_wp_error( $new ) ) {
 				$result['message'] = sprintf(
 					// translators: %s: Error message.
@@ -420,7 +420,7 @@ class GmailHandler implements ConnectionHandler {
 
 			// Update stored tokens.
 			$this->connection_data['access_token']  = $new['access_token'];
-			$this->connection_data['expire_stamp']  = time() + $new['expires_in'];
+			$this->connection_data['expire_stamp']  = time() + (int) $new['expires_in'];
 			$this->connection_data['expires_in']    = $new['expires_in'];
 			$this->connection_data['refresh_token'] = $new['refresh_token'] ?? $this->connection_data['refresh_token'];
 			Settings::instance()->update_connection( $this->connection_data );
@@ -436,7 +436,7 @@ class GmailHandler implements ConnectionHandler {
 	 * Refresh the access token using the refresh token.
 	 *
 	 * @param string $refresh_token The refresh token.
-	 * @return array|WP_Error The new token data.
+	 * @return array<string, string|int>|WP_Error The new token data.
 	 */
 	private function client_refresh_token( $refresh_token ) {
 		$body = [
@@ -451,10 +451,10 @@ class GmailHandler implements ConnectionHandler {
 	/**
 	 * Get a new access token using the refresh token.
 	 *
-	 * @return array The new token data.
+	 * @return array<string, string|int|bool>
 	 */
 	private function get_new_token() {
-		$tokens = $this->client_refresh_token( $this->connection_data['refresh_token'] );
+		$tokens = $this->client_refresh_token( (string) $this->connection_data['refresh_token'] );
 		if ( is_wp_error( $tokens ) ) {
 			return [
 				'success' => false,

@@ -60,3 +60,8 @@
 .whats-new-rss-flyout.suremails-whats-new-flyout.closed {
   visibility: hidden;
 }
+
+/* Ensure the label for the consent checkbox is displayed properly. */
+label:has(.sm-consent) {
+	display: block !important;
+}

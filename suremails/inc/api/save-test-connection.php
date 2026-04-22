@@ -9,6 +9,7 @@
 
 namespace SureMails\Inc\API;
 
+use SureMails\Inc\Analytics\Analytics;
 use SureMails\Inc\Emails\Handler\ConnectionHandlerFactory;
 use SureMails\Inc\Providers;
 use SureMails\Inc\Settings;
@@ -104,7 +105,7 @@ class SaveTestConnection extends Api_Base {
 				return new WP_REST_Response(
 					[
 						'success' => false,
-						'message' => $validation['message'],
+						'message' => $validation['message'] ?? __( 'Validation failed.', 'suremails' ),
 					],
 					400
 				);
@@ -116,7 +117,7 @@ class SaveTestConnection extends Api_Base {
 			$connection_data['type'] = strtoupper( $provider );
 
 			// Check for priority uniqueness.
-			if ( isset( $connection_data['priority'] ) && ! $this->is_priority_unique( intval( $connection_data['priority'] ), $connection_data['id'] ?? '' ) ) {
+			if ( isset( $connection_data['priority'] ) && ! $this->is_priority_unique( intval( $connection_data['priority'] ), (string) ( $connection_data['id'] ?? '' ) ) ) {
 				return new WP_REST_Response(
 					[
 						'success' => false,
@@ -138,7 +139,7 @@ class SaveTestConnection extends Api_Base {
 				return new WP_REST_Response(
 					[
 						'success' => false,
-						'message' => $auth_result['message'] ?? __( 'Failed to authenticate.', 'suremails' ),
+						'message' => $auth_result['message'] ?? __( 'Failed to authenticate.', 'suremails' ), // @phpstan-ignore nullCoalesce.offset
 					],
 					$status_code
 				);
@@ -173,8 +174,8 @@ class SaveTestConnection extends Api_Base {
 	/**
 	 * Authenticate the email connection to ensure it is valid.
 	 *
-	 * @param array $connection_data The connection data.
-	 * @return array The result of the authentication process.
+	 * @param array<string, string|int|bool> $connection_data The connection data.
+	 * @return array{success: bool, message: string, error_code?: int} The result of the authentication process.
 	 */
 	public function authenticate_connection( array $connection_data ) {
 		$handler = ConnectionHandlerFactory::create( $connection_data );
@@ -190,7 +191,7 @@ class SaveTestConnection extends Api_Base {
 		$auth_result = $handler->authenticate();
 
 		// Include an error code based on the specific error, if provided.
-		if ( isset( $auth_result['success'] ) && ! $auth_result['success'] ) {
+		if ( isset( $auth_result['success'] ) && ! $auth_result['success'] ) { // @phpstan-ignore isset.offset
 			$auth_result['error_code'] = $auth_result['error_code'] ?? 401;
 		}
 
@@ -200,7 +201,7 @@ class SaveTestConnection extends Api_Base {
 	/**
 	 * Get all connection details.
 	 *
-	 * @return array The array of all connections.
+	 * @return array<string, array<string, string|int|bool>> The array of all connections.
 	 */
 	public function get_all_connections() {
 		// Fetch the connections from the WordPress options.
@@ -212,8 +213,8 @@ class SaveTestConnection extends Api_Base {
 	/**
 	 * Store the email connection data in the database.
 	 *
-	 * @param array $connection_data The connection data.
-	 * @return array The stored connection data.
+	 * @param array<string, string|int|bool> $connection_data The connection data.
+	 * @return array<string, string|int|bool> The stored connection data.
 	 */
 	public function store_connection( array $connection_data ) {
 		$options = Settings::instance()->get_settings();
@@ -239,6 +240,15 @@ class SaveTestConnection extends Api_Base {
 			// Store the timestamp in MySQL datetime format.
 			$connection_data['created_at']                    = current_time( 'mysql' );
 			$options['connections'][ $connection_data['id'] ] = $connection_data;
+
+			$events = Analytics::events();
+			if ( null !== $events ) {
+				$events->track(
+					'first_connection_added',
+					SUREMAILS_VERSION,
+					[ 'provider_type' => $connection_data['type'] ?? '' ]
+				);
+			}
 		}
 
 		// Set default connection if necessary.
@@ -260,9 +270,9 @@ class SaveTestConnection extends Api_Base {
 	/**
 	 * Add extra fields to the connection data.
 	 *
-	 * @param array $connection_data The connection data.
-	 * @param array $new_fields The new fields to add.
-	 * @return array The updated connection data.
+	 * @param array<string, string|int|bool> $connection_data The connection data.
+	 * @param array<string, string|int|bool> $new_fields The new fields to add.
+	 * @return array<string, string|int|bool> The updated connection data.
 	 */
 	protected function add_extra_fields( $connection_data, $new_fields ) {
 
@@ -304,14 +314,14 @@ class SaveTestConnection extends Api_Base {
 	/**
 	 * Validate the provided settings against the provider's field schema.
 	 *
-	 * @param array $schema   The field definitions from the provider's options.
-	 * @param array $settings The submitted settings.
-	 * @return array ['success' => bool, 'message' => string]
+	 * @param array<string, array<string, mixed>> $schema   The field definitions from the provider's options.
+	 * @param array<string, string|int|bool>      $settings The submitted settings.
+	 * @return array{success: bool, message?: string}
 	 */
 	private function validate_schema_fields( array $schema, array $settings ) {
 		foreach ( $schema as $field => $rules ) {
 			if ( ! empty( $rules['required'] ) ) {
-				$value = trim( $settings[ $field ] ?? '' );
+				$value = trim( (string) ( $settings[ $field ] ?? '' ) );
 				if ( '' === $value ) {
 					return [
 						'success' => false,
@@ -329,9 +339,9 @@ class SaveTestConnection extends Api_Base {
 	 *
 	 * Only fields defined in the schema are stored.
 	 *
-	 * @param array $schema   The provider's field definitions.
-	 * @param array $settings The settings array from the request.
-	 * @return array The prepared connection data.
+	 * @param array<string, array<string, mixed>> $schema   The provider's field definitions.
+	 * @param array<string, string|int|bool>      $settings The settings array from the request.
+	 * @return array<string, string|int|bool> The prepared connection data.
 	 */
 	private function prepare_connection_data( array $schema, array $settings ) {
 		$data = [];
@@ -340,7 +350,7 @@ class SaveTestConnection extends Api_Base {
 				$value = $settings[ $field ];
 				switch ( $rules['datatype'] ) {
 					case 'email':
-						$data[ $field ] = sanitize_email( $value );
+						$data[ $field ] = sanitize_email( (string) $value );
 						break;
 					case 'int':
 						$data[ $field ] = intval( $value );
@@ -350,7 +360,7 @@ class SaveTestConnection extends Api_Base {
 						break;
 					case 'string':
 					default:
-						$data[ $field ] = sanitize_text_field( $value );
+						$data[ $field ] = sanitize_text_field( (string) $value );
 						break;
 				}
 			} else {
@@ -398,7 +408,7 @@ class SaveTestConnection extends Api_Base {
 	/**
 	 * Generates a unique ID for a connection.
 	 *
-	 * @param array $existing_connections The list of existing connections.
+	 * @param array<string, array<string, string|int|bool>> $existing_connections The list of existing connections.
 	 * @return string The generated unique ID.
 	 */
 	private function generate_unique_id( array $existing_connections ) {
@@ -412,8 +422,8 @@ class SaveTestConnection extends Api_Base {
 	/**
 	 * Checks if a connection ID already exists.
 	 *
-	 * @param string $id The ID to check.
-	 * @param array  $existing_connections The existing connections.
+	 * @param string                                        $id The ID to check.
+	 * @param array<string, array<string, string|int|bool>> $existing_connections The existing connections.
 	 * @return bool True if exists, false otherwise.
 	 */
 	private function id_exists( string $id, array $existing_connections ) {
@@ -425,16 +435,6 @@ class SaveTestConnection extends Api_Base {
 		return false;
 	}
 
-	/**
-	 * Encrypt sensitive data.
-	 *
-	 * @param string $data The data to encrypt.
-	 * @return string The encrypted data.
-	 */
-	private function encrypt( string $data ) {
-		// Implement your encryption logic here.
-		return $data;
-	}
 }
 
 // Initialize the SaveTestConnection singleton.

@@ -5,7 +5,7 @@ Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 1.9.3
+Stable tag: 1.9.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -245,6 +245,11 @@ You can report the issue through our [Bug Bounty Program](https://brainstormforc
 
 == Changelog ==
 
+v1.9.4 - 22-April-2026
+- New: WordPress Abilities APIs introduced.
+- Improvement: Coding standards and code quality improvements.
+- Improvement: Internal libraries updated to the latest versions with improved stability.
+
 v1.9.3 - 27-February-2026
 - Fix: Attachment storing - Fixed an where duplicate attachments were stored in database.
 - Improvement: Emailit connection - Updated Emailit V1 API to V2 and added support for the new API features.
@@ -259,7 +264,7 @@ v1.9.0 04-November-2025
 - New: Zoho Mail email service provider added.
 - Improvement: Improved Weekly Email Summary format with more intuitive design.
 - Improvement: Other SMTP Connection - Improved Other SMTP provider to support have 'username' and 'password' fields optional.
-- Improvement: Added SureMail settings in WP admin menu for better accessibility. 
+- Improvement: Added SureMail settings in WP admin menu for better accessibility.
 
 v1.8.1 - 1-August-2025
 - Fix: AWS - Gmail - PHPMail Connection : Fixed an issue with plain text content type.

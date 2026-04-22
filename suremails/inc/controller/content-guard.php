@@ -40,7 +40,7 @@ class ContentGuard {
 	/**
 	 * Hashes of the content.
 	 *
-	 * @var array
+	 * @var array<string, array<string, bool|string|array<string, bool|float>>>
 	 */
 	public $hashes = [];
 
@@ -58,8 +58,8 @@ class ContentGuard {
 	/**
 	 * Check the email content and determine if it should be blocked.
 	 *
-	 * @param array $atts The email attributes.
-	 * @return bool|array The status of the email content.
+	 * @param array{subject?: string, message?: string} $atts The email attributes.
+	 * @return bool|string|array<string, bool|float> The status of the email content.
 	 */
 	public function check_email_content( array $atts ) {
 		$result = true;
@@ -85,7 +85,7 @@ class ContentGuard {
 	 * Check if the content is protected.
 	 *
 	 * @param string $content The content to check.
-	 * @return array Moderation response.
+	 * @return array<string, bool|string|array<string, bool|float>> Moderation response.
 	 * @since 1.0.0
 	 */
 	public function validate( $content ) {
@@ -124,7 +124,7 @@ class ContentGuard {
 	/**
 	 * Get all the hashes.
 	 *
-	 * @return array Associative array of hashes and their responses.
+	 * @return array<string, array<string, bool|string|array<string, bool|float>>> Associative array of hashes and their responses.
 	 * @since 1.0.0
 	 */
 	public function get_hashes() {
@@ -134,8 +134,8 @@ class ContentGuard {
 	/**
 	 * Add a hash with its corresponding response.
 	 *
-	 * @param string $hash The hash to add.
-	 * @param array  $response The moderation response associated with the hash.
+	 * @param string                                               $hash The hash to add.
+	 * @param array<string, bool|string|array<string, bool|float>> $response The moderation response associated with the hash.
 	 * @since 1.0.0
 	 * @return void
 	 */
@@ -165,7 +165,7 @@ class ContentGuard {
 	 * Get the response associated with a hash.
 	 *
 	 * @param string $hash The hash to get the response for.
-	 * @return array|bool The response array if the hash exists, false otherwise.
+	 * @return array<string, bool|string|array<string, bool|float>>|false The response array if the hash exists, false otherwise.
 	 * @since 1.0.0
 	 */
 	public function get_hash( $hash ) {
@@ -181,7 +181,7 @@ class ContentGuard {
 	 *
 	 * @param string $subject The subject of the email.
 	 * @param string $message The message body of the email.
-	 * @return array The result of the moderation process.
+	 * @return array{status: bool, response: array<string, bool|string|array<string, bool|float>>} The result of the moderation process.
 	 * @since 1.0.0
 	 */
 	public function check( $subject = '', $message = '' ) {
@@ -230,7 +230,7 @@ class ContentGuard {
 	 * Find proper nouns in the text.
 	 *
 	 * @param string $text The text to search for proper nouns.
-	 * @return array The list of proper nouns found in the text.
+	 * @return array<int, string> The list of proper nouns found in the text.
 	 * @since 1.3.0
 	 */
 	public function find_proper_nouns( $text ) {
@@ -272,8 +272,8 @@ class ContentGuard {
 	/**
 	 * Trim all the given strings from the text.
 	 *
-	 * @param string $text The text to trim.
-	 * @param array  $strings The strings to trim from the text.
+	 * @param string             $text The text to trim.
+	 * @param array<int, string> $strings The strings to trim from the text.
 	 *
 	 * @return string The trimmed text.
 	 * @since 1.3.0
@@ -299,7 +299,7 @@ class ContentGuard {
 	/**
 	 * Handles the response when content is flagged.
 	 *
-	 * @param array $atts The email attributes with content guard response.
+	 * @param array<string, mixed> $atts The email attributes with content guard response.
 	 * @return int|bool The log ID after handling the response.
 	 */
 	private function handle_content_guard_response( array $atts ) {
@@ -314,9 +314,9 @@ class ContentGuard {
 		$email_data_processor = ProcessEmailData::instance();
 		$logger               = Logger::instance();
 		$connection_manager   = ConnectionManager::instance();
-		$atts['to']           = $email_data_processor->process_to( $atts['to'] );
-		$atts['headers']      = $email_data_processor->process_headers( $atts['headers'] );
-		$atts['attachments']  = $email_data_processor->process_attachments( $atts['attachments'] );
+		$atts['to']           = $email_data_processor->process_to( $atts['to'] ); // @phpstan-ignore argument.type
+		$atts['headers']      = $email_data_processor->process_headers( $atts['headers'] ); // @phpstan-ignore argument.type
+		$atts['attachments']  = $email_data_processor->process_attachments( $atts['attachments'] ); // @phpstan-ignore argument.type
 		$from_email           = $atts['headers']['from']['email'];
 		$email_from           = '';
 		if ( ! empty( $from_email ) ) {
@@ -324,7 +324,7 @@ class ContentGuard {
 			$email_from = "{$from_name} <{$from_email}>";
 		}
 
-		$handler_response = $logger->prepare_log_data(
+		$handler_response = $logger->prepare_log_data( // @phpstan-ignore argument.type
 			[
 				'email_to'    => $email_data_processor->format_email_recipients( $atts['to'] ),
 				'email_from'  => ! empty( $email_from ) ? $email_from : ' ',
@@ -358,7 +358,7 @@ class ContentGuard {
 			return $log_id;
 		}
 		$log_entry = (array) $logger->get_log( $log_id );
-		$meta      = $log_entry['meta'] ?? [
+		$meta      = is_array( $log_entry['meta'] ?? null ) ? $log_entry['meta'] : [
 			'retry'  => 0,
 			'resend' => 0,
 		];

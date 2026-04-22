@@ -10,6 +10,7 @@
 namespace SureMails\Inc\Emails\Handler;
 
 use SureMails\Inc\Admin\Crons;
+use SureMails\Inc\Analytics\Analytics;
 use SureMails\Inc\ConnectionManager;
 use SureMails\Inc\Controller\ContentGuard;
 use SureMails\Inc\Controller\Logger;
@@ -84,7 +85,7 @@ class MailHandler {
 	/**
 	 * Handles sending an email based on the provided attributes.
 	 *
-	 * @param array $atts The email attributes.
+	 * @param array<string, string|array<int, string>> $atts The email attributes.
 	 * @return bool|null The result of the email sending process.
 	 */
 	public static function handle_mail( array $atts ) {
@@ -94,7 +95,7 @@ class MailHandler {
 	/**
 	 * Processes the email sending logic.
 	 *
-	 * @param array $atts The email attributes.
+	 * @param array<string, string|array<int, string>> $atts The email attributes.
 	 * @return bool The result of the email sending process.
 	 */
 	private function process_mail( array $atts ) {
@@ -128,9 +129,21 @@ class MailHandler {
 
 		$connection = $this->connection_manager->get_connection();
 		if ( $connection === null ) {
-			$connection = $this->determine_connection( $processed_data['headers'] );
+			/**
+			 * Processed email headers.
+			 *
+			 * @var array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>} $headers
+			 */
+			$headers    = $processed_data['headers'];
+			$connection = $this->determine_connection( $headers );
 		}
-		$connection = $this->review_email_settings( $connection, $processed_data['headers']['from'] );
+		/**
+		 * The from header data.
+		 *
+		 * @var array{name: string, email: string}|null $from_header
+		 */
+		$from_header = $processed_data['headers']['from'];
+		$connection  = $this->review_email_settings( $connection, $from_header );
 
 		// Initialize handler_response.
 		$handler_response = [
@@ -138,17 +151,20 @@ class MailHandler {
 			'status'           => Logger::STATUS_PENDING,
 			'message'          => '',
 			'success'          => false,
-			'source'           => $connection['type'] ?? 'Default',
-			'connection_title' => $connection['connection_title'] ?? 'Default',
+			'source'           => (string) ( $connection['type'] ?? 'Default' ),
+			'connection_title' => (string) ( $connection['connection_title'] ?? 'Default' ),
 			'from'             => [
-				'email' => $connection['from_email'] ?? '',
-				'name'  => ! empty( $connection['from_name'] ) ? $connection['from_name'] : __( 'WordPress', 'suremails' ),
+				'email' => (string) ( $connection['from_email'] ?? '' ),
+				'name'  => ! empty( $connection['from_name'] ) ? (string) $connection['from_name'] : __( 'WordPress', 'suremails' ),
 			],
 		];
 
 		if ( $connection === null ) {
 			// Send via DefaultMailHandler.
-			$send = DefaultMailHandler::send_mail( $atts );
+			$send = false;
+			if ( class_exists( DefaultMailHandler::class ) ) {
+				$send = DefaultMailHandler::send_mail( $atts );
+			}
 			if ( $send ) {
 				$handler_response['status']  = Logger::STATUS_SENT;
 				$handler_response['message'] = __( 'Sent using Default WordPress Handler', 'suremails' );
@@ -156,7 +172,6 @@ class MailHandler {
 			} else {
 				$handler_response['message'] = __( 'Failed to send email using Default WordPress Handler', 'suremails' );
 				$handler_response['success'] = false;
-
 			}
 
 			$this->handle_response( $handler_response );
@@ -175,15 +190,29 @@ class MailHandler {
 		}
 
 		// Send via handler.
-		$send_result = $handler->send( $atts, $this->logger->get_id(), $connection, $processed_data );
+		/**
+		 * Typed processed email data.
+		 *
+		 * @var array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $typed_processed_data
+		 */
+		$typed_processed_data = $processed_data;
+		$send_result          = $handler->send( $atts, $this->logger->get_id(), $connection, $typed_processed_data );
 
-		// Setting status and messageee.
-		$handler_response['success']         = $send_result['success'] ?? false;
+		// Setting status and message.
+		$handler_response['success']         = $send_result['success'];
 		$handler_response['status']          = $handler_response['success'] ? Logger::STATUS_SENT : Logger::STATUS_FAILED;
-		$handler_response['message']         = $send_result['message'] ?? ( $handler_response['success'] ? __( 'Email sent successfully.', 'suremails' ) : __( 'Failed to send email.', 'suremails' ) );
+		$handler_response['message']         = $send_result['message'];
 		$handler_response['email_simulated'] = $send_result['email_simulated'] ?? false;
 
 		if ( $handler_response['success'] ) {
+			$events = Analytics::events();
+			if ( null !== $events ) {
+				$events->track(
+					'first_email_sent',
+					SUREMAILS_VERSION,
+					[ 'days_since_install' => (string) Analytics::get_days_since_install() ]
+				);
+			}
 			do_action( 'wp_mail_succeeded', $mail_data );
 			$this->handle_response( $handler_response );
 			$this->connection_manager->reset();
@@ -230,15 +259,25 @@ class MailHandler {
 	/**
 	 * Processes the email data using ProcessEmailData class and populates PHPMailer.
 	 *
-	 * @param array $atts The email attributes.
-	 * @return array Processed email data.
+	 * @param array<string, string|array<int, string>> $atts The email attributes.
+	 * @return array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} Processed email data.
 	 */
 	private function process_email_data( array $atts ) {
-		$to          = $atts['to'] ?? [];
-		$headers     = $atts['headers'] ?? [];
+		$to      = $atts['to'] ?? [];
+		$headers = $atts['headers'] ?? [];
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
 		$message     = $atts['message'] ?? '';
 		$attachments = $atts['attachments'] ?? [];
-		$subject     = $atts['subject'] ?? '';
+		/**
+		 * The email subject line.
+		 *
+		 * @var string $subject
+		 */
+		$subject = $atts['subject'] ?? '';
 
 		$processed_data = $this->email_data_processor->process_all( $to, $headers, $message, $attachments, $subject );
 
@@ -255,7 +294,7 @@ class MailHandler {
 	/**
 	 * Handles the response from email sending and logging.
 	 *
-	 * @param array $handler_response The response data from the handler.
+	 * @param array{atts: array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>}, status: string, message: string, success: bool, source: string, connection_title: string, from: array{email: string, name: string}, email_simulated?: bool} $handler_response The response data from the handler.
 	 * @return int|null The log ID after handling the response.
 	 */
 	private function handle_response( array $handler_response ) {
@@ -269,11 +308,22 @@ class MailHandler {
 
 		];
 
-		$atts              = $handler_response['atts'];
-		$status            = $handler_response['status'];
-		$source            = $handler_response['source'];
-		$from_email        = $handler_response['from']['email'];
-		$from_name         = $handler_response['from']['name'];
+		/**
+		 * The email attributes.
+		 *
+		 * @var array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $atts
+		 */
+		$atts   = $handler_response['atts'];
+		$status = $handler_response['status'];
+		$source = $handler_response['source'];
+		/**
+		 * The from address data.
+		 *
+		 * @var array{email: string, name: string} $from
+		 */
+		$from              = $handler_response['from'];
+		$from_email        = $from['email'];
+		$from_name         = $from['name'];
 		$email_from        = "{$from_name} <{$from_email}>";
 		$email_to          = $this->email_data_processor->format_email_recipients( $atts['to'] );
 		$formatted_headers = $this->email_data_processor->format_processed_headers( $atts['headers'] );
@@ -283,10 +333,10 @@ class MailHandler {
 			[
 				'email_from'  => $email_from,
 				'email_to'    => $email_to,
-				'subject'     => $atts['subject'] ?? '',
-				'body'        => $atts['message'] ?? '',
+				'subject'     => $atts['subject'],
+				'body'        => $atts['message'],
 				'headers'     => $formatted_headers,
-				'attachments' => $atts['uploaded_attachments'] ?? [],
+				'attachments' => $atts['uploaded_attachments'],
 				'status'      => $status,
 				'response'    => [ $new_server_response ],
 				'connection'  => $source,
@@ -319,7 +369,12 @@ class MailHandler {
 
 		// Update existing log.
 		$log_entry = (array) $this->logger->get_log( $log_id );
-		$meta      = $log_entry['meta'] ?? [
+		/**
+		 * The log metadata.
+		 *
+		 * @var array{retry: int, resend: int} $meta
+		 */
+		$meta = is_array( $log_entry['meta'] ?? null ) ? $log_entry['meta'] : [
 			'retry'  => 0,
 			'resend' => 0,
 		];
@@ -337,13 +392,18 @@ class MailHandler {
 			$meta['resend'] += 1;
 		}
 
-		$existing_responses = $log_entry['response'];
+		$existing_responses = $log_entry['response'] ?? [];
 		if ( ! is_array( $existing_responses ) ) {
 			$existing_responses = [];
 		}
 
 		$existing_responses[] = $new_server_response;
 
+		/**
+		 * The update data for the log entry.
+		 *
+		 * @var array{meta?: array{retry: int, resend: int}, response?: array<int, array<string, int|string>>, status?: string, updated_at?: string, connection?: string} $update_data
+		 */
 		$update_data = [
 			'status'     => $log_data['status'],
 			'response'   => $existing_responses,
@@ -370,11 +430,11 @@ class MailHandler {
 	/**
 	 * Determines which connection to use based on email attributes.
 	 *
-	 * @param array $headers The email headers.
-	 * @return array|null The connection details or null if not found.
+	 * @param array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>} $headers The email headers.
+	 * @return array<string, string|int|bool>|null The connection details or null if not found.
 	 */
 	private function determine_connection( array $headers ) {
-		$from       = $headers['from'] ?? null;
+		$from       = $headers['from'];
 		$from_name  = ! empty( $from['name'] ) ? $from['name'] : null;
 		$from_email = ! empty( $from['email'] ) ? $from['email'] : null;
 
@@ -387,7 +447,7 @@ class MailHandler {
 		if ( $connection === null ) {
 			// No connection found for the from_email. Use the default connection first then get all connections from from_email of default connection and use as fallback sequence based on priority.
 			$default_connection = $this->connection_manager->get_default_connection( false );
-			$default_from_email = $default_connection['from_email'] ?? '';
+			$default_from_email = (string) ( $default_connection['from_email'] ?? '' );
 			$this->connection_manager->set_from_email( $default_from_email );
 
 			// Swap default connection to true to get all connections from from_email of default connection but first connection should be default connection.
@@ -402,7 +462,7 @@ class MailHandler {
 	 * Get connection details based on from_email and priority.
 	 *
 	 * @param string $from_email The email address to match.
-	 * @return array|null The connection details with the highest priority or null if not found.
+	 * @return array<string, string|int|bool>|null The connection details with the highest priority or null if not found.
 	 */
 	private function get_connection_from_email( string $from_email ) {
 		$best_connection = null;
@@ -459,10 +519,10 @@ class MailHandler {
 	/**
 	 * Reviews and updates the connection's email settings based on the given $from and force settings.
 	 *
-	 * @param array|null $connection The connection details (associative array).
-	 * @param array|null $from       The "from" details, typically containing 'name' and 'email'.
-	 * @param string     $default_name    The default name to use if none is provided and force is false (e.g., 'WordPress').
-	 * @return array|null            The updated connection or null if the connection is null.
+	 * @param array<string, string|int|bool>|null     $connection The connection details (associative array).
+	 * @param array{name: string, email: string}|null $from       The "from" details, typically containing 'name' and 'email'.
+	 * @param string                                  $default_name    The default name to use if none is provided and force is false (e.g., 'WordPress').
+	 * @return array<string, string|int|bool>|null            The updated connection or null if the connection is null.
 	 */
 	private function review_email_settings( ?array $connection, ?array $from, string $default_name = '' ) {
 		if ( $connection === null ) {
@@ -491,7 +551,7 @@ class MailHandler {
 		}
 
 		$phpmailer = $this->connection_manager->get_phpmailer();
-		$phpmailer->setFrom( $connection['from_email'], $connection['from_name'] );
+		$phpmailer->setFrom( (string) ( $connection['from_email'] ?? '' ), (string) ( $connection['from_name'] ?? '' ) );
 
 		return $connection;
 	}

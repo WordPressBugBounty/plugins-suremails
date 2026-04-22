@@ -33,6 +33,13 @@ class Onboarding {
 	private $onboarding_status_option = 'suremails_onboarding_completed';
 
 	/**
+	 * Onboarding skipped setting.
+	 *
+	 * @var string
+	 */
+	private $onboarding_skipped_option = 'suremails_onboarding_skipped';
+
+	/**
 	 * Set onboarding completion status.
 	 *
 	 * @since 0.0.1
@@ -51,5 +58,24 @@ class Onboarding {
 	 */
 	public function get_onboarding_status() {
 		return get_option( $this->onboarding_status_option, 'no' ) === 'yes';
+	}
+
+	/**
+	 * Set onboarding skipped status.
+	 *
+	 * @param bool $skipped Whether any onboarding step was skipped.
+	 * @return bool
+	 */
+	public function set_onboarding_skipped_status( bool $skipped = false ) {
+		return update_option( $this->onboarding_skipped_option, $skipped );
+	}
+
+	/**
+	 * Get onboarding skipped status.
+	 *
+	 * @return bool
+	 */
+	public function get_onboarding_skipped_status() {
+		return (bool) get_option( $this->onboarding_skipped_option, false );
 	}
 }

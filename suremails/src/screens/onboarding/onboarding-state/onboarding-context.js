@@ -67,6 +67,7 @@ export const OnboardingProvider = ( { children } ) => {
 				},
 		  }
 		: {
+				hasSkippedStep: false,
 				safeGuard: {
 					activation: suremails?.contentGuardActiveStatus === 'yes',
 					showLeadForm: Boolean( suremails?.contentGuardPopupStatus ),

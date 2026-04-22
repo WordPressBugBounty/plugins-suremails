@@ -5,9 +5,11 @@ import { SureMailLogo } from '@assets/icons';
 import { XIcon } from 'lucide-react';
 import { __ } from '@wordpress/i18n';
 import { useOnboardingNavigation } from './hooks';
+import { getVisibleOnboardingRoutes } from './onboarding-routes-config';
 import {
 	OnboardingProvider,
 	ONBOARDING_SESSION_STORAGE_KEY,
+	useOnboardingState,
 } from './onboarding-state';
 import { useEffect, useLayoutEffect } from 'react';
 import './styles.css';
@@ -15,6 +17,8 @@ import './styles.css';
 
 const NavBar = () => {
 	const { getCurrentStepNumber, navigateToStep } = useOnboardingNavigation();
+	const [ onboardingState ] = useOnboardingState();
+	const visibleRoutes = getVisibleOnboardingRoutes( onboardingState );
 
 	return (
 		<Topbar className="p-5 bg-background-secondary">
@@ -32,14 +36,19 @@ const NavBar = () => {
 						type="inline"
 						variant="number"
 					>
-						{ Array.from( { length: 4 }, ( _, index ) => (
-							<ProgressSteps.Step
-								key={ index }
-								size="md"
-								onClick={ () => navigateToStep( index + 1 ) }
-								className="cursor-pointer hover:bg-background-secondary transition-colors duration-200"
-							/>
-						) ) }
+						{ Array.from(
+							{ length: Math.max( visibleRoutes.length - 1, 0 ) },
+							( _, index ) => (
+								<ProgressSteps.Step
+									key={ index }
+									size="md"
+									onClick={ () =>
+										navigateToStep( index + 1 )
+									}
+									className="cursor-pointer hover:bg-background-secondary transition-colors duration-200"
+								/>
+							)
+						) }
 					</ProgressSteps>
 				</Topbar.Item>
 			</Topbar.Middle>

@@ -134,14 +134,14 @@ class DeleteConnection extends Api_Base {
 	/**
 	 * Handle default and fallback connections after deletion.
 	 *
-	 * @param array $options     The connections options array (passed by reference).
-	 * @param array $deleted_conn The deleted connection's data.
-	 * @return array
+	 * @param array{connections: array<string, array<string, string|int|bool>>, default_connection: array{type: string, email: string, id: string, connection_title: string}, log_emails: string, delete_email_logs_after: string, email_simulation: string} $options     The connections options array.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                 $deleted_conn The deleted connection's data.
+	 * @return array{connections: array<string, array<string, string|int|bool>>, default_connection: array{type: string, email: string, id: string, connection_title: string}, log_emails: string, delete_email_logs_after: string, email_simulation: string}
 	 */
 	private function handle_default_and_fallback_connections( $options, $deleted_conn ) {
 		// Handle default connection.
 		if (
-			isset( $options['default_connection'] ) &&
+			isset( $options['default_connection'] ) && // @phpstan-ignore isset.offset
 			$options['default_connection']['id'] === $deleted_conn['id']
 		) {
 
@@ -156,8 +156,8 @@ class DeleteConnection extends Api_Base {
 	/**
 	 * Get the connection with the highest priority.
 	 *
-	 * @param array $connections The associative array of connections.
-	 * @return array The connection with the highest priority or an empty array.
+	 * @param array<string, array<string, string|int|bool>> $connections The associative array of connections.
+	 * @return array{type: string, email: string, id: string, connection_title: string} The connection with the highest priority or an empty array.
 	 */
 	private function get_highest_priority_connection( $connections ) {
 		if ( empty( $connections ) ) {
@@ -182,10 +182,10 @@ class DeleteConnection extends Api_Base {
 
 		if ( $first_connection ) {
 			return [
-				'type'             => $first_connection['type'],
-				'email'            => $first_connection['from_email'],
-				'id'               => $first_connection['id'],
-				'connection_title' => $first_connection['connection_title'],
+				'type'             => (string) ( $first_connection['type'] ?? '' ),
+				'email'            => (string) ( $first_connection['from_email'] ?? '' ),
+				'id'               => (string) ( $first_connection['id'] ?? '' ),
+				'connection_title' => (string) ( $first_connection['connection_title'] ?? '' ),
 			];
 		}
 

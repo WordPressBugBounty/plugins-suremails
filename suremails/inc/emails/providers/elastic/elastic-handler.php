@@ -28,7 +28,7 @@ class ElasticHandler implements ConnectionHandler {
 	/**
 	 * Connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
@@ -44,7 +44,7 @@ class ElasticHandler implements ConnectionHandler {
 	/**
 	 * Payload
 	 *
-	 * @var array
+	 * @var array<string, string|array<string, string|array<int|string, string|array<string, bool|string>>>>
 	 * @since 1.2.0
 	 */
 	protected $payload = [];
@@ -52,7 +52,7 @@ class ElasticHandler implements ConnectionHandler {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $connection_data Connection data.
+	 * @param array<string, string|int|bool> $connection_data Connection data.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -62,7 +62,7 @@ class ElasticHandler implements ConnectionHandler {
 	 * Get the payload for the Elastic Email API request.
 	 *
 	 * @since 1.2.0
-	 * @return array Payload.
+	 * @return array<string, string|array<string, string|array<int|string, string|array<string, bool|string>>>> Payload.
 	 */
 	public function get_payload() {
 		return $this->payload;
@@ -72,7 +72,7 @@ class ElasticHandler implements ConnectionHandler {
 	 * Get the headers for the Elastic Email API request.
 	 *
 	 * @param string $api_key API key.
-	 * @return array Headers.
+	 * @return array<string, string> Headers.
 	 * @since 1.2.0
 	 */
 	public function get_headers( $api_key ) {
@@ -105,7 +105,7 @@ class ElasticHandler implements ConnectionHandler {
 	/**
 	 * Authenticate the Elastic Email connection.
 	 *
-	 * @return array Authentication result.
+	 * @return array{success: bool, message: string, error_code: int}
 	 */
 	public function authenticate() {
 		if ( empty( $this->connection_data['api_key'] ) || empty( $this->connection_data['from_email'] ) ) {
@@ -126,46 +126,59 @@ class ElasticHandler implements ConnectionHandler {
 	/**
 	 * Send email using Elastic Email.
 	 *
-	 * @param array $atts Email attributes.
-	 * @param int   $log_id Log ID.
-	 * @param array $connection Connection data.
-	 * @param array $processed_data Processed email data.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts Email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id Log ID.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection Connection data.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data Processed email data.
 	 *
-	 * @return array Send result.
+	 * @return array{success: bool, message: string, send: bool}
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
 
 		try {
-			$this->set_content( $atts['message'], $processed_data['headers']['content_type'] );
+			/**
+			 * The email message body.
+			 *
+			 * @var string $message
+			 */
+			$message = $atts['message'] ?? '';
+			$this->set_content( $message, $processed_data['headers']['content_type'] );
 
 			if ( ! empty( $processed_data['attachments'] ) ) {
 				$this->set_attachments( $processed_data['attachments'] );
 			}
 
-			$this->set_subject( sanitize_text_field( $atts['subject'] ?? '' ) );
+			/**
+			 * The raw email subject.
+			 *
+			 * @var string $raw_subject
+			 */
+			$raw_subject = $atts['subject'] ?? '';
+			$this->set_subject( sanitize_text_field( $raw_subject ) );
 
 			$this->set_reply_to( $processed_data['headers']['reply_to'] );
 
-			$this->set_from( $connection['from_email'], $connection['from_name'] );
+			$this->set_from( (string) ( $connection['from_email'] ?? '' ), (string) ( $connection['from_name'] ?? '' ) );
 
-			$all_headers = $this->get_headers( $connection['api_key'] );
+			$api_key     = (string) ( $connection['api_key'] ?? '' );
+			$all_headers = $this->get_headers( $api_key );
 
 			foreach ( $all_headers as $key => $value ) {
 				$this->set_body_header( $key, $value );
 			}
 
-			$type = $connection['mail_type'] ?? 'transactional';
+			$type = (string) ( $connection['mail_type'] ?? 'transactional' );
 
 			$this->set_recipients(
 				[
-					'to'  => $processed_data['to'] ?? [],
-					'cc'  => $processed_data['headers']['cc'] ?? [],
-					'bcc' => $processed_data['headers']['bcc'] ?? [],
+					'to'  => $processed_data['to'],
+					'cc'  => $processed_data['headers']['cc'],
+					'bcc' => $processed_data['headers']['bcc'],
 				],
 				$type
 			);
 
-			$response = $this->send_api( $this->get_url( $type ), $this->get_headers( $connection['api_key'] ) );
+			$response = $this->send_api( $this->get_url( $type ), $this->get_headers( $api_key ) );
 
 			if ( is_wp_error( $response ) ) {
 				return [
@@ -230,7 +243,7 @@ class ElasticHandler implements ConnectionHandler {
 	/**
 	 * Set the attachments.
 	 *
-	 * @param array $attachments Attachments.
+	 * @param array<int, string> $attachments Attachments.
 	 * @since 1.2.0
 	 * @return void
 	 */
@@ -347,13 +360,13 @@ class ElasticHandler implements ConnectionHandler {
 	 *
 	 * @since 1.2.0
 	 *
-	 * @param array  $recipients Email recipients.
-	 * @param string $email_type Email type.
+	 * @param array{to: array<int, array{name: string, email: string}>, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>} $recipients Email recipients.
+	 * @param string                                                                                                                                                             $email_type Email type.
 	 * @return void
 	 */
 	public function set_recipients( $recipients, $email_type ) {
 
-		if ( empty( $recipients ) ) {
+		if ( empty( $recipients['to'] ) ) {
 			return;
 		}
 
@@ -394,7 +407,7 @@ class ElasticHandler implements ConnectionHandler {
 			$field = $recipient_mappings[ $type ];
 
 			foreach ( $emails as $email ) {
-				if ( ! isset( $email['email'] ) || ! filter_var( $email['email'], FILTER_VALIDATE_EMAIL ) ) {
+				if ( ! isset( $email['email'] ) || ! filter_var( $email['email'], FILTER_VALIDATE_EMAIL ) ) { // @phpstan-ignore isset.offset
 					continue;
 				}
 
@@ -416,7 +429,7 @@ class ElasticHandler implements ConnectionHandler {
 	 *
 	 * @since 1.2.0
 	 *
-	 * @param array $emails Reply To email addresses.
+	 * @param array<int, array{name: string, email: string}> $emails Reply To email addresses.
 	 * @return void
 	 */
 	public function set_reply_to( $emails ) {
@@ -450,7 +463,7 @@ class ElasticHandler implements ConnectionHandler {
 	/**
 	 * Get Elastic Email specific options.
 	 *
-	 * @return array Elastic Email specific options.
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, icon: string, display_name: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -468,7 +481,7 @@ class ElasticHandler implements ConnectionHandler {
 	/**
 	 * Get the specific schema fields for Elastic Email.
 	 *
-	 * @return array Elastic Email specific fields.
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [
@@ -514,7 +527,7 @@ class ElasticHandler implements ConnectionHandler {
 	 *
 	 * @since 1.2.0
 	 *
-	 * @param array $param Key=>value of what should be sent to a 3rd party API.
+	 * @param array<string, mixed> $param Key=>value of what should be sent to a 3rd party API.
 	 *
 	 * @internal param array $params
 	 * @return void
@@ -527,9 +540,9 @@ class ElasticHandler implements ConnectionHandler {
 	/**
 	 * Retrieve data from Elastic Email API using GET requests.
 	 *
-	 * @param string $url     The full API URL.
-	 * @param array  $headers The request headers.
-	 * @return array|WP_Error The decoded response data or a WP_Error on failure.
+	 * @param string                $url     The full API URL.
+	 * @param array<string, string> $headers The request headers.
+	 * @return array<string, string|int>|WP_Error The decoded response data or a WP_Error on failure.
 	 */
 	private function send_api( $url, array $headers ) {
 		$body = wp_json_encode( $this->get_payload() );

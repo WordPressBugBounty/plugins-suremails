@@ -9,9 +9,18 @@ import Title from '@components/title/title';
 
 // Constants moved to top level
 const INITIAL_FORM_STATE = {
-	first_name: '',
-	last_name: '',
-	email: '',
+	first_name:
+		window?.suremails?.contentGuardUserDetails?.first_name ||
+		window?.suremails?.currentUser?.firstName ||
+		'',
+	last_name:
+		window?.suremails?.contentGuardUserDetails?.last_name ||
+		window?.suremails?.currentUser?.lastName ||
+		'',
+	email:
+		window?.suremails?.contentGuardUserDetails?.email ||
+		window?.suremails?.currentUser?.email ||
+		'',
 };
 
 const INITIAL_LOADING_STATE = {
@@ -374,7 +383,7 @@ const SafeGuardSection = () => {
 
 	const handleActivateContentGuard = async ( value ) => {
 		try {
-			const response = await activateContentGuard();
+			const response = await activateContentGuard( value );
 			if ( response.success ) {
 				setActiveContentGuard( value );
 				toast.success(
@@ -432,7 +441,7 @@ const SafeGuardSection = () => {
 				</div>
 			) }
 			{ /* User Details Form Dialog */ }
-			{ !! window.suremails.contentGuardPopupStatus && (
+			{ !! window?.suremails?.contentGuardPopupStatus && (
 				<UserDetailsFormDialog
 					open={ open }
 					setOpen={ setOpen }

@@ -29,7 +29,7 @@ class SparkpostHandler implements ConnectionHandler {
 	/**
 	 * SparkPost connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
@@ -38,7 +38,7 @@ class SparkpostHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -52,13 +52,13 @@ class SparkpostHandler implements ConnectionHandler {
 	 *
 	 * @throws \Exception If the API key, domain, or from email is missing in the connection data.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code?: int}
 	 */
 	public function authenticate() {
 
-		$api_key    = sanitize_text_field( $this->connection_data['api_key'] ?? '' );
-		$from_email = sanitize_email( $this->connection_data['from_email'] ?? '' );
-		$region     = sanitize_text_field( $this->connection_data['region'] ?? '' );
+		$api_key    = sanitize_text_field( (string) ( $this->connection_data['api_key'] ?? '' ) );
+		$from_email = sanitize_email( (string) ( $this->connection_data['from_email'] ?? '' ) );
+		$region     = sanitize_text_field( (string) ( $this->connection_data['region'] ?? '' ) );
 
 		if ( empty( $api_key ) || empty( $from_email ) || empty( $region ) ) {
 			return [
@@ -84,17 +84,17 @@ class SparkpostHandler implements ConnectionHandler {
 	/**
 	 * Send email using SparkPost.
 	 *
-	 * @param array $atts The email attributes.
-	 * @param int   $log_id The log ID.
-	 * @param array $connection The connection details.
-	 * @param array $processed_data The processed email data.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The log ID.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data.
 	 *
 	 * @throws \Exception If the API key is missing in the connection data.
-	 * @return array The result of the sending attempt.
+	 * @return array{success: bool, message: string, send: bool}
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
 
-		$api_key = sanitize_text_field( $connection['api_key'] ?? '' );
+		$api_key = sanitize_text_field( (string) ( $connection['api_key'] ?? '' ) );
 
 		if ( empty( $api_key ) ) {
 			return [
@@ -104,34 +104,42 @@ class SparkpostHandler implements ConnectionHandler {
 			];
 		}
 
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
+		$message       = $atts['message'] ?? '';
 		$email_payload = [
 			'content'    => [
 				'from'    => [
-					'email' => $connection['from_email'] ?? '',
-					'name'  => $connection['from_name'] ?? '',
+					'email' => (string) ( $connection['from_email'] ?? '' ),
+					'name'  => (string) ( $connection['from_name'] ?? '' ),
 				],
-				'subject' => sanitize_text_field( $processed_data['subject'] ?? '' ),
-				'text'    => wp_strip_all_tags( $atts['message'] ?? '' ),
+				'subject' => sanitize_text_field( $processed_data['subject'] ),
+				'text'    => wp_strip_all_tags( $message ),
 			],
 			'recipients' => $this->get_recipients( $processed_data ),
 		];
 
 		$content_type = $processed_data['headers']['content_type'];
 		if ( ! empty( $content_type ) && ProviderHelper::is_html( $content_type ) ) {
-			$email_payload['content']['html'] = $atts['message'] ?? '';
+			$email_payload['content']['html'] = $message;
 		}
 
 		$reply_to = $processed_data['headers']['reply_to'];
 		if ( ! empty( $reply_to ) ) {
-			$reply_to                             = reset( $processed_data['headers']['reply_to'] );
-			$email_payload['content']['reply_to'] = $this->process_reply_to_recipients( $reply_to );
+			$reply_to_first = reset( $processed_data['headers']['reply_to'] );
+			if ( is_array( $reply_to_first ) ) {
+				$email_payload['content']['reply_to'] = $this->process_reply_to_recipients( $reply_to_first );
+			}
 		}
 
 		if ( ! empty( $processed_data['headers']['cc'] ) ) {
 			$cc = [];
 			foreach ( $processed_data['headers']['cc'] as $recipient ) {
-				if ( is_array( $recipient ) ) {
-					$email = isset( $recipient['email'] ) ? sanitize_email( $recipient['email'] ) : '';
+				if ( is_array( $recipient ) ) { // @phpstan-ignore function.alreadyNarrowedType
+					$email = isset( $recipient['email'] ) ? sanitize_email( $recipient['email'] ) : ''; // @phpstan-ignore isset.offset
 					if ( ! empty( $email ) ) {
 						$cc[] = $email;
 					}
@@ -154,7 +162,7 @@ class SparkpostHandler implements ConnectionHandler {
 			];
 		}
 
-		$region  = ! empty( $connection['region'] ) ? sanitize_text_field( $connection['region'] ) : 'US';
+		$region  = ! empty( $connection['region'] ) ? sanitize_text_field( (string) ( $connection['region'] ) ) : 'US';
 		$api_url = 'EU' === strtoupper( $region ) ? self::API_BASE_EU : self::API_BASE_US;
 
 		$response = wp_safe_remote_post(
@@ -207,7 +215,7 @@ class SparkpostHandler implements ConnectionHandler {
 	/**
 	 * Process reply-to recipients array.
 	 *
-	 * @param array $recipients Array of recipients.
+	 * @param array{email?: string, name?: string} $recipients Array of recipients.
 	 * @return string
 	 */
 	public function process_reply_to_recipients( $recipients ) {
@@ -223,9 +231,9 @@ class SparkpostHandler implements ConnectionHandler {
 	/**
 	 * Get the recipients for the email.
 	 *
-	 * @param array $processed_data The processed email data.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>}} $processed_data The processed email data.
 	 *
-	 * @return array The recipients for the email.
+	 * @return array<int, array{address: array{email: string, header_to?: string}}>
 	 */
 	public function get_recipients( $processed_data ) {
 
@@ -233,17 +241,17 @@ class SparkpostHandler implements ConnectionHandler {
 		$cc  = [];
 		$bcc = [];
 
-		$to_emails = $processed_data['to'] ?? [];
+		$to_emails = $processed_data['to'];
 		if ( ! empty( $to_emails ) ) {
 			$to = self::process_recipients( $to_emails );
 		}
 
-		$cc_emails = $processed_data['headers']['cc'] ?? [];
+		$cc_emails = $processed_data['headers']['cc'];
 		if ( ! empty( $cc_emails ) ) {
 			$cc = $this->process_recipients( $cc_emails, $to_emails, true );
 		}
 
-		$bcc_emails = $processed_data['headers']['bcc'] ?? [];
+		$bcc_emails = $processed_data['headers']['bcc'];
 		if ( ! empty( $bcc_emails ) ) {
 			$bcc = $this->process_recipients( $bcc_emails, $to_emails, true );
 		}
@@ -254,7 +262,7 @@ class SparkpostHandler implements ConnectionHandler {
 	/**
 	 * Get the SparkPost connection options.
 	 *
-	 * @return array The SparkPost connection options.
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, icon: string, display_name: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -272,7 +280,7 @@ class SparkpostHandler implements ConnectionHandler {
 	/**
 	 * Get the specific fields for the SparkPost connection.
 	 *
-	 * @return array The specific fields for the SparkPost connection.
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [
@@ -307,17 +315,17 @@ class SparkpostHandler implements ConnectionHandler {
 	/**
 	 * Process recipients array.
 	 *
-	 * @param array $recipients Array of recipients.
-	 * @param array $to_mail Array of to email addresses.
-	 * @param bool  $is_cc_bcc Whether the recipients are CC/BCC.
+	 * @param array<int, array{name: string, email: string}> $recipients Array of recipients.
+	 * @param array<int, array{name: string, email: string}> $to_mail Array of to email addresses.
+	 * @param bool                                           $is_cc_bcc Whether the recipients are CC/BCC.
 	 *
-	 * @return array
+	 * @return array<int, array{address: array{email: string, header_to?: string}}>
 	 */
 	public static function process_recipients( $recipients, $to_mail = [], $is_cc_bcc = false ) {
 		$result = [];
 		foreach ( $recipients as $recipient ) {
-			if ( is_array( $recipient ) ) {
-				$email = isset( $recipient['email'] ) ? sanitize_email( $recipient['email'] ) : '';
+			if ( is_array( $recipient ) ) { // @phpstan-ignore function.alreadyNarrowedType
+				$email = isset( $recipient['email'] ) ? sanitize_email( $recipient['email'] ) : ''; // @phpstan-ignore isset.offset
 
 				if ( ! empty( $email ) ) {
 					$address = [
@@ -340,8 +348,8 @@ class SparkpostHandler implements ConnectionHandler {
 	/**
 	 * Process attachments by reading the file, encoding its contents in base64 and preparing the attachment array.
 	 *
-	 * @param array $attachments Array of attachment file paths.
-	 * @return array
+	 * @param array<int, string> $attachments Array of attachment file paths.
+	 * @return array<int, array{name: string|false, data: string|false, type: string|false}>
 	 */
 	private function get_attachments( $attachments ) {
 		$result = [];

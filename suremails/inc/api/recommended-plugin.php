@@ -150,7 +150,7 @@ class RecommendedPlugin extends Api_Base {
 	/**
 	 * Get recommended plugins sequence.
 	 *
-	 * @return array
+	 * @return array<int, string>
 	 * @since 1.9.0
 	 */
 	public static function get_recommended_plugins_sequence() {

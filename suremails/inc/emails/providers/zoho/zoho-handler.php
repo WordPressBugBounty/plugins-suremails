@@ -34,7 +34,7 @@ class ZohoHandler implements ConnectionHandler {
 	/**
 	 * Zoho connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	private $connection_data;
 
@@ -43,7 +43,7 @@ class ZohoHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		// Ensure our connection data is available.
@@ -55,7 +55,7 @@ class ZohoHandler implements ConnectionHandler {
 	 *
 	 * This method handles the entire OAuth flow using direct API calls.
 	 *
-	 * @return array
+	 * @return array<string, bool|int|string>
 	 */
 	public function authenticate() {
 		$result = [
@@ -109,14 +109,14 @@ class ZohoHandler implements ConnectionHandler {
 
 		// Merge in token data and timestamps.
 		$result                 = array_merge( $result, $tokens );
-		$result['expire_stamp'] = time() + $tokens['expires_in'];
+		$result['expire_stamp'] = time() + (int) $tokens['expires_in'];
 		$result['success']      = true;
 		$result['message']      = __( 'Successfully authenticated with Zoho Mail.', 'suremails' );
 
 		$this->connection_data['access_token'] = $tokens['access_token'];
 		$account_details                       = $this->get_account_details();
 
-		if ( empty( $account_details ) || ! isset( $account_details['account_id'] ) || ! isset( $account_details['from_email'] ) ) {
+		if ( empty( $account_details ) || empty( $account_details['account_id'] ) || empty( $account_details['from_email'] ?? '' ) ) {
 			$result['message'] = __( 'Failed to get Zoho account details.', 'suremails' );
 			return $result;
 		}
@@ -128,17 +128,17 @@ class ZohoHandler implements ConnectionHandler {
 	/**
 	 * Send email using Zoho Mail via direct API call.
 	 *
-	 * @param array $atts             Email attributes.
-	 * @param int   $log_id           Log ID.
-	 * @param array $connection_data  Connection data.
-	 * @param array $processed_data   Processed email data.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts Email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id Log ID.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection_data Connection data.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data Processed email data.
 	 *
-	 * @return array The result of the sending attempt.
+	 * @return array{success: bool, message: string, email_id?: string}
 	 */
 	public function send( array $atts, $log_id, array $connection_data, $processed_data ) {
 
 		$response = $this->check_tokens();
-		if ( isset( $response['success'] ) && $response['success'] === false ) {
+		if ( $response['success'] === false ) {
 			return $response;
 		}
 
@@ -161,20 +161,20 @@ class ZohoHandler implements ConnectionHandler {
 			$from = $from_email;
 		}
 
-		$content_type = $processed_data['headers']['content_type'] ?? '';
+		$content_type = $processed_data['headers']['content_type'];
 		$is_html      = ProviderHelper::is_html( $content_type );
 		$mail_format  = $is_html ? 'html' : 'plaintext';
 
 		// Zoho Mail API expects specific payload format.
 		$email_payload = [
 			'fromAddress' => $from,
-			'toAddress'   => $this->process_recipients( $processed_data['to'] ?? [] ),
-			'subject'     => sanitize_text_field( $processed_data['subject'] ?? '' ),
+			'toAddress'   => $this->process_recipients( $processed_data['to'] ),
+			'subject'     => sanitize_text_field( $processed_data['subject'] ),
 			'content'     => $atts['message'] ?? '',
 			'mailFormat'  => $mail_format,
 		];
 
-		$cc_emails = $processed_data['headers']['cc'] ?? [];
+		$cc_emails = $processed_data['headers']['cc'];
 		if ( ! empty( $cc_emails ) ) {
 			$cc_addresses = $this->process_recipients( $cc_emails );
 			if ( ! empty( $cc_addresses ) ) {
@@ -182,7 +182,7 @@ class ZohoHandler implements ConnectionHandler {
 			}
 		}
 
-		$bcc_emails = $processed_data['headers']['bcc'] ?? [];
+		$bcc_emails = $processed_data['headers']['bcc'];
 		if ( ! empty( $bcc_emails ) ) {
 			$bcc_addresses = $this->process_recipients( $bcc_emails );
 			if ( ! empty( $bcc_addresses ) ) {
@@ -247,8 +247,8 @@ class ZohoHandler implements ConnectionHandler {
 	/**
 	 * Get Zoho authorization URL.
 	 *
-	 * @param array $params The parameters passed in the API request.
-	 * @return array Returns the Zoho auth URL or an error response.
+	 * @param array{client_id?: string, client_secret?: string, region?: string, redirect_url?: string} $params The parameters passed in the API request.
+	 * @return array{auth_url?: string, error?: string}
 	 */
 	public static function get_auth_url( $params ) {
 		$client_id     = isset( $params['client_id'] ) ? sanitize_text_field( $params['client_id'] ) : '';
@@ -281,7 +281,7 @@ class ZohoHandler implements ConnectionHandler {
 	/**
 	 * Get the Zoho connection options.
 	 *
-	 * @return array The Zoho connection options.
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, icon: string, display_name: string, provider_type: string, field_sequence: array<int, string>, help_texts: array<string, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -316,7 +316,7 @@ class ZohoHandler implements ConnectionHandler {
 	/**
 	 * Get the Zoho connection specific fields.
 	 *
-	 * @return array The Zoho specific fields.
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		$redirect_uri = Utils::get_admin_url();
@@ -478,11 +478,11 @@ class ZohoHandler implements ConnectionHandler {
 	/**
 	 * Make an API call.
 	 *
-	 * @param string $url   The URL to call.
-	 * @param array  $body  The body arguments.
-	 * @param string $type  The HTTP method to use.
+	 * @param string                         $url  The URL to call.
+	 * @param array<string, string|int|bool> $body The body arguments.
+	 * @param string                         $type The HTTP method to use.
 	 *
-	 * @return array|WP_Error The API response.
+	 * @return array<string, string|int>|WP_Error The API response.
 	 */
 	private function api_call( $url, $body = [], $type = 'GET' ) {
 		$args = [
@@ -540,7 +540,7 @@ class ZohoHandler implements ConnectionHandler {
 	 *
 	 * @since 1.9.0
 	 *
-	 * @return array The result of the token check.
+	 * @return array{success: bool, message: string}
 	 */
 	private function check_tokens() {
 		$result = [
@@ -556,8 +556,8 @@ class ZohoHandler implements ConnectionHandler {
 			return $result;
 		}
 
-		if ( time() > $this->connection_data['expire_stamp'] - 500 ) {
-			$new = $this->client_refresh_token( $this->connection_data['refresh_token'] );
+		if ( time() > (int) $this->connection_data['expire_stamp'] - 500 ) {
+			$new = $this->client_refresh_token( (string) $this->connection_data['refresh_token'] );
 			if ( is_wp_error( $new ) ) {
 				$result['message'] = sprintf(
 					// translators: %s: Error message.
@@ -574,7 +574,7 @@ class ZohoHandler implements ConnectionHandler {
 
 			// Update stored tokens.
 			$this->connection_data['access_token']  = $new['access_token'];
-			$this->connection_data['expire_stamp']  = time() + $new['expires_in'];
+			$this->connection_data['expire_stamp']  = time() + (int) $new['expires_in'];
 			$this->connection_data['expires_in']    = $new['expires_in'];
 			$this->connection_data['refresh_token'] = $new['refresh_token'] ?? $this->connection_data['refresh_token'];
 			Settings::instance()->update_connection( $this->connection_data );
@@ -590,7 +590,7 @@ class ZohoHandler implements ConnectionHandler {
 	 * Refresh the access token using the refresh token.
 	 *
 	 * @param string $refresh_token The refresh token.
-	 * @return array|WP_Error The new token data.
+	 * @return array<string, string|int>|WP_Error The new token data.
 	 */
 	private function client_refresh_token( $refresh_token ) {
 		$body = [
@@ -605,7 +605,7 @@ class ZohoHandler implements ConnectionHandler {
 	/**
 	 * Get a new access token using the refresh token.
 	 *
-	 * @return array The new token data.
+	 * @return array<string, string|int|bool>
 	 */
 	private function get_new_token() {
 		$refresh_token = $this->connection_data['refresh_token'] ?? '';
@@ -616,7 +616,7 @@ class ZohoHandler implements ConnectionHandler {
 			];
 		}
 
-		$tokens = $this->client_refresh_token( $refresh_token );
+		$tokens = $this->client_refresh_token( (string) $refresh_token );
 		if ( is_wp_error( $tokens ) ) {
 			return [
 				'success' => false,
@@ -630,7 +630,7 @@ class ZohoHandler implements ConnectionHandler {
 	 * Get the Zoho account details.
 	 * Following WP Mail SMTP Pro implementation pattern.
 	 *
-	 * @return array|false The account details array with 'account_id' and 'from_email' or false on failure.
+	 * @return array{account_id: string, from_email?: string}|false The account details array with 'account_id' and 'from_email' or false on failure.
 	 */
 	private function get_account_details() {
 		// Check if access token is available.
@@ -684,8 +684,8 @@ class ZohoHandler implements ConnectionHandler {
 	 * Process attachments by uploading them to Zoho API first, then preparing the attachment array.
 	 * Following Zoho Mail API requirements for attachment handling.
 	 *
-	 * @param array $attachments Array of attachment file paths.
-	 * @return array
+	 * @param array<int, string> $attachments Array of attachment file paths.
+	 * @return array<int, array<string, string>>
 	 */
 	private function get_attachments( $attachments ) {
 		$result      = [];
@@ -736,7 +736,7 @@ class ZohoHandler implements ConnectionHandler {
 	/**
 	 * Process recipients array.
 	 *
-	 * @param array $recipients Array of recipients (each can be array with 'email' and 'name' keys or string email).
+	 * @param array<int, array{name: string, email: string}> $recipients Array of recipients (each can be array with 'email' and 'name' keys or string email).
 	 *
 	 * @return string Comma-separated list of formatted email addresses.
 	 */
@@ -744,8 +744,8 @@ class ZohoHandler implements ConnectionHandler {
 		$result = [];
 		foreach ( $recipients as $recipient ) {
 			if ( is_array( $recipient ) ) {
-				$email = isset( $recipient['email'] ) ? sanitize_email( $recipient['email'] ) : '';
-				$name  = $recipient['name'] ?? '';
+				$email = sanitize_email( $recipient['email'] );
+				$name  = $recipient['name'];
 
 				if ( empty( $email ) ) {
 					continue;

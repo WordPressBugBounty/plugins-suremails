@@ -1,7 +1,15 @@
 import React, { useRef, useState } from 'react';
 import { Divider, Header } from './components';
 import { __, sprintf } from '@wordpress/i18n';
-import { Container, Input, Label, Switch, toast } from '@bsf/force-ui';
+import { createInterpolateElement } from '@wordpress/element';
+import {
+	Checkbox,
+	Container,
+	Input,
+	Label,
+	Switch,
+	toast,
+} from '@bsf/force-ui';
 import { cn } from '@utils/utils';
 import NavigationButtons from './navigation-buttons';
 import { useOnboardingNavigation, useFormValidation } from './hooks';
@@ -9,12 +17,27 @@ import { useOnboardingState } from './onboarding-state';
 import { ChevronRight, Sparkles } from 'lucide-react';
 import { z } from 'zod';
 import { activateContentGuard, saveUserDetails } from '@api/settings';
+import { setOnboardingCompletionStatus } from '@api/onboarding';
 
 // Constants for the component
 const INITIAL_FORM_STATE = {
-	first_name: '',
-	last_name: '',
-	email: '',
+	first_name:
+		window?.suremails?.contentGuardUserDetails?.first_name ||
+		window?.suremails?.currentUser?.firstName ||
+		'',
+	last_name:
+		window?.suremails?.contentGuardUserDetails?.last_name ||
+		window?.suremails?.currentUser?.lastName ||
+		'',
+	email:
+		window?.suremails?.contentGuardUserDetails?.email ||
+		window?.suremails?.currentUser?.email ||
+		'',
+	agree_to_terms:
+		typeof window?.suremails?.contentGuardUserDetails?.agree_to_terms ===
+		'boolean'
+			? window?.suremails?.contentGuardUserDetails?.agree_to_terms
+			: true,
 };
 
 // Form validation schema using Zod
@@ -99,6 +122,37 @@ const SafeGuardForm = ( {
 					</div>
 				) ) }
 			</Container>
+			<div className="mt-3">
+				<Checkbox
+					name="agree_to_terms"
+					checked={ Boolean( formData.agree_to_terms ) }
+					size="sm"
+					onChange={ handleChange( 'agree_to_terms' ) }
+					disabled={ isLoading }
+					label={ {
+						heading: createInterpolateElement(
+							__(
+								'Stay in the loop and help shape SureMail! Get feature updates, and help us build a better SureMail by sharing how you use the plugin. <a>Privacy Policy</a>',
+								'suremails'
+							),
+							{
+								a: (
+									<a
+										href={
+											window?.suremails?.privacyPolicyURL
+										}
+										target="_blank"
+										rel="noopener noreferrer"
+										className="sm-consent ring-0"
+									>
+										{ __( 'Privacy Policy', 'suremails' ) }
+									</a>
+								),
+							}
+						),
+					} }
+				/>
+			</div>
 		</>
 	);
 };
@@ -131,7 +185,8 @@ const SafeGuardActivation = ( { handleActivateContentGuard } ) => {
 };
 
 const SafeGuard = () => {
-	const [ { safeGuard }, setState ] = useOnboardingState();
+	const [ { safeGuard, hasSkippedStep = false }, setState ] =
+		useOnboardingState();
 	const { navigateToNextRoute, navigateToPreviousRoute } =
 		useOnboardingNavigation();
 	const [ isLoading, setIsLoading ] = useState( false );
@@ -175,7 +230,7 @@ const SafeGuard = () => {
 	// Handles content guard activation
 	const handleActivateContentGuard = async ( value ) => {
 		try {
-			const response = await activateContentGuard();
+			const response = await activateContentGuard( value );
 			if ( response.success ) {
 				setState( {
 					safeGuard: {
@@ -209,24 +264,36 @@ const SafeGuard = () => {
 	// Handles saving user details and activating content guard
 	const handleSaveUserDetailsAndActivate = async ( skip = false ) => {
 		if ( isLoading ) {
-			return;
+			return false;
 		}
 
-		if ( ! skip ) {
+		const shouldSkip = skip || ! formData.agree_to_terms;
+
+		if ( ! shouldSkip ) {
 			// Use the validateForm function from the hook
 			const isValid = validateForm();
 			if ( ! isValid ) {
-				return;
+				return false;
 			}
 		}
 
 		setIsLoading( true );
 		try {
+			const payload = shouldSkip
+				? {
+						skip: 'yes',
+						agree_to_terms: false,
+				  }
+				: {
+						...formData,
+						skip: 'no',
+						agree_to_terms: true,
+				  };
+
 			await saveUserDetails( {
-				...formData,
-				skip: skip ? 'yes' : 'no',
+				...payload,
 			} );
-			const response = await activateContentGuard();
+			const response = await activateContentGuard( true );
 			if ( response.success ) {
 				toast.success(
 					__( 'Reputation Shield activated', 'suremails' ),
@@ -238,6 +305,7 @@ const SafeGuard = () => {
 					}
 				);
 				setState( {
+					hasSkippedStep: shouldSkip ? true : hasSkippedStep,
 					safeGuard: {
 						...safeGuard,
 						activation: true,
@@ -248,15 +316,46 @@ const SafeGuard = () => {
 				if ( window.suremails ) {
 					window.suremails.contentGuardPopupStatus = false;
 					window.suremails.contentGuardActiveStatus = 'yes';
+					window.suremails.contentGuardUserDetails = {
+						...( window.suremails.contentGuardUserDetails || {} ),
+						...payload,
+					};
 				}
+
+				return true;
 			}
 		} catch ( error ) {
 			toast.error(
 				error.message ||
 					__( 'Error Activating Reputation Shield', 'suremails' )
 			);
+			return false;
 		} finally {
 			setIsLoading( false );
+		}
+
+		return false;
+	};
+
+	// Mark onboarding as complete in the backend.
+	const updateOnboardingCompletionStatus = async ( skipped = false ) => {
+		if ( !! window?.suremails?.onboardingCompleted ) {
+			return;
+		}
+		try {
+			await setOnboardingCompletionStatus( { skipped } );
+		} catch ( error ) {
+			toast.error(
+				error?.message ?? __( 'Something went wrong', 'suremails' ),
+				! error?.message
+					? {
+							description: __(
+								'An error occurred while setting the onboarding status.',
+								'suremails'
+							),
+					  }
+					: {}
+			);
 		}
 	};
 
@@ -264,11 +363,26 @@ const SafeGuard = () => {
 	const handleActivation = async () => {
 		if ( ! safeGuard?.activation && safeGuard?.showLeadForm ) {
 			// If not activated, initiate the save user details and activate process
-			await handleSaveUserDetailsAndActivate( false );
+			const isActivated = await handleSaveUserDetailsAndActivate(
+				! formData.agree_to_terms
+			);
+			if ( isActivated ) {
+				await updateOnboardingCompletionStatus( hasSkippedStep );
+				navigateToNextRoute();
+			}
 			return;
 		}
 
-		// If already activated, navigate to next step
+		// If already activated, mark complete and navigate to done
+		await updateOnboardingCompletionStatus( hasSkippedStep );
+		navigateToNextRoute();
+	};
+
+	const handleSkip = async () => {
+		setState( {
+			hasSkippedStep: true,
+		} );
+		await updateOnboardingCompletionStatus( true );
 		navigateToNextRoute();
 	};
 
@@ -330,7 +444,7 @@ const SafeGuard = () => {
 					iconPosition: ! isFirstTimeActivation ? 'right' : 'left',
 				} }
 				skipProps={ {
-					onClick: navigateToNextRoute,
+					onClick: handleSkip,
 					text: __( 'Skip', 'suremails' ),
 				} }
 			/>

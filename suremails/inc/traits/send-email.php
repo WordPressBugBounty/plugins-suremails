@@ -22,11 +22,11 @@ trait SendEmail {
 	 *
 	 * @since 0.0.1
 	 *
-	 * @param string           $to          The email address to send to.
-	 * @param string           $subject     The email subject.
-	 * @param string           $message     The email message.
-	 * @param string|array     $headers     The email headers.
-	 * @param array<int,mixed> $attachments The email attachments.
+	 * @param string                    $to          The email address to send to.
+	 * @param string                    $subject     The email subject.
+	 * @param string                    $message     The email message.
+	 * @param string|array<int, string> $headers     The email headers.
+	 * @param array<int,mixed>          $attachments The email attachments.
 	 * @return bool|null
 	 */
 	public static function send( $to, $subject, $message, $headers, $attachments ) {

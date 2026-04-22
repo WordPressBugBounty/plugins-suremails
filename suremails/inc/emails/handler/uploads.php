@@ -33,8 +33,8 @@ class Uploads {
 	 *
 	 * @since 1.5.0
 	 *
-	 * @param array $attachments List of attachment information.
-	 * @return array Modified attachment list.
+	 * @param array<int, string> $attachments List of attachment information.
+	 * @return array<int, string> Modified attachment list.
 	 */
 	public function handle_attachments( $attachments ) {
 		return array_map(
@@ -60,7 +60,7 @@ class Uploads {
 	 *
 	 * @since 1.5.0
 	 *
-	 * @return array|WP_Error Array with 'path' and 'url' or an error.
+	 * @return array{path: string, url: string}|WP_Error Array with 'path' and 'url' or an error.
 	 */
 	public static function get_suremails_base_dir() {
 		$upload_info = wp_upload_dir();
@@ -186,6 +186,9 @@ class Uploads {
 		if ( empty( $wp_filesystem ) ) {
 			WP_Filesystem();
 		}
+		if ( ! is_object( $wp_filesystem ) || ! method_exists( $wp_filesystem, 'put_contents' ) ) {
+			return false;
+		}
 		$result = $wp_filesystem->put_contents( $index, '' );
 		return $result !== false;
 	}
@@ -258,6 +261,9 @@ class Uploads {
 		if ( empty( $wp_filesystem ) ) {
 			WP_Filesystem();
 		}
+		if ( ! is_object( $wp_filesystem ) || ! method_exists( $wp_filesystem, 'put_contents' ) ) {
+			return false;
+		}
 
 		$result = $wp_filesystem->put_contents( $dest, $content );
 		return $result !== false;
@@ -304,6 +310,9 @@ exit;
 		global $wp_filesystem;
 		if ( empty( $wp_filesystem ) ) {
 			WP_Filesystem();
+		}
+		if ( ! is_object( $wp_filesystem ) || ! method_exists( $wp_filesystem, 'put_contents' ) ) {
+			return false;
 		}
 
 		$result = $wp_filesystem->put_contents( $dest, $content );
@@ -353,6 +362,9 @@ auto_append_file ='
 		global $wp_filesystem;
 		if ( empty( $wp_filesystem ) ) {
 			WP_Filesystem();
+		}
+		if ( ! is_object( $wp_filesystem ) || ! method_exists( $wp_filesystem, 'put_contents' ) ) {
+			return false;
 		}
 
 		$result = $wp_filesystem->put_contents( $dest, $content );
@@ -501,6 +513,9 @@ auto_append_file ='
 		global $wp_filesystem;
 		if ( empty( $wp_filesystem ) ) {
 			WP_Filesystem();
+		}
+		if ( ! is_object( $wp_filesystem ) || ! method_exists( $wp_filesystem, 'put_contents' ) ) {
+			return false;
 		}
 
 		$result = $wp_filesystem->put_contents( $new_path, $content, FS_CHMOD_FILE );

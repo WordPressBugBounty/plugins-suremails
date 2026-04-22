@@ -135,18 +135,16 @@ class SetSettings extends Api_Base {
 		// Sanitize and update the settings.
 
 		// Update default_connection if necessary.
-		if ( isset( $default_connection['type'], $default_connection['email'], $default_connection['id'] ) ) {
-			$sanitized_default = [
-				'type'             => sanitize_text_field( $default_connection['type'] ),
-				'email'            => sanitize_email( $default_connection['email'] ),
-				'id'               => sanitize_text_field( $default_connection['id'] ),
-				'connection_title' => sanitize_text_field( $default_connection['connection_title'] ),
-			];
+		$sanitized_default = [
+			'type'             => sanitize_text_field( $default_connection['type'] ),
+			'email'            => sanitize_email( $default_connection['email'] ),
+			'id'               => sanitize_text_field( $default_connection['id'] ),
+			'connection_title' => sanitize_text_field( $default_connection['connection_title'] ?? '' ),
+		];
 
-			if ( $options['default_connection'] !== $sanitized_default ) {
-				$options['default_connection'] = $sanitized_default;
-				$is_updated                    = true;
-			}
+		if ( $options['default_connection'] !== $sanitized_default ) {
+			$options['default_connection'] = $sanitized_default;
+			$is_updated                    = true;
 		}
 
 		// Update log_emails if provided.
@@ -236,7 +234,7 @@ class SetSettings extends Api_Base {
 	/**
 	 * Updates the miscellaneous settings.
 	 *
-	 * @param array $settings The settings to update.
+	 * @param array<string, string> $settings The settings to update.
 	 * @return void
 	 */
 	private function update_misc_settings( $settings ) {

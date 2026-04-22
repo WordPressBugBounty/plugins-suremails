@@ -40,7 +40,7 @@ class MailjetHandler implements ConnectionHandler {
 	/**
 	 * Mailjet connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 	/**
@@ -48,7 +48,7 @@ class MailjetHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -60,7 +60,7 @@ class MailjetHandler implements ConnectionHandler {
 	 * Since Mailjet does not provide a direct authentication endpoint, this function
 	 * simply saves the connection data and returns a success message.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code?: int}
 	 */
 	public function authenticate() {
 
@@ -81,12 +81,12 @@ class MailjetHandler implements ConnectionHandler {
 	/**
 	 * Send email using Mailjet.
 	 *
-	 * @param array $atts Email attributes.
-	 * @param int   $log_id Log ID.
-	 * @param array $connection Connection data.
-	 * @param array $processed_data Processed email data.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts Email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id Log ID.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection Connection data.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data Processed email data.
 	 *
-	 * @return array The result of the sending attempt.
+	 * @return array{success: bool, message: string, send: bool}
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
 
@@ -101,37 +101,45 @@ class MailjetHandler implements ConnectionHandler {
 			];
 		}
 
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
+		$message       = $atts['message'] ?? '';
 		$email_payload = [
 			'Messages' => [
 				[
 					'From'     => [
-						'Email' => $connection['from_email'] ?? '',
-						'Name'  => $connection['from_name'] ?? '',
+						'Email' => (string) ( $connection['from_email'] ?? '' ),
+						'Name'  => (string) ( $connection['from_name'] ?? '' ),
 					],
-					'To'       => $this->process_recipients( $processed_data['to'] ?? [] ),
-					'Subject'  => sanitize_text_field( $processed_data['subject'] ?? '' ),
-					'TextPart' => wp_strip_all_tags( $atts['message'] ?? '' ),
+					'To'       => $this->process_recipients( $processed_data['to'] ),
+					'Subject'  => sanitize_text_field( $processed_data['subject'] ),
+					'TextPart' => wp_strip_all_tags( $message ),
 				],
 			],
 		];
 
 		$content_type = $processed_data['headers']['content_type'];
 		if ( ! empty( $content_type ) && ProviderHelper::is_html( $content_type ) ) {
-			$email_payload['Messages'][0]['HTMLPart'] = $atts['message'];
+			$email_payload['Messages'][0]['HTMLPart'] = $message;
 		}
 
 		$reply_to = $processed_data['headers']['reply_to'];
 		if ( ! empty( $reply_to ) ) {
-			$reply_to                                = reset( $processed_data['headers']['reply_to'] );
-			$email_payload['Messages'][0]['ReplyTo'] = $this->process_reply_to_recipients( $reply_to );
+			$reply_to_first = reset( $processed_data['headers']['reply_to'] );
+			if ( is_array( $reply_to_first ) ) {
+				$email_payload['Messages'][0]['ReplyTo'] = $this->process_reply_to_recipients( $reply_to_first );
+			}
 		}
 
-		$cc_emails = $processed_data['headers']['cc'] ?? [];
+		$cc_emails = $processed_data['headers']['cc'];
 		if ( ! empty( $cc_emails ) ) {
 			$email_payload['Messages'][0]['Cc'] = $this->process_recipients( $cc_emails );
 		}
 
-		$bcc_emails = $processed_data['headers']['bcc'] ?? [];
+		$bcc_emails = $processed_data['headers']['bcc'];
 		if ( ! empty( $bcc_emails ) ) {
 			$email_payload['Messages'][0]['Bcc'] = $this->process_recipients( $bcc_emails );
 		}
@@ -195,7 +203,7 @@ class MailjetHandler implements ConnectionHandler {
 	/**
 	 * Get the Mailjet connection options.
 	 *
-	 * @return array The Mailjet connection options.
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, icon: string, display_name: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -213,7 +221,7 @@ class MailjetHandler implements ConnectionHandler {
 	/**
 	 * Get the specific schema fields for Mailjet.
 	 *
-	 * @return array The specific schema fields for Mailjet.
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [
@@ -239,15 +247,15 @@ class MailjetHandler implements ConnectionHandler {
 	/**
 	 * Process recipients array.
 	 *
-	 * @param array $recipients Array of recipients.
-	 * @return array
+	 * @param array<int, array{name: string, email: string}|string> $recipients Array of recipients.
+	 * @return array<int, array{Email: string, Name?: string}>
 	 */
 	public function process_recipients( $recipients ) {
 		$result = [];
 		foreach ( $recipients as $recipient ) {
 			if ( is_array( $recipient ) ) {
-				$email = isset( $recipient['email'] ) ? sanitize_email( $recipient['email'] ) : ( isset( $recipient['from_email'] ) ? sanitize_email( $recipient['from_email'] ) : '' );
-				$name  = isset( $recipient['name'] ) ? sanitize_text_field( $recipient['name'] ) : '';
+				$email = isset( $recipient['email'] ) ? sanitize_email( $recipient['email'] ) : ( isset( $recipient['from_email'] ) ? sanitize_email( $recipient['from_email'] ) : '' ); // @phpstan-ignore-line
+				$name  = isset( $recipient['name'] ) ? sanitize_text_field( $recipient['name'] ) : ''; // @phpstan-ignore isset.offset
 
 				if ( ! empty( $email ) ) {
 					$result[] = [
@@ -272,8 +280,8 @@ class MailjetHandler implements ConnectionHandler {
 	/**
 	 * Process reply-to recipients array.
 	 *
-	 * @param array $recipients Array of recipients.
-	 * @return array
+	 * @param array{email?: string, name?: string} $recipients Array of recipients.
+	 * @return array{Email: string, Name: string}|array{}
 	 */
 	public function process_reply_to_recipients( $recipients ) {
 
@@ -293,8 +301,8 @@ class MailjetHandler implements ConnectionHandler {
 	/**
 	 * Process attachments by reading the file, encoding its contents in base64 and preparing the attachment array.
 	 *
-	 * @param array $attachments Array of attachment file paths.
-	 * @return array
+	 * @param array<int, string> $attachments Array of attachment file paths.
+	 * @return array<int, array{Filename: string|false, Base64Content: string|false, ContentType: string|false}>
 	 */
 	private function get_attachments( $attachments ) {
 		$result = [];

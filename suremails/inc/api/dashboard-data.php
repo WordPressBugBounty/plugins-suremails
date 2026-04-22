@@ -79,7 +79,7 @@ class DashboardData extends Api_Base {
 	/**
 	 * Get Total counts including connections.
 	 *
-	 * @param bool|array<string, mixed> $chart_data Chart data containing sent and failed counts.
+	 * @param array<int, array<string, int|string|array<int|string, int|string>>>|false $chart_data Chart data containing sent and failed counts.
 	 * @return array<string, mixed>
 	 */
 	public function get_total_count( $chart_data ) {
@@ -111,7 +111,7 @@ class DashboardData extends Api_Base {
 	/**
 	 * Get Recent Logs
 	 *
-	 * @return array<string, mixed>|false
+	 * @return array<int, array<string, int|string|array<int|string, int|string>>>|false
 	 */
 	public function get_recent_logs() {
 		return EmailLog::instance()->get(
@@ -125,7 +125,7 @@ class DashboardData extends Api_Base {
 	/**
 	 * Get Chart data
 	 *
-	 * @return array<string, mixed>|false
+	 * @return array<int, array<string, int|string|array<int|string, int|string>>>|false
 	 */
 	public function get_chart_data() {
 		$email_log = EmailLog::instance();

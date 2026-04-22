@@ -16,11 +16,12 @@ if ( ! defined( 'ABSPATH' ) ) {
 use SureMails\Inc\Traits\Instance;
 
 const DEFAULT_USER_DETAILS = [
-	'first_name' => '',
-	'last_name'  => '',
-	'email'      => '',
-	'skip'       => 'no',
-	'lead'       => false,
+	'first_name'     => '',
+	'last_name'      => '',
+	'email'          => '',
+	'agree_to_terms' => true,
+	'skip'           => 'no',
+	'lead'           => false,
 ];
 
 const DEFAULT_CONNECTION_DETAILS = [
@@ -64,7 +65,7 @@ class Settings {
 	/**
 	 * The connections array.
 	 *
-	 * @var array|null
+	 * @var array{connections: array<string, array<string, string|int|bool>>, default_connection: array{type: string, email: string, id: string, connection_title: string}, log_emails: string, delete_email_logs_after: string, email_simulation: string}|null
 	 * @since 1.3.0
 	 */
 	public static $connections = null;
@@ -138,7 +139,8 @@ class Settings {
 	 * @return void
 	 */
 	public function set_user_details( $details ) {
-		update_option( 'suremails_content_guard_user_details', wp_parse_args( $details, DEFAULT_USER_DETAILS ) );
+		$existing = wp_parse_args( get_option( 'suremails_content_guard_user_details', [] ), DEFAULT_USER_DETAILS );
+		update_option( 'suremails_content_guard_user_details', wp_parse_args( $details, $existing ) );
 	}
 
 	/**
@@ -173,7 +175,7 @@ class Settings {
 	 * Get keys to be encrypted.
 	 *
 	 * @param string $slug Slug of the connection.
-	 * @return array
+	 * @return array<int, string>
 	 * @since 1.3.0
 	 */
 	public function get_encryptable_keys( $slug ) {
@@ -195,8 +197,8 @@ class Settings {
 	/**
 	 * Pre process all the connection encrytable fields.
 	 *
-	 * @param array $settings Connections array.
-	 * @return array
+	 * @param array{connections: array<string, array<string, string|int|bool>>, default_connection: array{type: string, email: string, id: string, connection_title: string}, log_emails: string, delete_email_logs_after: string, email_simulation: string} $settings Connections array.
+	 * @return array{connections: array<string, array<string, string|int|bool>>, default_connection: array{type: string, email: string, id: string, connection_title: string}, log_emails: string, delete_email_logs_after: string, email_simulation: string}
 	 * @since 1.3.0
 	 */
 	public function pre_process( $settings ) {
@@ -204,11 +206,11 @@ class Settings {
 			return $settings;
 		}
 		foreach ( $settings['connections'] as $key => $connection ) {
-			$slug             = $connection['type'] ?? '';
+			$slug             = (string) ( $connection['type'] ?? '' );
 			$encryptable_keys = $this->get_encryptable_keys( $slug );
 			foreach ( $encryptable_keys as $field ) {
 				if ( isset( $connection[ $field ] ) ) {
-					$settings['connections'][ $key ][ $field ] = $this->decrypt( $connection[ $field ] );
+					$settings['connections'][ $key ][ $field ] = $this->decrypt( (string) $connection[ $field ] );
 				}
 			}
 		}
@@ -255,19 +257,19 @@ class Settings {
 	 * Encrpt all the connection fields.
 	 *
 	 * @since 1.3.0
-	 * @param array $settings The settings array.
-	 * @return array The encrypted string.
+	 * @param array{connections: array<string, array<string, string|int|bool>>, default_connection: array{type: string, email: string, id: string, connection_title: string}, log_emails: string, delete_email_logs_after: string, email_simulation: string} $settings The settings array.
+	 * @return array{connections: array<string, array<string, string|int|bool>>, default_connection: array{type: string, email: string, id: string, connection_title: string}, log_emails: string, delete_email_logs_after: string, email_simulation: string} The encrypted settings.
 	 */
 	public function encrypt_all( $settings ) {
 		if ( empty( $settings['connections'] ) ) {
 			return $settings;
 		}
 		foreach ( $settings['connections'] as $key => $connection ) {
-			$slug             = $connection['type'] ?? '';
+			$slug             = (string) ( $connection['type'] ?? '' );
 			$encryptable_keys = $this->get_encryptable_keys( $slug );
 			foreach ( $encryptable_keys as $field ) {
 				if ( isset( $connection[ $field ] ) && is_string( $connection[ $field ] ) ) {
-					$settings['connections'][ $key ][ $field ] = $this->encrypt( $settings['connections'][ $key ][ $field ] );
+					$settings['connections'][ $key ][ $field ] = $this->encrypt( (string) $settings['connections'][ $key ][ $field ] );
 				}
 			}
 		}
@@ -276,11 +278,11 @@ class Settings {
 	}
 
 	/**
-	 * Encrypt data using base64.
+	 * Update a single connection in settings.
 	 *
-	 * @param array $connection_data The input string which needs to be encrypted.
+	 * @param array<string, string|int|bool> $connection_data The connection data to update.
 	 * @since 1.4.0
-	 * @return void The encrypted string.
+	 * @return void
 	 */
 	public function update_connection( $connection_data ) {
 		$settings                       = $this->get_settings();

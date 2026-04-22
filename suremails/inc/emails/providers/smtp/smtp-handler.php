@@ -26,7 +26,7 @@ class SmtpHandler implements ConnectionHandler {
 	/**
 	 * SMTP connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
@@ -35,7 +35,7 @@ class SmtpHandler implements ConnectionHandler {
 	 *
 	 * Initializes SMTP connection data.
 	 *
-	 * @param array $connection_data The SMTP connection settings.
+	 * @param array<string, string|int|bool> $connection_data The SMTP connection settings.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -44,7 +44,7 @@ class SmtpHandler implements ConnectionHandler {
 	/**
 	 * Authenticate the SMTP connection.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code: int}
 	 */
 	public function authenticate() {
 		return [
@@ -57,11 +57,11 @@ class SmtpHandler implements ConnectionHandler {
 	/**
 	 * Send an email via SMTP, including attachments if provided.
 	 *
-	 * @param array $atts          The email attributes, such as 'to', 'from', 'subject', 'message', 'headers', 'attachments', etc.
-	 * @param int   $log_id        The ID of the email log entry.
-	 * @param array $connection    The connection details.
-	 * @param array $processed_data The processed email data from ProcessEmailData.
-	 * @return array                The result of the email send operation.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The ID of the email log entry.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data from ProcessEmailData.
+	 * @return array{success: bool, message: string, send: bool, retries?: int} The result of the email send operation.
 	 */
 	public function send( array $atts, $log_id, array $connection, array $processed_data ) {
 		$result = [
@@ -74,20 +74,20 @@ class SmtpHandler implements ConnectionHandler {
 			$phpmailer = ConnectionManager::instance()->get_phpmailer();
 			// Server settings.
 			$phpmailer->isSMTP(); // Set mailer to use SMTP.
-			$phpmailer->Host        = sanitize_text_field( $connection['host'] ?? '' ); // Specify main SMTP server.
-			$phpmailer->Username    = sanitize_text_field( $connection['username'] ?? '' ); // SMTP username.
-			$phpmailer->Password    = sanitize_text_field( $connection['password'] ?? '' ); // SMTP password.
+			$phpmailer->Host        = sanitize_text_field( (string) ( $connection['host'] ?? '' ) ); // Specify main SMTP server.
+			$phpmailer->Username    = sanitize_text_field( (string) ( $connection['username'] ?? '' ) ); // SMTP username.
+			$phpmailer->Password    = sanitize_text_field( (string) ( $connection['password'] ?? '' ) ); // SMTP password.
 			$phpmailer->SMTPAuth    = ! ( empty( $phpmailer->Username ) && empty( $phpmailer->Password ) ); // Enable SMTP auth only if credentials exist.
 			$phpmailer->SMTPAutoTLS = (bool) $connection['auto_tls'];
-			$encryption             = strtolower( sanitize_text_field( $connection['encryption'] ) );
+			$encryption             = strtolower( sanitize_text_field( (string) ( $connection['encryption'] ) ) );
 			if ( $encryption !== 'none' ) {
 				$phpmailer->SMTPSecure = $encryption;
 			}
 			$phpmailer->Port    = intval( $connection['port'] ); // TCP port to connect to.
 			$phpmailer->Timeout = 5; // Set a timeout of 4 seconds.
 
-			$from_email = $connection['from_email'];
-			$from_name  = ! empty( $connection['from_name'] ) ? $connection['from_name'] : __( 'WordPress', 'suremails' );
+			$from_email = (string) ( $connection['from_email'] ?? '' );
+			$from_name  = ! empty( $connection['from_name'] ) ? (string) $connection['from_name'] : __( 'WordPress', 'suremails' );
 
 			$phpmailer->setFrom( $from_email, $from_name );
 
@@ -126,7 +126,7 @@ class SmtpHandler implements ConnectionHandler {
 	/**
 	 * Return the option configuration for SMTP.
 	 *
-	 * @return array
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, display_name: string, icon: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -144,7 +144,7 @@ class SmtpHandler implements ConnectionHandler {
 	/**
 	 * Get the specific schema fields for SMTP.
 	 *
-	 * @return array
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [

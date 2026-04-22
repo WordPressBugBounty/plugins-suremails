@@ -75,11 +75,11 @@ class ProviderHelper {
 	 *
 	 * @since 1.2.0
 	 *
-	 * @param array $address Address array.
-	 * @return array|string
+	 * @param array{email: string, name?: string} $address Address array.
+	 * @return string
 	 */
 	public static function address_format( $address ) {
-		$email  = $address['email'] ?? '';
+		$email  = $address['email'];
 		$name   = $address['name'] ?? '';
 		$result = $email;
 		if ( ! empty( $name ) ) {
@@ -99,7 +99,7 @@ class ProviderHelper {
 	 */
 	public static function get_attachments_folder() {
 		$base_folder = Uploads::get_suremails_base_dir();
-		if ( ! is_wp_error( $base_folder ) && isset( $base_folder['path'] ) ) {
+		if ( ! is_wp_error( $base_folder ) ) {
 			$base_folder = $base_folder['path'];
 		} else {
 			$base_folder = '';
@@ -114,8 +114,8 @@ class ProviderHelper {
 	 * This function loops through the list of attachments to delete and, if an
 	 * attachment is not present in the retained attachments array, it deletes the file.
 	 *
-	 * @param array $attachments_to_delete List of attachments that could be deleted.
-	 * @param array $attachments_kept      List of attachments that are still in use.
+	 * @param array<int|string, int|string> $attachments_to_delete List of attachments that could be deleted.
+	 * @param array<int|string, int|string> $attachments_kept      List of attachments that are still in use.
 	 *
 	 * @since 1.5.0
 	 * @return void
@@ -157,9 +157,9 @@ class ProviderHelper {
 	 * This function accepts an array of attachment names and builds an array
 	 * of conditions to be used in a query where clause.
 	 *
-	 * @param array $attachments List of attachments.
+	 * @param array<int|string, int|string> $attachments List of attachments.
 	 * @since 1.5.0
-	 * @return array The conditions array.
+	 * @return array<string, string> The conditions array.
 	 */
 	public static function build_attachment_like_conditions( array $attachments ) {
 		$where = [];
@@ -184,12 +184,9 @@ class ProviderHelper {
 	 * This function loops through the provided logs and extracts all log IDs
 	 * and attachments. Attachments are merged into a unique list.
 	 *
-	 * @param array $logs Array of logs.
+	 * @param array<int, array<string, int|string|array<int|string, int|string>>> $logs Array of logs.
 	 * @since  1.5.0
-	 * @return array {
-	 *     @type array $log_ids Array of log IDs.
-	 *     @type array $attachments Array of unique attachments.
-	 * }
+	 * @return array{log_ids: array<int|string, int|string|array<int|string, int|string>>, attachments: array<int|string, int|string>}
 	 */
 	public static function extract_log_data( array $logs ) {
 		$log_ids     = [];

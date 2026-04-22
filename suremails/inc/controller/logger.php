@@ -464,8 +464,8 @@ class Logger {
 	/**
 	 * Prepares log data by merging provided data with default values.
 	 *
-	 * @param array $args The data to merge with defaults.
-	 * @return array The prepared log data.
+	 * @param array<string, string|array<int, string>|array<int, array<string, int|string|bool>>|array{retry: int, resend: int, content_guard?: string}|null> $args The data to merge with defaults.
+	 * @return array<string, string|array<int, string>|array<int, array<string, int|string|bool>>|array{retry: int, resend: int, content_guard?: string}|null> The prepared log data.
 	 */
 	public function prepare_log_data( array $args = [] ): array {
 		$defaults = [
@@ -490,7 +490,7 @@ class Logger {
 	/**
 	 * Logs an email attempt.
 	 *
-	 * @param array $data The data to log.
+	 * @param array<string, string|array<int, string>|array<int, array<string, int|string|bool>>|array{retry: int, resend: int, content_guard?: string}|null> $data The data to log.
 	 * @return int|WP_Error|false The ID of the log entry on success, WP_Error on failure, or false if logging is disabled.
 	 */
 	public function log_email( array $data ) {
@@ -541,8 +541,8 @@ class Logger {
 	/**
 	 * Updates an existing email log entry.
 	 *
-	 * @param int   $log_id The ID of the log entry to update.
-	 * @param array $data   The data to update.
+	 * @param int                                                                                                  $log_id The ID of the log entry to update.
+	 * @param array<string, string|array<int, array<string, int|string|bool>>|array{retry: int, resend: int}|null> $data   The data to update.
 	 * @return bool|WP_Error True on success, WP_Error on failure.
 	 */
 	public function update_log( int $log_id, array $data ) {
@@ -575,7 +575,7 @@ class Logger {
 	 * Retrieves a specific email log entry by its ID.
 	 *
 	 * @param int $log_id The ID of the log entry to retrieve.
-	 * @return array|WP_Error|false The log entry as an associative array, WP_Error on failure, or false if not found.
+	 * @return array<string, int|string|array<int|string, int|string>>|WP_Error|false The log entry as an associative array, WP_Error on failure, or false if not found.
 	 */
 	public function get_log( int $log_id ) {
 		if ( empty( $log_id ) ) {

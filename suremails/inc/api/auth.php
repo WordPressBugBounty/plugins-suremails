@@ -87,7 +87,7 @@ class Auth extends Api_Base {
 	/**
 	 * Get supported OAuth providers
 	 *
-	 * @return array
+	 * @return array<string, class-string>
 	 */
 	private function get_supported_providers() {
 		return [

@@ -1,5 +1,5 @@
 import { useLocation, useNavigate } from 'react-router-dom';
-import ONBOARDING_ROUTES_CONFIG from './onboarding-routes-config';
+import { getVisibleOnboardingRoutes } from './onboarding-routes-config';
 import { useCallback, useEffect, useMemo, useRef } from '@wordpress/element';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSettings } from '@api/connections';
@@ -16,21 +16,25 @@ export const useOnboardingNavigation = () => {
 	const location = useLocation();
 	const currentRoute = location.pathname;
 	const [ onboardingState ] = useOnboardingState();
+	const visibleRoutes = useMemo(
+		() => getVisibleOnboardingRoutes( onboardingState ),
+		[ onboardingState ]
+	);
 
 	const getNextRoute = ( currentPath ) => {
-		const currentIndex = ONBOARDING_ROUTES_CONFIG.findIndex(
+		const currentIndex = visibleRoutes.findIndex(
 			( route ) => route.url === currentPath
 		);
 
-		return ONBOARDING_ROUTES_CONFIG[ currentIndex + 1 ].url;
+		return visibleRoutes[ currentIndex + 1 ]?.url;
 	};
 
 	const getPreviousRoute = ( currentPath ) => {
-		const currentIndex = ONBOARDING_ROUTES_CONFIG.findIndex(
+		const currentIndex = visibleRoutes.findIndex(
 			( route ) => route.url === currentPath
 		);
 
-		return ONBOARDING_ROUTES_CONFIG[ currentIndex - 1 ].url;
+		return visibleRoutes[ currentIndex - 1 ]?.url;
 	};
 
 	const navigateToNextRoute = () => {
@@ -44,7 +48,7 @@ export const useOnboardingNavigation = () => {
 	};
 
 	const getCurrentStepNumber = () => {
-		const currentIndex = ONBOARDING_ROUTES_CONFIG.findIndex(
+		const currentIndex = visibleRoutes.findIndex(
 			( route ) => route.url === currentRoute
 		);
 
@@ -56,18 +60,15 @@ export const useOnboardingNavigation = () => {
 		const targetIndex = stepNumber - 1;
 
 		// Check if step number is valid
-		if (
-			targetIndex < 0 ||
-			targetIndex >= ONBOARDING_ROUTES_CONFIG.length
-		) {
+		if ( targetIndex < 0 || targetIndex >= visibleRoutes.length ) {
 			return;
 		}
 
-		const targetRoute = ONBOARDING_ROUTES_CONFIG[ targetIndex ];
+		const targetRoute = visibleRoutes[ targetIndex ];
 
 		// Check if we can navigate to this step by checking requirements
 		for ( let i = 0; i <= targetIndex; i++ ) {
-			const route = ONBOARDING_ROUTES_CONFIG[ i ];
+			const route = visibleRoutes[ i ];
 
 			// Skip routes without requirements
 			if (
@@ -109,7 +110,7 @@ export const useOnboardingNavigation = () => {
 	 */
 	const checkRequiredStep = useCallback( () => {
 		// Get current route index
-		const currentIndex = ONBOARDING_ROUTES_CONFIG.findIndex(
+		const currentIndex = visibleRoutes.findIndex(
 			( route ) => route.url === currentRoute
 		);
 
@@ -120,7 +121,7 @@ export const useOnboardingNavigation = () => {
 
 		// Check all previous steps for any unmet requirements
 		for ( let i = 0; i <= currentIndex; i++ ) {
-			const route = ONBOARDING_ROUTES_CONFIG[ i ];
+			const route = visibleRoutes[ i ];
 
 			// Skip routes without requirements
 			if (
@@ -143,7 +144,7 @@ export const useOnboardingNavigation = () => {
 
 		// If we get here, all previous requirements are met
 		return '';
-	}, [ location.pathname, onboardingState ] );
+	}, [ currentRoute, onboardingState, visibleRoutes ] );
 
 	return {
 		getNextRoute,
@@ -153,6 +154,7 @@ export const useOnboardingNavigation = () => {
 		getCurrentStepNumber,
 		navigateToStep,
 		checkRequiredStep,
+		visibleRoutes,
 	};
 };
 

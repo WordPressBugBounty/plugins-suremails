@@ -173,10 +173,10 @@ class Logs extends Api_Base {
 	/**
 	 * Retrieve email logs with pagination.
 	 *
-	 * @param array $where    The 'where' conditions for the query.
-	 * @param int   $page     The current page number.
-	 * @param int   $per_page The number of logs per page.
-	 * @return array|false The fetched logs or false on failure.
+	 * @param array<string, string> $where    The 'where' conditions for the query.
+	 * @param int                   $page     The current page number.
+	 * @param int                   $per_page The number of logs per page.
+	 * @return array<int, array<string, string|int|array<int, string>|array<string, int|string>>>|false The fetched logs or false on failure.
 	 */
 	protected function get_logs( array $where, int $page, int $per_page ) {
 		$email_log = EmailLog::instance();
@@ -196,7 +196,7 @@ class Logs extends Api_Base {
 	/**
 	 * Retrieve the total count of email logs.
 	 *
-	 * @param array $where The 'where' conditions for the query.
+	 * @param array<string, string> $where The 'where' conditions for the query.
 	 * @return int|false The total count or false on failure.
 	 */
 	protected function get_total_count( array $where ) {

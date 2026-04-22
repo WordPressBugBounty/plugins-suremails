@@ -26,14 +26,14 @@ class PostmarkHandler implements ConnectionHandler {
 	/**
 	 * Postmark connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
 	/**
 	 * Request parameters used for every API call.
 	 *
-	 * @var array
+	 * @var array{headers?: array<string, string>, body?: string}
 	 */
 	protected $params = [];
 
@@ -47,7 +47,7 @@ class PostmarkHandler implements ConnectionHandler {
 	/**
 	 * Constructor.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -56,14 +56,14 @@ class PostmarkHandler implements ConnectionHandler {
 		$this->params['headers'] = [
 			'Accept'                  => 'application/json',
 			'Content-Type'            => 'application/json',
-			'X-Postmark-Server-Token' => sanitize_text_field( $this->connection_data['server_token'] ?? '' ),
+			'X-Postmark-Server-Token' => sanitize_text_field( (string) ( $this->connection_data['server_token'] ?? '' ) ),
 		];
 	}
 
 	/**
 	 * Authenticate the Postmark connection by verifying that from_email is a verified sender.
 	 *
-	 * @return array
+	 * @return array{success: bool, message: string, error_code: int}
 	 */
 	public function authenticate() {
 		return [
@@ -76,12 +76,12 @@ class PostmarkHandler implements ConnectionHandler {
 	/**
 	 * Send email using Postmark.
 	 *
-	 * @param array $atts           The email attributes.
-	 * @param int   $log_id         The log ID.
-	 * @param array $connection     The connection details.
-	 * @param array $processed_data The processed email data.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The log ID.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data.
 	 *
-	 * @return array
+	 * @return array{success: bool, message: string, send: bool, email_id?: string, error_code?: int|string}
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
 		$result = [
@@ -90,15 +90,26 @@ class PostmarkHandler implements ConnectionHandler {
 			'send'    => false,
 		];
 
-		$from_name  = $connection['from_name'] ?? '';
-		$from_email = sanitize_email( $connection['from_email'] );
+		$from_name  = (string) ( $connection['from_name'] ?? '' );
+		$from_email = sanitize_email( (string) ( $connection['from_email'] ?? '' ) );
 		$from       = ! empty( $from_name ) ? $from_name . ' <' . $from_email . '>' : $from_email;
 
-		$to  = implode( ', ', $this->process_recipients( $processed_data['to'] ?? [] ) );
-		$cc  = implode( ', ', $this->process_recipients( $processed_data['headers']['cc'] ?? [] ) );
-		$bcc = implode( ', ', $this->process_recipients( $processed_data['headers']['bcc'] ?? [] ) );
+		$to  = implode( ', ', $this->process_recipients( $processed_data['to'] ) );
+		$cc  = implode( ', ', $this->process_recipients( $processed_data['headers']['cc'] ) );
+		$bcc = implode( ', ', $this->process_recipients( $processed_data['headers']['bcc'] ) );
 
-		$subject   = sanitize_text_field( $atts['subject'] ?? '' );
+		/**
+		 * The raw email subject.
+		 *
+		 * @var string $raw_subject
+		 */
+		$raw_subject = $atts['subject'] ?? '';
+		$subject     = sanitize_text_field( $raw_subject );
+		/**
+		 * The HTML email body.
+		 *
+		 * @var string $html_body
+		 */
 		$html_body = $atts['message'] ?? '';
 		$text_body = wp_strip_all_tags( $html_body );
 
@@ -116,24 +127,20 @@ class PostmarkHandler implements ConnectionHandler {
 			$payload['Bcc'] = $bcc;
 		}
 
-		if ( ! empty( $processed_data['headers']['reply_to'] ) && is_array( $processed_data['headers']['reply_to'] ) ) {
+		if ( ! empty( $processed_data['headers']['reply_to'] ) ) {
 			$reply_to = reset( $processed_data['headers']['reply_to'] );
-			if ( is_array( $reply_to ) && isset( $reply_to['email'] ) ) {
+			if ( is_array( $reply_to ) && ! empty( $reply_to['email'] ) ) {
 				$payload['ReplyTo'] = sanitize_email( $reply_to['email'] );
-			} elseif ( is_string( $reply_to ) ) {
-				$payload['ReplyTo'] = sanitize_email( $reply_to );
 			}
 		}
 
-		if ( ! empty( $processed_data['attachments'] ) && is_array( $processed_data['attachments'] ) ) {
+		if ( ! empty( $processed_data['attachments'] ) ) {
 			$payload['Attachments'] = $this->get_attachments( $processed_data['attachments'] );
 		}
 
-		$payload['MessageStream'] = sanitize_text_field( $connection['message_stream'] ?? 'outbound' );
+		$payload['MessageStream'] = sanitize_text_field( (string) ( $connection['message_stream'] ?? 'outbound' ) );
 
-		$content_type = isset( $processed_data['headers']['content_type'] )
-			? strtolower( $processed_data['headers']['content_type'] )
-			: 'text/html';
+		$content_type = strtolower( $processed_data['headers']['content_type'] );
 
 		if ( $content_type === 'text/html' ) {
 			$payload['HtmlBody'] = $html_body;
@@ -183,7 +190,7 @@ class PostmarkHandler implements ConnectionHandler {
 	/**
 	 * Get the Postmark connection options.
 	 *
-	 * @return array
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, icon: string, display_name: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -201,7 +208,7 @@ class PostmarkHandler implements ConnectionHandler {
 	/**
 	 * Get the specific fields for the Postmark connection.
 	 *
-	 * @return array
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [
@@ -235,8 +242,8 @@ class PostmarkHandler implements ConnectionHandler {
 	/**
 	 * Process recipients into an array of formatted email strings.
 	 *
-	 * @param array $recipients The recipients to process.
-	 * @return array The processed recipients.
+	 * @param array<int, array{name?: string, email?: string}|string> $recipients The recipients to process.
+	 * @return array<int, string> The processed recipients.
 	 */
 	private function process_recipients( array $recipients ) {
 		$result = [];
@@ -259,8 +266,8 @@ class PostmarkHandler implements ConnectionHandler {
 	/**
 	 * Process attachments into a Postmark-compatible attachments array.
 	 *
-	 * @param array $attachments The attachments to process.
-	 * @return array The processed attachments.
+	 * @param array<int, string> $attachments The attachments to process.
+	 * @return array<int, array{Name: string|false, Content: string|false, ContentType: string|false}> The processed attachments.
 	 */
 	private function get_attachments( array $attachments ) {
 		$result = [];

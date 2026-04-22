@@ -160,7 +160,7 @@ class EmailLog {
 	/**
 	 * Insert a new email log entry.
 	 *
-	 * @param array $data Associative array of data to insert.
+	 * @param array<string, string|array<int, string>|array<int, array<string, int|string|bool>>|array{retry: int, resend: int, content_guard?: string}|null> $data Associative array of data to insert.
 	 * @return int|false Inserted row ID or false on failure.
 	 * @throws Exception If there is an error inserting the record.
 	 */
@@ -245,7 +245,7 @@ class EmailLog {
 	/**
 	 * Retrieve email log entries based on given parameters.
 	 *
-	 * @param array $args Query arguments including:
+	 * @param array{select?: string, where?: array<string, int|string|array<int, int|string>>, group_by?: string, having?: array<string, string>, order?: array<string, string>, limit?: int, offset?: int} $args Query arguments including:
 	 *                    - 'select'     => string (default '*')
 	 *                    - 'where'      => array (field => value)
 	 *                    - 'group_by'   => string
@@ -254,25 +254,35 @@ class EmailLog {
 	 *                    - 'limit'      => int
 	 *                    - 'offset'     => int.
 	 *
-	 * @return array|false Array of results or false on failure.
-	 *  @throws Exception If there is an error creating the table.
+	 * @return array<int, array<string, int|string|array<int|string, int|string>>>|false Array of results or false on failure.
+	 * @throws Exception If there is an error creating the table.
 	 */
 	public function get( array $args = [] ) {
 		global $wpdb;
 
 		// Extract parameters with defaults.
 		$select   = ! empty( $args['select'] ) ? $args['select'] : '*';
-		$where    = ! empty( $args['where'] ) && is_array( $args['where'] ) ? $args['where'] : [];
-		$group_by = ! empty( $args['group_by'] ) && is_string( $args['group_by'] ) ? $args['group_by'] : '';
-		$having   = ! empty( $args['having'] ) && is_array( $args['having'] ) ? $args['having'] : [];
-		$order_by = ! empty( $args['order'] ) && is_array( $args['order'] ) ? $args['order'] : [];
+		$where    = ! empty( $args['where'] ) && is_array( $args['where'] ) ? $args['where'] : []; // @phpstan-ignore booleanAnd.rightAlwaysTrue
+		$group_by = ! empty( $args['group_by'] ) && is_string( $args['group_by'] ) ? $args['group_by'] : ''; // @phpstan-ignore booleanAnd.rightAlwaysTrue
+		$having   = ! empty( $args['having'] ) && is_array( $args['having'] ) ? $args['having'] : []; // @phpstan-ignore booleanAnd.rightAlwaysTrue
+		$order_by = ! empty( $args['order'] ) && is_array( $args['order'] ) ? $args['order'] : []; // @phpstan-ignore booleanAnd.rightAlwaysTrue
 
 		if ( isset( $args['limit'] ) || isset( $args['offset'] ) ) {
 			$limit        = isset( $args['limit'] ) ? intval( $args['limit'] ) : 0;
 			$offset       = isset( $args['offset'] ) ? intval( $args['offset'] ) : 0;
 			$limit_object = Db_Helper::form_limit_clause( $limit, $offset );
-			$limit_clause = is_string( $limit_object['clause'] ) ? $limit_object['clause'] : '';
-			$values_limit = is_array( $limit_object['values'] ) ? $limit_object['values'] : [];
+			/**
+			 * The SQL LIMIT clause.
+			 *
+			 * @var string $limit_clause
+			 */
+			$limit_clause = $limit_object['clause'];
+			/**
+			 * The limit clause values.
+			 *
+			 * @var array<int, int> $values_limit
+			 */
+			$values_limit = $limit_object['values'];
 		} else {
 			$limit_clause = '';
 			$values_limit = [];
@@ -283,13 +293,13 @@ class EmailLog {
 
 			// Build WHERE clause.
 			$where_object = Db_Helper::form_where_clause( $where );
-			$where_clause = is_string( $where_object['clause'] ) ? $where_object['clause'] : '';
-			$values_where = is_array( $where_object['values'] ) ? $where_object['values'] : [];
+			$where_clause = $where_object['clause'];
+			$values_where = $where_object['values'];
 
 			// Build HAVING clause.
 			$having_object = Db_Helper::form_where_clause( $having, true );
-			$having_clause = is_string( $having_object['clause'] ) ? $having_object['clause'] : '';
-			$values_having = is_array( $having_object['values'] ) ? $having_object['values'] : [];
+			$having_clause = $having_object['clause'];
+			$values_having = $having_object['values'];
 
 			// Build GROUP BY clause.
 			$group_by_clause = Db_Helper::form_group_by_clause( $group_by );
@@ -328,9 +338,9 @@ class EmailLog {
 	/**
 	 * Update an email log entry.
 	 *
-	 * @param int   $id   The ID of the record to update.
-	 * @param array $data Associative array of data to update.
-	 *  @throws Exception If there is an error updating the record.
+	 * @param int                                                                                                  $id   The ID of the record to update.
+	 * @param array<string, string|array<int, array<string, int|string|bool>>|array{retry: int, resend: int}|null> $data Associative array of data to update.
+	 * @throws Exception If there is an error updating the record.
 	 * @return bool|WP_Error True on success, WP_Error on failure.
 	 */
 	public function update( int $id, array $data ) {
@@ -346,7 +356,7 @@ class EmailLog {
 		}
 
 		try {
-			if ( isset( $data['response'] ) ) {
+			if ( isset( $data['response'] ) && ( is_array( $data['response'] ) || is_string( $data['response'] ) ) ) {
 				$data['response'] = maybe_serialize( $data['response'] );
 			}
 
@@ -378,7 +388,7 @@ class EmailLog {
 	 * Retrieve a specific email log entry by its ID.
 	 *
 	 * @param int $log_id The ID of the log entry to retrieve.
-	 * @return array|WP_Error|false The log entry as an associative array, WP_Error on failure, or false if not found.
+	 * @return array<string, int|string|array<int|string, int|string>>|WP_Error|false The log entry as an associative array, WP_Error on failure, or false if not found.
 	 */
 	public function get_log( int $log_id ) {
 		if ( empty( $log_id ) ) {
@@ -412,17 +422,11 @@ class EmailLog {
 	/**
 	 * Delete email log entries based on given parameters.
 	 *
-	 * @param array $args {
-	 *   ids?: int|int[],
-	 *   where?: array<string, mixed>,
-	 *   having?: array<string, mixed>,
-	 *   limit?: int
-	 * } $args The arguments for deleting email logs, including:
+	 * @param array{ids?: int|array<int, int>, where?: array<string, string>, having?: array<string, string>, limit?: int} $args The arguments for deleting email logs, including:
 	 *   - 'ids' (int|int[], optional): The ID or array of IDs of the records to delete.
-	 *   - 'where' (array<string, mixed>, optional): Conditions for the WHERE clause.
-	 *   - 'having' (array<string, mixed>, optional): Conditions for the HAVING clause.
+	 *   - 'where' (array, optional): Conditions for the WHERE clause.
+	 *   - 'having' (array, optional): Conditions for the HAVING clause.
 	 *   - 'limit' (int, optional): The maximum number of records to delete.
-	 * }.
 	 *
 	 * @return int|false Number of rows deleted or false on failure.
 	 * @throws Exception If there is an error deleting the records.
@@ -448,7 +452,7 @@ class EmailLog {
 			}
 
 			// Handle 'where' conditions.
-			if ( isset( $args['where'] ) && is_array( $args['where'] ) ) {
+			if ( isset( $args['where'] ) && is_array( $args['where'] ) ) { // @phpstan-ignore booleanAnd.rightAlwaysTrue
 				foreach ( $args['where'] as $field => $value ) {
 					if ( preg_match( '/^(\w+)\s*(=|!=|<|<=|>|>=|LIKE)$/', $field, $matches ) ) {
 						$field_name   = $matches[1];

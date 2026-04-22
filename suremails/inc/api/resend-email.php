@@ -102,18 +102,47 @@ class ResendEmail extends Api_Base {
 			$log = $logs[0];
 
 			// Prepare the email attributes.
-			$atts = [
-				'to'          => maybe_unserialize( $log['email_to'] ),
-				'subject'     => $log['subject'],
-				'message'     => $log['body'],
-				'headers'     => $log['headers'],
-				'attachments' => $log['attachments'],
-			];
+			/**
+			 * The email recipient.
+			 *
+			 * @var string $email_to
+			 */
+			$email_to = $log['email_to'];
+			/**
+			 * The log subject.
+			 *
+			 * @var string $log_subject
+			 */
+			$log_subject = $log['subject'];
+			/**
+			 * The log body.
+			 *
+			 * @var string $log_body
+			 */
+			$log_body = $log['body'];
+			/**
+			 * The log headers.
+			 *
+			 * @var string|array<int, string> $log_headers
+			 */
+			$log_headers = $log['headers'];
+			/**
+			 * The log attachments.
+			 *
+			 * @var array<int, string> $log_attachments
+			 */
+			$log_attachments = $log['attachments'];
 
 			$logger->set_id( $log_id );
 			$connection_manager->set_is_resend( true );
 
-			$email_sent = self::send( $atts['to'], $atts['subject'], $atts['message'], $atts['headers'], $atts['attachments'] );
+			/**
+			 * The send-to address.
+			 *
+			 * @var string $send_to
+			 */
+			$send_to    = maybe_unserialize( $email_to );
+			$email_sent = self::send( $send_to, $log_subject, $log_body, $log_headers, $log_attachments );
 
 			if ( $email_sent ) {
 				$results[] = [

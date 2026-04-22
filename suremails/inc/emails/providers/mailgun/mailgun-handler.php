@@ -34,14 +34,14 @@ class MailgunHandler implements ConnectionHandler {
 	/**
 	 * Mailgun connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
 	/**
 	 * Constructor.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -52,7 +52,7 @@ class MailgunHandler implements ConnectionHandler {
 	 *
 	 * Validates the API key, domain, and from email using Mailgun's `/v4/domains` API.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code: int}
 	 * @throws \Exception If the API key, domain, or from email is missing, or if the domain is not active.
 	 */
 	public function authenticate() {
@@ -68,12 +68,12 @@ class MailgunHandler implements ConnectionHandler {
 	 *
 	 * Formats processed data to match the Mailgun API parameters.
 	 *
-	 * @param array $atts           The email attributes (e.g., subject, message).
-	 * @param int   $log_id         The log ID for the email.
-	 * @param array $connection     The connection details (includes from_email, from_name, domain, api_key, region).
-	 * @param array $processed_data The processed email data (to, cc, bcc, headers, attachments, etc.).
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes (e.g., subject, message).
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The log ID for the email.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details (includes from_email, from_name, domain, api_key, region).
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data (to, cc, bcc, headers, attachments, etc.).
 	 *
-	 * @return array The result of the email send operation.
+	 * @return array{success: bool, message: string, send: bool, error_code?: int|string}
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
 		$result = [
@@ -82,14 +82,14 @@ class MailgunHandler implements ConnectionHandler {
 			'send'    => false,
 		];
 
-		$domain = isset( $connection['domain'] ) ? sanitize_text_field( $connection['domain'] ) : '';
+		$domain = isset( $connection['domain'] ) ? sanitize_text_field( (string) ( $connection['domain'] ) ) : '';
 		if ( empty( $domain ) ) {
 			$result['message']    = __( 'Mailgun domain is missing.', 'suremails' );
 			$result['error_code'] = 400;
 			return $result;
 		}
 
-		$region   = ! empty( $connection['region'] ) ? sanitize_text_field( $connection['region'] ) : 'US';
+		$region   = ! empty( $connection['region'] ) ? sanitize_text_field( (string) ( $connection['region'] ) ) : 'US';
 		$api_base = 'EU' === strtoupper( $region ) ? self::API_BASE_EU_V3 : self::API_BASE_US_V3;
 
 		$url = $api_base . $domain . '/messages';
@@ -97,19 +97,30 @@ class MailgunHandler implements ConnectionHandler {
 		$from_email = $connection['from_email'];
 		$from_name  = $connection['from_name'] ?? __( 'WordPress', 'suremails' );
 		$from       = sprintf( '%s <%s>', $from_name, $from_email );
-		$to         = $this->prepareRecipients( $processed_data['to'] ?? [] );
-		$cc         = $this->prepareRecipients( $processed_data['headers']['cc'] ?? [] );
-		$bcc        = $this->prepareRecipients( $processed_data['headers']['bcc'] ?? [] );
+		$to         = $this->prepareRecipients( $processed_data['to'] );
+		$cc         = $this->prepareRecipients( $processed_data['headers']['cc'] );
+		$bcc        = $this->prepareRecipients( $processed_data['headers']['bcc'] );
 
-		$is_html      = isset( $processed_data['headers']['content_type'] )
-			&& strtolower( $processed_data['headers']['content_type'] ) === 'text/html';
-		$text_content = $is_html ? wp_strip_all_tags( $atts['message'] ) : $atts['message'];
-		$html_content = $is_html ? $atts['message'] : '';
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
+		$message = $atts['message'] ?? '';
+		/**
+		 * The raw email subject.
+		 *
+		 * @var string $raw_subject
+		 */
+		$raw_subject  = $atts['subject'] ?? '';
+		$is_html      = strtolower( $processed_data['headers']['content_type'] ) === 'text/html';
+		$text_content = $is_html ? wp_strip_all_tags( $message ) : $message;
+		$html_content = $is_html ? $message : '';
 
 		$body = [
 			'from'    => $from,
 			'to'      => $to,
-			'subject' => sanitize_text_field( $atts['subject'] ?? '' ),
+			'subject' => sanitize_text_field( $raw_subject ),
 		];
 
 		if ( ! empty( $html_content ) ) {
@@ -119,7 +130,7 @@ class MailgunHandler implements ConnectionHandler {
 			$body['text'] = $text_content;
 		}
 
-		if ( ! empty( $processed_data['headers']['reply_to'] ) && is_array( $processed_data['headers']['reply_to'] ) ) {
+		if ( ! empty( $processed_data['headers']['reply_to'] ) ) { // @phpstan-ignore booleanAnd.rightAlwaysTrue
 			$reply_to = $this->prepareRecipients( $processed_data['headers']['reply_to'] );
 			if ( $reply_to ) {
 				$body['h:Reply-To'] = $reply_to;
@@ -133,11 +144,11 @@ class MailgunHandler implements ConnectionHandler {
 			$body['bcc'] = $bcc;
 		}
 
-		$attachments_payload = $this->get_attachments( $processed_data['attachments'] ?? [] );
+		$attachments_payload = $this->get_attachments( $processed_data['attachments'] );
 
 		$params = [
 			'headers' => [
-				'Authorization' => 'Basic ' . base64_encode( 'api:' . sanitize_text_field( $connection['api_key'] ) ),
+				'Authorization' => 'Basic ' . base64_encode( 'api:' . sanitize_text_field( (string) ( $connection['api_key'] ) ) ),
 			],
 		];
 
@@ -187,7 +198,7 @@ class MailgunHandler implements ConnectionHandler {
 	/**
 	 * Return the option configuration for Mailgun.
 	 *
-	 * @return array
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, icon: string, display_name: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -205,7 +216,7 @@ class MailgunHandler implements ConnectionHandler {
 	/**
 	 * Get the specific schema fields for Mailgun.
 	 *
-	 * @return array
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [
@@ -249,9 +260,9 @@ class MailgunHandler implements ConnectionHandler {
 	 *
 	 * Processes the attachments array and prepares the multipart/form-data payload.
 	 *
-	 * @param array $attachments Array of attachment file paths.
+	 * @param array<int, string> $attachments Array of attachment file paths.
 	 *
-	 * @return array|null Returns an array with 'boundary' and 'payload' keys or null if no attachments.
+	 * @return array{boundary: string, payload: string}|null Returns an array with 'boundary' and 'payload' keys or null if no attachments.
 	 */
 	private function get_attachments( array $attachments ) {
 		$attachment_data = [];
@@ -295,13 +306,13 @@ class MailgunHandler implements ConnectionHandler {
 	 *
 	 * Each recipient is formatted as "Name <email>" if a name is provided or just "email".
 	 *
-	 * @param array $recipients The array of recipient arrays.
+	 * @param array<int, array{name?: string, email: string}> $recipients The array of recipient arrays.
 	 * @return string Comma-separated string of recipients.
 	 */
 	private function prepareRecipients( array $recipients ) {
 		$output = [];
 		foreach ( $recipients as $recipient ) {
-			if ( isset( $recipient['email'] ) ) {
+			if ( isset( $recipient['email'] ) ) { // @phpstan-ignore isset.offset
 				$email = sanitize_email( $recipient['email'] );
 				if ( ! empty( $recipient['name'] ) ) {
 					$output[] = sprintf( '%s <%s>', sanitize_text_field( $recipient['name'] ), $email );

@@ -26,7 +26,7 @@ class EmailitHandler implements ConnectionHandler {
 	/**
 	 * Emailit connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
@@ -42,7 +42,7 @@ class EmailitHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -52,7 +52,7 @@ class EmailitHandler implements ConnectionHandler {
 	 * Get headers for the Emailit connection.
 	 *
 	 * @param string $api_key The API key for the Emailit connection.
-	 * @return array The headers for the Emailit connection.
+	 * @return array<string, string> The headers for the Emailit connection.
 	 */
 	public function get_headers( $api_key ) {
 		return [
@@ -63,22 +63,24 @@ class EmailitHandler implements ConnectionHandler {
 	/**
 	 * Authenticate the Emailit connection by verifying the API key.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code: int}
 	 */
 	public function authenticate() {
 		return [
-			'success' => true,
+			'success'    => true,
+			'message'    => __( 'Emailit connection saved successfully.', 'suremails' ),
+			'error_code' => 200,
 		];
 	}
 
 	/**
 	 * Send an email via Emailit, including attachments if provided.
 	 *
-	 * @param array $atts        The email attributes, such as 'to', 'from', 'subject', 'message', 'headers', 'attachments', etc.
-	 * @param int   $log_id      The log ID for the email.
-	 * @param array $connection  The connection details.
-	 * @param array $processed_data The processed email data.
-	 * @return array             The result of the email send operation.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The log ID for the email.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data.
+	 * @return array{success: bool, message: string, send: bool, email_id?: string, error_code?: int|string, retries?: int} The result of the email send operation.
 	 * @throws \Exception If the email payload cannot be encoded to JSON.
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
@@ -89,29 +91,35 @@ class EmailitHandler implements ConnectionHandler {
 		];
 
 		// Prepare basic email payload.
-		$from_email = isset( $connection['from_email'] ) ? sanitize_email( $connection['from_email'] ) : '';
+		$from_email = sanitize_email( (string) ( $connection['from_email'] ?? '' ) ); // @phpstan-ignore nullCoalesce.offset
 		if ( empty( $from_email ) || ! is_email( $from_email ) ) {
 			$result['message'] = __( 'Invalid or missing from email address.', 'suremails' );
 			return $result;
 		}
 
-		$from_name  = ! empty( $connection['from_name'] )
-			? sanitize_text_field( $connection['from_name'] )
+		$from_name = ! empty( $connection['from_name'] )
+			? sanitize_text_field( (string) ( $connection['from_name'] ) )
 			: __( 'WordPress', 'suremails' );
 
+		/**
+		 * The raw email subject.
+		 *
+		 * @var string $raw_subject
+		 */
+		$raw_subject   = $atts['subject'] ?? '';
 		$email_payload = [
 			'from'    => $this->format_email_address(
 				$from_email,
 				$from_name
 			),
-			'subject' => sanitize_text_field( $atts['subject'] ?? '' ),
+			'subject' => sanitize_text_field( $raw_subject ),
 		];
 
 		// Prepare recipients.
-		$to_recipients = $processed_data['to'] ?? [];
+		$to_recipients = $processed_data['to'];
 		$to_emails     = [];
 		foreach ( $to_recipients as $recipient ) {
-			if ( ! isset( $recipient['email'] ) ) {
+			if ( ! isset( $recipient['email'] ) ) { // @phpstan-ignore isset.offset
 				continue;
 			}
 			$sanitized_email = sanitize_email( $recipient['email'] );
@@ -127,10 +135,10 @@ class EmailitHandler implements ConnectionHandler {
 		}
 
 		// Handle reply-to.
-		$reply_to = $processed_data['headers']['reply_to'] ?? [];
+		$reply_to = $processed_data['headers']['reply_to'];
 		if ( ! empty( $reply_to ) ) {
 			$reply_to_email = reset( $reply_to );
-			if ( isset( $reply_to_email['email'] ) && ! empty( $reply_to_email['email'] ) ) {
+			if ( isset( $reply_to_email['email'] ) && ! empty( $reply_to_email['email'] ) ) { // @phpstan-ignore isset.offset
 				$sanitized_email = sanitize_email( $reply_to_email['email'] );
 				if ( is_email( $sanitized_email ) ) {
 					$email_payload['reply_to'] = $sanitized_email;
@@ -139,9 +147,14 @@ class EmailitHandler implements ConnectionHandler {
 		}
 
 		// Add content based on content type.
-		$content_type = $processed_data['headers']['content_type'] ?? '';
+		$content_type = $processed_data['headers']['content_type'];
 		$is_html      = ProviderHelper::is_html( $content_type );
 
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
 		$message = $atts['message'] ?? '';
 		if ( $is_html ) {
 			$email_payload['html'] = $message;
@@ -154,7 +167,7 @@ class EmailitHandler implements ConnectionHandler {
 		if ( ! empty( $processed_data['headers']['cc'] ) ) {
 			$cc_emails = [];
 			foreach ( $processed_data['headers']['cc'] as $cc ) {
-				if ( ! isset( $cc['email'] ) ) {
+				if ( ! isset( $cc['email'] ) ) { // @phpstan-ignore isset.offset
 					continue;
 				}
 				$sanitized_email = sanitize_email( $cc['email'] );
@@ -171,7 +184,7 @@ class EmailitHandler implements ConnectionHandler {
 		if ( ! empty( $processed_data['headers']['bcc'] ) ) {
 			$bcc_emails = [];
 			foreach ( $processed_data['headers']['bcc'] as $bcc ) {
-				if ( ! isset( $bcc['email'] ) ) {
+				if ( ! isset( $bcc['email'] ) ) { // @phpstan-ignore isset.offset
 					continue;
 				}
 				$sanitized_email = sanitize_email( $bcc['email'] );
@@ -216,7 +229,7 @@ class EmailitHandler implements ConnectionHandler {
 			$response = wp_safe_remote_post(
 				$this->api_url,
 				[
-					'headers' => $this->get_headers( $connection['api_key'] ?? '' ),
+					'headers' => $this->get_headers( (string) ( $connection['api_key'] ?? '' ) ),
 					'body'    => $json_payload,
 					'timeout' => 30,
 				]
@@ -263,7 +276,7 @@ class EmailitHandler implements ConnectionHandler {
 	/**
 	 * Return the option configuration for Emailit.
 	 *
-	 * @return array
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, display_name: string, icon: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -281,7 +294,7 @@ class EmailitHandler implements ConnectionHandler {
 	/**
 	 * Get the specific schema fields for Emailit.
 	 *
-	 * @return array
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [
@@ -319,23 +332,33 @@ class EmailitHandler implements ConnectionHandler {
 	/**
 	 * Extract error message from API response.
 	 *
-	 * @param array|null $decoded_body The decoded response body.
-	 * @param int        $response_code The HTTP response code.
+	 * @param array<string, string|array<string, string>|array<int, string|array<string, string>>>|null $decoded_body The decoded response body.
+	 * @param int                                                                                       $response_code The HTTP response code.
 	 * @return string The error message.
 	 */
 	private function extract_error_message( $decoded_body, $response_code ) {
 		if ( is_array( $decoded_body ) ) {
-			if ( isset( $decoded_body['message'] ) ) {
+			if ( isset( $decoded_body['message'] ) && is_string( $decoded_body['message'] ) ) {
 				return $decoded_body['message'];
 			}
 			if ( isset( $decoded_body['error'] ) ) {
-				return is_string( $decoded_body['error'] ) ? $decoded_body['error'] :
-					( $decoded_body['error']['message'] ?? __( 'Unknown error', 'suremails' ) );
+				if ( is_string( $decoded_body['error'] ) ) {
+					return $decoded_body['error'];
+				}
+				if ( is_array( $decoded_body['error'] ) && isset( $decoded_body['error']['message'] ) ) { // @phpstan-ignore function.alreadyNarrowedType, booleanAnd.leftAlwaysTrue
+					return (string) $decoded_body['error']['message']; // @phpstan-ignore cast.string
+				}
+				return __( 'Unknown error', 'suremails' );
 			}
 			if ( isset( $decoded_body['errors'] ) && is_array( $decoded_body['errors'] ) && ! empty( $decoded_body['errors'] ) ) {
 				$first_error = reset( $decoded_body['errors'] );
-				return is_string( $first_error ) ? $first_error :
-					( $first_error['message'] ?? __( 'Unknown error', 'suremails' ) );
+				if ( is_string( $first_error ) ) {
+					return $first_error;
+				}
+				if ( is_array( $first_error ) && isset( $first_error['message'] ) ) {
+					return (string) $first_error['message'];
+				}
+				return __( 'Unknown error', 'suremails' );
 			}
 		}
 

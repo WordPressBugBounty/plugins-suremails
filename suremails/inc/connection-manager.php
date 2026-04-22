@@ -54,21 +54,21 @@ class ConnectionManager {
 	/**
 	 * All available connections.
 	 *
-	 * @var array
+	 * @var array{connections?: array<string, array<string, string|int|bool>>, default_connection?: array{type: string, email: string, id: string, connection_title: string}, log_emails?: string, delete_email_logs_after?: string, email_simulation?: string}
 	 */
 	private $connections = [];
 
 	/**
 	 * Array of connections filtered by from_email.
 	 *
-	 * @var array
+	 * @var array<int, array<string, string|int|bool>>
 	 */
 	private $from_email_connections = [];
 
 	/**
 	 * The currently selected connection data.
 	 *
-	 * @var array|null
+	 * @var array<string, string|int|bool>|null
 	 */
 	private $current_connection = null;
 
@@ -141,7 +141,7 @@ class ConnectionManager {
 	/**
 	 * Sets the current connection data.
 	 *
-	 * @param array $connection The connection data to set.
+	 * @param array<string, string|int|bool> $connection The connection data to set.
 	 * @return void
 	 */
 	public function set_connection( array $connection ) {
@@ -151,7 +151,7 @@ class ConnectionManager {
 	/**
 	 * Retrieves the current connection data.
 	 *
-	 * @return array|null The current connection data or null if not set.
+	 * @return array<string, string|int|bool>|null The current connection data or null if not set.
 	 */
 	public function get_connection() {
 		return $this->current_connection;
@@ -160,7 +160,7 @@ class ConnectionManager {
 	/**
 	 * Sets the entire connections data.
 	 *
-	 * @param array $connections The array of all connection data.
+	 * @param array{connections?: array<string, array<string, string|int|bool>>, default_connection?: array{type: string, email: string, id: string, connection_title: string}, log_emails?: string, delete_email_logs_after?: string, email_simulation?: string} $connections The array of all connection data.
 	 * @return void
 	 */
 	public function set_connections( array $connections ) {
@@ -170,7 +170,7 @@ class ConnectionManager {
 	/**
 	 * Retrieves all connections data.
 	 *
-	 * @return array|null The array of all connections or null if not set.
+	 * @return array{connections?: array<string, array<string, string|int|bool>>, default_connection?: array{type: string, email: string, id: string, connection_title: string}, log_emails?: string, delete_email_logs_after?: string, email_simulation?: string}|null The array of all connections or null if not set.
 	 */
 	public function get_connections() {
 		return $this->connections;
@@ -320,16 +320,16 @@ class ConnectionManager {
 	/**
 	 * Adjusts the current PHPMailer instance with connection-specific settings.
 	 *
-	 * @param array $connection The connection settings.
+	 * @param array<string, string|int|bool> $connection The connection settings.
 	 * @return void
 	 */
 	public function configure_phpmailer( array $connection ) {
 		$phpmailer = $this->get_phpmailer();
 
-		$from_email = $connection['from_email'] ?? null;
-		$from_name  = $connection['from_name'] ?? null;
+		$from_email = (string) ( $connection['from_email'] ?? '' );
+		$from_name  = (string) ( $connection['from_name'] ?? '' );
 
-		if ( $from_email ) {
+		if ( ! empty( $from_email ) ) {
 			$phpmailer->setFrom( $from_email, $from_name );
 		}
 	}
@@ -337,7 +337,7 @@ class ConnectionManager {
 	/**
 	 * Retrieves the next connection based on priority.
 	 *
-	 * @return array|null The next connection details or null if no more connections are available.
+	 * @return array<string, string|int|bool>|null The next connection details or null if no more connections are available.
 	 */
 	public function get_next_connection() {
 		if ( $this->current_index === null ) {
@@ -367,7 +367,7 @@ class ConnectionManager {
 	/**
 	 * Retrieves the fallback connection based on priority.
 	 *
-	 * @return array|null The fallback connection details or null if not found.
+	 * @return array<string, string|int|bool>|null The fallback connection details or null if not found.
 	 */
 	public function get_priority_based_fallback_connection() {
 		$connections = $this->connections;
@@ -413,7 +413,7 @@ class ConnectionManager {
 	 * Retrieves the default connection based on settings.
 	 *
 	 * @param bool $set_checks bool If set to true, it will set the is_default property.
-	 * @return array|null The default connection details or null if not found.
+	 * @return array<string, string|int|bool>|null The default connection details or null if not found.
 	 */
 	public function get_default_connection( $set_checks = true ) {
 		$settings    = $this->get_connections();
@@ -434,7 +434,7 @@ class ConnectionManager {
 	/**
 	 * Retrieves and sorts connections filtered by the current from_email.
 	 *
-	 * @return array|null The array of filtered and sorted connections or null if not found.
+	 * @return array<int, array<string, string|int|bool>>|null The array of filtered and sorted connections or null if not found.
 	 */
 	private function get_from_email_connections() {
 		if ( $this->get_from_email() === null ) {
@@ -450,7 +450,7 @@ class ConnectionManager {
 		$from_email_connections = [];
 
 		foreach ( $connections as $connection ) {
-			if ( strtolower( $connection['from_email'] ) === $this->from_email ) {
+			if ( strtolower( (string) $connection['from_email'] ) === $this->from_email ) {
 				$send = $connection;
 
 				$from_email_connections[] = $send;

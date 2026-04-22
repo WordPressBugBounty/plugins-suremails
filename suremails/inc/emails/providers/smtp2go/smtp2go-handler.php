@@ -27,7 +27,7 @@ class Smtp2goHandler implements ConnectionHandler {
 	/**
 	 * SMTP2GO connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
@@ -43,7 +43,7 @@ class Smtp2goHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -52,7 +52,7 @@ class Smtp2goHandler implements ConnectionHandler {
 	/**
 	 * Authenticate the SMTP2GO connection by verifying the API key.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code: int}
 	 */
 	public function authenticate() {
 		$result = [
@@ -91,12 +91,12 @@ class Smtp2goHandler implements ConnectionHandler {
 	 * - custom_headers  : array of objects (custom header objects)
 	 * - attachments     : array of objects (attachment objects)
 	 *
-	 * @param array $atts           The email attributes (subject, message, html_body, text_body, etc.).
-	 * @param int   $log_id         The log ID for the email.
-	 * @param array $connection     The connection details.
-	 * @param array $processed_data The processed email data (recipients, headers, attachments, etc.).
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes (subject, message, html_body, text_body, etc.).
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The log ID for the email.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data (recipients, headers, attachments, etc.).
 	 *
-	 * @return array The result of the email send operation.
+	 * @return array{success: bool, message: string, send: bool, email_id?: string, error_code?: int|string}
 	 * @throws Exception If the email payload cannot be encoded to JSON.
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
@@ -106,13 +106,25 @@ class Smtp2goHandler implements ConnectionHandler {
 			'send'    => false,
 		];
 
+		/**
+		 * The raw email subject.
+		 *
+		 * @var string $raw_subject
+		 */
+		$raw_subject = $atts['subject'] ?? '';
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
+		$message       = $atts['message'] ?? '';
 		$email_payload = [
-			'sender'    => $connection['from_name'] . ' <' . $connection['from_email'] . '>',
+			'sender'    => (string) ( $connection['from_name'] ?? '' ) . ' <' . (string) ( $connection['from_email'] ?? '' ) . '>',
 			'to'        => $this->process_recipients( $processed_data['to'] ),
-			'cc'        => $this->process_recipients( $processed_data['headers']['cc'] ?? [] ),
-			'bcc'       => $this->process_recipients( $processed_data['headers']['bcc'] ?? [] ),
-			'subject'   => sanitize_text_field( $atts['subject'] ?? '' ),
-			'text_body' => wp_strip_all_tags( $atts['message'] ?? '' ),
+			'cc'        => $this->process_recipients( $processed_data['headers']['cc'] ),
+			'bcc'       => $this->process_recipients( $processed_data['headers']['bcc'] ),
+			'subject'   => sanitize_text_field( $raw_subject ),
+			'text_body' => wp_strip_all_tags( $message ),
 		];
 
 		$content_type = $processed_data['headers']['content_type'];
@@ -194,7 +206,7 @@ class Smtp2goHandler implements ConnectionHandler {
 	/**
 	 * Return the option configuration for SMTP2GO.
 	 *
-	 * @return array
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, display_name: string, icon: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -212,7 +224,7 @@ class Smtp2goHandler implements ConnectionHandler {
 	/**
 	 * Get the specific schema fields for SMTP2GO.
 	 *
-	 * @return array
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [
@@ -238,8 +250,8 @@ class Smtp2goHandler implements ConnectionHandler {
 	 * This function handles recipients provided as either an array (with keys 'email' or 'from_email' and optional 'name')
 	 * or as a plain email string. If a name is provided, it formats the recipient as "Name <email>".
 	 *
-	 * @param array $recipients Array of recipients.
-	 * @return array Processed array of email strings.
+	 * @param array<int, array{name?: string, email?: string, from_email?: string}|string> $recipients Array of recipients.
+	 * @return array<int, string> Processed array of email strings.
 	 */
 	private static function process_recipients( $recipients ) {
 		$result = [];
@@ -262,8 +274,8 @@ class Smtp2goHandler implements ConnectionHandler {
 	/**
 	 * Process attachments by reading the file, encoding its contents in base64 and preparing the attachment array.
 	 *
-	 * @param array $attachments Array of attachment file paths.
-	 * @return array
+	 * @param array<int, string> $attachments Array of attachment file paths.
+	 * @return array<int, array{filename: string|false, fileblob: string|false, mimetype: string|false}>
 	 */
 	private function get_attachments( $attachments ) {
 		$result = [];
@@ -286,12 +298,12 @@ class Smtp2goHandler implements ConnectionHandler {
 	/**
 	 * Build the request headers for the API request.
 	 *
-	 * @return array
+	 * @return array<string, string|int|bool>
 	 */
 	private function get_request_headers() {
 		return [
 			'Content-Type'      => 'application/json',
-			'X-Smtp2go-Api-Key' => sanitize_text_field( $this->connection_data['api_key'] ),
+			'X-Smtp2go-Api-Key' => sanitize_text_field( (string) ( $this->connection_data['api_key'] ?? '' ) ),
 			'timeout'           => 30,
 			'httpversion'       => '1.1',
 			'blocking'          => true,

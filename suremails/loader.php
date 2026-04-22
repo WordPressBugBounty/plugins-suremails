@@ -9,6 +9,7 @@
 
 namespace SureMails;
 
+use SureMails\Inc\Abilities\Ability;
 use SureMails\Inc\Admin\Activator;
 use SureMails\Inc\Admin\Crons;
 use SureMails\Inc\Admin\Plugin;
@@ -92,6 +93,9 @@ class Loader {
 		Api_Init::instance();
 		Analytics::instance();
 		WeeklySummary::instance();
+
+		// Register WordPress Abilities API (WP 6.9+).
+		$this->register_abilities();
 	}
 
 	/**
@@ -101,8 +105,8 @@ class Loader {
 	 */
 	public function load_libraries() {
 
-		if ( ! class_exists( 'Astra_Notices' ) ) {
-			require_once SUREMAILS_DIR . 'inc/lib/astra-notices/class-astra-notices.php';
+		if ( ! class_exists( 'BSF_Admin_Notices' ) ) {
+			require_once SUREMAILS_DIR . 'inc/lib/astra-notices/class-bsf-admin-notices.php';
 		}
 
 		if ( ! class_exists( 'BSF_Analytics_Loader' ) ) {
@@ -116,7 +120,7 @@ class Loader {
 			}
 		}
 
-		$srml_bsf_analytics = \BSF_Analytics_Loader::get_instance();
+		$srml_bsf_analytics = \BSF_Analytics_Loader::get_instance(); // @phpstan-ignore class.notFound
 
 		$srml_bsf_analytics->set_entity(
 			[
@@ -125,6 +129,21 @@ class Loader {
 					'path'                => SUREMAILS_DIR . 'inc/lib/bsf-analytics',
 					'author'              => 'SureMail',
 					'time_to_display'     => '+24 hours',
+					'deactivation_survey' => apply_filters(
+						'suremails_deactivation_survey_data',
+						[
+							[
+								'id'                => 'deactivation-survey-suremails',
+								'popup_logo'        => SUREMAILS_PLUGIN_URL . 'inc/images/suremails.svg',
+								'plugin_slug'       => 'suremails',
+								'popup_title'       => 'Quick Feedback',
+								'support_url'       => 'https://suremails.com/contact/',
+								'popup_description' => 'If you have a moment, please share why you are deactivating SureMail:',
+								'show_on_screens'   => [ 'plugins' ],
+								'plugin_version'    => SUREMAILS_VERSION,
+							],
+						]
+					),
 					'hide_optin_checkbox' => true,
 				],
 			]
@@ -271,6 +290,29 @@ class Loader {
 			// Look in local /wp-content/plugins/suremails/languages/ folder.
 			load_textdomain( 'suremails', $mofile_local );
 		}
+	}
+
+	/**
+	 * Register abilities for the WordPress Abilities API.
+	 *
+	 * Graceful degradation: if Abilities API is not available (WordPress < 6.9),
+	 * the plugin functions normally — abilities simply aren't registered.
+	 *
+	 * @since 1.9.4
+	 * @return void
+	 */
+	private function register_abilities(): void {
+		if (
+			! defined( 'SUREMAILS_ABILITY_API' ) ||
+			! SUREMAILS_ABILITY_API || // @phpstan-ignore booleanNot.alwaysFalse (defensive check — constant may be overridden)
+			! function_exists( 'wp_register_ability' )
+		) {
+			return;
+		}
+
+		$ability = new Ability();
+		add_action( 'wp_abilities_api_categories_init', [ $ability, 'register_categories' ] );
+		add_action( 'wp_abilities_api_init', [ $ability, 'register' ] );
 	}
 
 	/**

@@ -31,9 +31,9 @@ class Db_Helper {
 	/**
 	 * Form the where clause string from given array conditions
 	 *
-	 * @param array<string,mixed> $where Where Array.
-	 * @param bool                $having_flag Having or Where flag.
-	 * @return array<string, array<int<0, max>, array|string>|string>
+	 * @param array<string, int|string|array<int, int|string>>|null $where Where Array.
+	 * @param bool                                                  $having_flag Having or Where flag.
+	 * @return array{clause: string, values: array<int, int|string>}
 	 */
 	public static function form_where_clause( $where = null, $having_flag = false ) {
 
@@ -55,15 +55,17 @@ class Db_Helper {
 				$field_name = $matches[2];
 				$operator   = strtoupper( $matches[3] );
 
-				if ( in_array( $operator, [ 'IN', 'NOT IN' ], true ) && is_array( $value ) ) {
+				if ( is_array( $value ) && in_array( $operator, [ 'IN', 'NOT IN' ], true ) ) {
 					$placeholders = implode( ', ', array_fill( 0, count( $value ), '%s' ) );
 					$clause_part  = "{$field_name} {$operator} ({$placeholders})";
 					foreach ( $value as $v ) {
 						$values_where[] = $v;
 					}
-				} else {
+				} elseif ( ! is_array( $value ) ) {
 					$clause_part    = "{$field_name} {$operator} %s";
-					$values_where[] = esc_sql( $value );
+					$values_where[] = is_int( $value ) ? $value : esc_sql( $value );
+				} else {
+					continue;
 				}
 
 				if ( empty( $conditions ) ) {
@@ -74,8 +76,16 @@ class Db_Helper {
 				}
 			} else {
 				// Default to '=' operator.
-				$default_clause = "{$field} = %s";
-				$values_where[] = $value;
+				if ( is_array( $value ) ) {
+					$placeholders   = implode( ', ', array_fill( 0, count( $value ), '%s' ) );
+					$default_clause = "{$field} IN ({$placeholders})";
+					foreach ( $value as $v ) {
+						$values_where[] = $v;
+					}
+				} else {
+					$default_clause = "{$field} = %s";
+					$values_where[] = $value;
+				}
 				if ( empty( $conditions ) ) {
 					$conditions[] = $default_clause;
 				} else {

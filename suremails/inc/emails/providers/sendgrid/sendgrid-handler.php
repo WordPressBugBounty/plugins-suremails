@@ -26,7 +26,7 @@ class SendgridHandler implements ConnectionHandler {
 	/**
 	 * SendGrid connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
@@ -42,7 +42,7 @@ class SendgridHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -51,7 +51,7 @@ class SendgridHandler implements ConnectionHandler {
 	/**
 	 * Get headers for the SendGrid connection.
 	 *
-	 * @return array The headers for the SendGrid connection.
+	 * @return array<string, string> The headers for the SendGrid connection.
 	 * @param string $api_key The API key for the SendGrid connection.
 	 * @since 1.0.1
 	 */
@@ -65,7 +65,7 @@ class SendgridHandler implements ConnectionHandler {
 	/**
 	 * Authenticate the SendGrid connection by verifying the API key.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code: int}
 	 */
 	public function authenticate() {
 		if ( empty( $this->connection_data['api_key'] ) || empty( $this->connection_data['from_email'] ) ) {
@@ -86,11 +86,11 @@ class SendgridHandler implements ConnectionHandler {
 	/**
 	 * Send an email via SendGrid, including attachments if provided.
 	 *
-	 * @param array $atts        The email attributes, such as 'to', 'from', 'subject', 'message', 'headers', 'attachments', etc.
-	 * @param int   $log_id      The log ID for the email.
-	 * @param array $connection  The connection details.
-	 * @param array $processed_data The processed email data.
-	 * @return array             The result of the email send operation.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The log ID for the email.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data.
+	 * @return array{success: bool, message: string, send: bool, error_code?: int|string} The result of the email send operation.
 	 * @throws \Exception If the email payload cannot be encoded to JSON.
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
@@ -100,19 +100,25 @@ class SendgridHandler implements ConnectionHandler {
 			'send'    => false,
 		];
 
+		/**
+		 * The raw email subject.
+		 *
+		 * @var string $raw_subject
+		 */
+		$raw_subject   = $atts['subject'] ?? '';
 		$email_payload = [
 			'personalizations' => [],
 			'from'             => [
-				'email' => sanitize_email( $connection['from_email'] ),
-				'name'  => ! empty( $connection['from_name'] ) ? sanitize_text_field( $connection['from_name'] ) : __( 'WordPress', 'suremails' ),
+				'email' => sanitize_email( (string) ( $connection['from_email'] ?? '' ) ),
+				'name'  => ! empty( $connection['from_name'] ) ? sanitize_text_field( (string) ( $connection['from_name'] ) ) : __( 'WordPress', 'suremails' ),
 			],
-			'subject'          => sanitize_text_field( $atts['subject'] ?? '' ),
+			'subject'          => sanitize_text_field( $raw_subject ),
 			'content'          => [],
 		];
 
 		// Prepare recipients.
 		$email_payload['personalizations'][] = [
-			'to' => $processed_data['to'] ?? [],
+			'to' => $processed_data['to'],
 		];
 
 		// Add CC and BCC if provided.
@@ -124,21 +130,27 @@ class SendgridHandler implements ConnectionHandler {
 		}
 
 		// Add content based on content type.
-		$is_html                    = isset( $processed_data['headers']['content_type'] ) && strtolower( $processed_data['headers']['content_type'] ) === 'text/html';
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
+		$message                    = $atts['message'] ?? '';
+		$is_html                    = strtolower( $processed_data['headers']['content_type'] ) === 'text/html';
 		$email_payload['content'][] = [
 			'type'  => $is_html ? 'text/html' : 'text/plain',
-			'value' => $is_html ? $atts['message'] : wp_strip_all_tags( $atts['message'] ),
+			'value' => $is_html ? $message : wp_strip_all_tags( $message ),
 		];
 
 		// Handle reply-to information.
-		$reply_to = $processed_data['headers']['reply_to'] ?? [];
+		$reply_to = $processed_data['headers']['reply_to'];
 		if ( ! empty( $reply_to ) ) {
-			if ( is_array( $reply_to ) && count( $reply_to ) > 1 ) {
+			if ( count( $reply_to ) > 1 ) {
 				$email_payload['reply_to_list'] = array_map(
 					static function ( $email ) {
 						return [
 							'email' => sanitize_email( $email['email'] ),
-							'name'  => isset( $email['name'] ) ? sanitize_text_field( $email['name'] ) : '',
+							'name'  => isset( $email['name'] ) ? sanitize_text_field( $email['name'] ) : '', // @phpstan-ignore isset.offset
 						];
 					},
 					$reply_to
@@ -149,7 +161,7 @@ class SendgridHandler implements ConnectionHandler {
 				$single_reply_to           = reset( $reply_to );
 				$email_payload['reply_to'] = [
 					'email' => sanitize_email( $single_reply_to['email'] ),
-					'name'  => isset( $single_reply_to['name'] ) ? sanitize_text_field( $single_reply_to['name'] ) : '',
+					'name'  => isset( $single_reply_to['name'] ) ? sanitize_text_field( $single_reply_to['name'] ) : '', // @phpstan-ignore isset.offset
 				];
 			}
 		}
@@ -186,7 +198,7 @@ class SendgridHandler implements ConnectionHandler {
 			$response = wp_safe_remote_post(
 				$this->api_url,
 				[
-					'headers' => $this->get_headers( $connection['api_key'] ),
+					'headers' => $this->get_headers( (string) ( $connection['api_key'] ?? '' ) ),
 					'body'    => $json_payload,
 				]
 			);
@@ -233,7 +245,7 @@ class SendgridHandler implements ConnectionHandler {
 	/**
 	 * Return the option configuration for SendGrid.
 	 *
-	 * @return array
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, display_name: string, icon: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -251,7 +263,7 @@ class SendgridHandler implements ConnectionHandler {
 	/**
 	 * Get the specific schema fields for SendGrid.
 	 *
-	 * @return array
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [

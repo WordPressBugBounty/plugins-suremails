@@ -26,7 +26,7 @@ class BrevoHandler implements ConnectionHandler {
 	/**
 	 * Brevo connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
@@ -40,7 +40,7 @@ class BrevoHandler implements ConnectionHandler {
 	/**
 	 * The allowed attachment extensions.
 	 *
-	 * @var array
+	 * @var array<int, string>
 	 */
 	private $allowed_extensions = [
 		'xlsx',
@@ -100,7 +100,7 @@ class BrevoHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -113,7 +113,7 @@ class BrevoHandler implements ConnectionHandler {
 	 * exists as a sender. If not, it retrieves the domains and checks whether the domain extracted
 	 * from the from_email is both authenticated and verified.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code?: int}
 	 */
 	public function authenticate() {
 
@@ -133,11 +133,11 @@ class BrevoHandler implements ConnectionHandler {
 	/**
 	 * Send an email via Brevo, including attachments if provided.
 	 *
-	 * @param array $atts           The email attributes (e.g., to, from, subject, message, etc.).
-	 * @param int   $log_id         The log ID for the email.
-	 * @param array $connection     The connection details.
-	 * @param array $processed_data The processed email data.
-	 * @return array                The result of the email send operation.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes (e.g., to, from, subject, message, etc.).
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The log ID for the email.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data.
+	 * @return array{success: bool, message: string, send: bool, error_code?: int|string} The result of the email send operation.
 	 * @throws \Exception           If the email payload cannot be encoded to JSON.
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
@@ -147,29 +147,39 @@ class BrevoHandler implements ConnectionHandler {
 			'send'    => false,
 		];
 
-		$body = [
+		/**
+		 * The raw email subject.
+		 *
+		 * @var string $raw_subject
+		 */
+		$raw_subject = $atts['subject'] ?? '';
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
+		$message = $atts['message'] ?? '';
+		$body    = [
 			'sender'      => [
-				'name'  => ! empty( $connection['from_name'] ) ? $connection['from_name'] : __( 'WordPress', 'suremails' ),
-				'email' => sanitize_email( $connection['from_email'] ),
+				'name'  => ! empty( $connection['from_name'] ) ? (string) $connection['from_name'] : __( 'WordPress', 'suremails' ),
+				'email' => sanitize_email( (string) ( $connection['from_email'] ?? '' ) ),
 			],
-			'subject'     => sanitize_text_field( $atts['subject'] ?? '' ),
-			'htmlContent' => $atts['message'] ?? '',
+			'subject'     => sanitize_text_field( $raw_subject ),
+			'htmlContent' => $message,
 		];
 
 		$request_headers = [
-			'Api-Key'      => sanitize_text_field( $connection['api_key'] ),
+			'Api-Key'      => sanitize_text_field( (string) ( $connection['api_key'] ) ),
 			'Content-Type' => 'application/json',
 			'Accept'       => 'application/json',
 		];
 
 		// Determine the content type from headers (default to HTML).
-		$content_type = isset( $processed_data['headers']['content_type'] )
-			? strtolower( $processed_data['headers']['content_type'] )
-			: 'text/html';
+		$content_type = strtolower( $processed_data['headers']['content_type'] );
 
 		if ( 'text/plain' === $content_type ) {
 			unset( $body['htmlContent'] );
-			$body['textContent'] = wp_strip_all_tags( $atts['message'] );
+			$body['textContent'] = wp_strip_all_tags( $message );
 		}
 
 		if ( ! empty( $processed_data['to'] ) ) {
@@ -183,18 +193,18 @@ class BrevoHandler implements ConnectionHandler {
 			$body['bcc'] = $this->format_email_recipients( $processed_data['headers']['bcc'] );
 		}
 
-		$reply_to = $processed_data['headers']['reply_to'] ?? [];
+		$reply_to = $processed_data['headers']['reply_to'];
 		if ( ! empty( $reply_to ) ) {
 
 			$reply_to     = $this->format_email_recipients( $reply_to );
 			$single_reply = reset( $reply_to );
 
-			if ( isset( $single_reply['name'] ) && ! empty( $single_reply['name'] ) ) {
+			if ( is_array( $single_reply ) && isset( $single_reply['name'] ) && ! empty( $single_reply['name'] ) ) {
 				$body['replyTo'] = [
 					'email' => sanitize_email( $single_reply['email'] ),
 					'name'  => sanitize_text_field( $single_reply['name'] ),
 				];
-			} else {
+			} elseif ( is_array( $single_reply ) ) {
 				$body['replyTo'] = [
 					'email' => sanitize_email( $single_reply['email'] ),
 				];
@@ -278,7 +288,7 @@ class BrevoHandler implements ConnectionHandler {
 	/**
 	 * Return the option configuration for Brevo.
 	 *
-	 * @return array
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, display_name: string, icon: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -296,7 +306,7 @@ class BrevoHandler implements ConnectionHandler {
 	/**
 	 * Get the specific schema fields for Brevo.
 	 *
-	 * @return array
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [
@@ -318,13 +328,13 @@ class BrevoHandler implements ConnectionHandler {
 	 * Iterates through the email recipient fields (e.g., reply_to, to, cc, bcc)
 	 * and removes the 'name' attribute if it is empty.
 	 *
-	 * @param array $recipients The array of email recipients.
-	 * @return array The sanitized array of recipients.
+	 * @param array<int, array{name: string, email: string}> $recipients The array of email recipients.
+	 * @return array<int, array{email: string, name?: string}>
 	 */
 	private function format_email_recipients( array $recipients ) {
 		return array_map(
 			static function ( $recipient ) {
-				if ( isset( $recipient['email'] ) && isset( $recipient['name'] ) ) {
+				if ( isset( $recipient['email'] ) && isset( $recipient['name'] ) ) { // @phpstan-ignore isset.offset, booleanAnd.alwaysTrue, isset.offset
 					if ( empty( $recipient['name'] ) ) {
 						unset( $recipient['name'] );
 					}

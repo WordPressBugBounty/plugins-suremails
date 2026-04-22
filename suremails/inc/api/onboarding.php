@@ -14,6 +14,7 @@ namespace SureMails\Inc\API;
 
 use SureMails\Inc\Onboarding as OnboardingSettings;
 use SureMails\Inc\Traits\Instance;
+use WP_REST_Request;
 use WP_REST_Response;
 use WP_REST_Server;
 
@@ -53,6 +54,13 @@ class Onboarding extends Api_Base {
 					'methods'             => WP_REST_Server::EDITABLE,
 					'callback'            => [ $this, 'set_onboarding_flag' ],
 					'permission_callback' => [ $this, 'validate_permission' ],
+					'args'                => [
+						'skipped' => [
+							'required'          => false,
+							'type'              => 'boolean',
+							'sanitize_callback' => 'rest_sanitize_boolean',
+						],
+					],
 				],
 			]
 		);
@@ -61,12 +69,17 @@ class Onboarding extends Api_Base {
 	/**
 	 * Set onboarding completion status.
 	 *
+	 * @param WP_REST_Request $request Request object.
+	 * @phpstan-param WP_REST_Request<array<string, mixed>> $request
 	 * @since 0.0.1
 	 * @return WP_REST_Response
 	 */
-	public function set_onboarding_flag() {
+	public function set_onboarding_flag( WP_REST_Request $request ) {
 		// Set the onboarding status to yes always.
 		OnboardingSettings::instance()->set_onboarding_status( 'yes' );
+		OnboardingSettings::instance()->set_onboarding_skipped_status(
+			(bool) $request->get_param( 'skipped' )
+		);
 
 		return new WP_REST_Response( [ 'success' => true ] );
 	}

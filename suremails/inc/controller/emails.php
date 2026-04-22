@@ -63,7 +63,10 @@ class Emails {
 			return;
 		}
 
-		$meta = $log_entry['meta'];
+		$meta = is_array( $log_entry['meta'] ) ? $log_entry['meta'] : [
+			'retry'  => 0,
+			'resend' => 0,
+		];
 
 		// Check if the email has already been sent successfully.
 		if ( $log_entry['status'] === Logger::STATUS_SENT ) {
@@ -80,10 +83,35 @@ class Emails {
 
 		// Set the current log ID using the setter.
 		$logger->set_id( $log_id );
-		$to         = $log_entry['email_to'];
-		$subject    = $log_entry['subject'];
-		$message    = $log_entry['body'];
-		$headers    = $log_entry['headers'];
+		/**
+		 * The email recipient.
+		 *
+		 * @var string $to
+		 */
+		$to = $log_entry['email_to'];
+		/**
+		 * The email subject.
+		 *
+		 * @var string $subject
+		 */
+		$subject = $log_entry['subject'];
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
+		$message = $log_entry['body'];
+		/**
+		 * The email headers.
+		 *
+		 * @var string|array<int, string> $headers
+		 */
+		$headers = $log_entry['headers'];
+		/**
+		 * The email attachments.
+		 *
+		 * @var array<int, string> $attachment
+		 */
 		$attachment = $log_entry['attachments'];
 
 		self::send( $to, $subject, $message, $headers, $attachment );
@@ -141,13 +169,18 @@ class Emails {
 
 					return;
 				}
-				$extracted            = ProviderHelper::extract_log_data( $logs_to_delete );
-				$log_ids              = $extracted['log_ids'] ?? [];
-				$all_attachments_list = $extracted['attachments'] ?? [];
+				$extracted = ProviderHelper::extract_log_data( $logs_to_delete );
+				/**
+				 * Log IDs extracted from logs.
+				 *
+				 * @var array<int, int|string> $log_ids
+				 */
+				$log_ids              = $extracted['log_ids'];
+				$all_attachments_list = $extracted['attachments'];
 
 				// Build conditions to check for attachments in logs that should be retained.
 				$where                 = ProviderHelper::build_attachment_like_conditions( $all_attachments_list );
-				$where['id NOT IN']    = $log_ids;
+				$where['id NOT IN']    = array_values( $log_ids );
 				$where['updated_at >'] = $date_threshold;
 
 				// Fetch logs that are still retained (so we don't delete shared attachments).

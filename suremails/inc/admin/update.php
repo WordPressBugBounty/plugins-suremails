@@ -27,7 +27,7 @@ class Update {
 	/**
 	 * DB updates and callbacks that need to be run per version.
 	 *
-	 * @var array
+	 * @var array<string, array<int, string>>
 	 */
 	private static $db_updates = [
 		'1.3.0' => [
@@ -50,7 +50,13 @@ class Update {
 		if ( ! defined( 'SUREMAILS_MIGRATIONS' ) ) {
 			define( 'SUREMAILS_MIGRATIONS', 'suremails_migrations' );
 		}
-		add_action( 'admin_init', [ $this, 'init' ] );
+
+		if ( is_admin() ) {
+			add_action( 'admin_init', [ $this, 'init' ] );
+		} else {
+			add_action( 'init', [ $this, 'init' ] );
+		}
+
 		add_action( 'suremails_update_before', [ $this, 'migrate' ] );
 	}
 
@@ -78,7 +84,7 @@ class Update {
 			return;
 		}
 
-		do_action( 'suremails_update_before' );
+		do_action( 'suremails_update_before', $saved_version, SUREMAILS_VERSION );
 
 		// Auto update product latest version.
 		update_option( 'suremails-version', SUREMAILS_VERSION, false );
@@ -90,7 +96,7 @@ class Update {
 	 * Get list of DB update callbacks.
 	 *
 	 * @since 1.3.0
-	 * @return array
+	 * @return array<string, array<int, string>>
 	 */
 	public function get_db_update_callbacks() {
 		return self::$db_updates;

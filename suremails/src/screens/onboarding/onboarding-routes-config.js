@@ -8,17 +8,15 @@ const ONBOARDING_ROUTES_CONFIG = [
 	},
 	{
 		url: '/onboarding/reputation-shield',
-		requires: {
-			stateKeys: [ 'connectionSaved' ],
-			redirectUrl: '/onboarding/connection',
-		},
-	},
-	{
-		url: '/onboarding/add-ons',
 	},
 	{
 		url: '/onboarding/done',
 	},
 ];
+
+export const getVisibleOnboardingRoutes = ( onboardingState = {} ) => {
+	void onboardingState;
+	return ONBOARDING_ROUTES_CONFIG;
+};
 
 export default ONBOARDING_ROUTES_CONFIG;

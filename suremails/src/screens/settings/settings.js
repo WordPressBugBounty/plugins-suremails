@@ -516,14 +516,14 @@ const Settings = () => {
 							size="sm"
 							label={ {
 								heading: __(
-									'Enable Anonymous Analytics',
+									'Contribute to SureMail',
 									'suremails'
 								),
 								description: (
 									<span>
 										<span>
 											{ __(
-												'Provide non-sensitive information such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. ',
+												'Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. ',
 												'suremails'
 											) }
 										</span>

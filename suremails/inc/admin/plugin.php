@@ -37,9 +37,8 @@ class Plugin {
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_scripts' ] );
 		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_admin_notice_scripts' ] );
 		add_action( 'admin_notices', [ $this, 'check_configuration' ] );
-		add_action( 'admin_notices', [ $this, 'show_menu_location_notice' ] );
-		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_menu_location_notice_scripts' ] );
 		add_action( 'admin_head', [ $this, 'hide_duplicate_menu_css' ] );
+		add_action( 'admin_enqueue_scripts', [ $this, 'enqueue_menu_location_notice_scripts' ] );
 
 		// Add settings link to the plugin action links.
 		add_filter( 'plugin_action_links_' . SUREMAILS_BASE, [ $this, 'add_settings_link' ] );
@@ -264,19 +263,42 @@ class Plugin {
 			$assets['version'],
 		);
 
+		$current_user = wp_get_current_user();
+		$user_details = Settings::instance()->get_user_details();
+
+		if ( ! is_array( $user_details ) ) {
+			$user_details = [];
+		}
+
+		$analytics_optin            = get_option( 'suremails_usage_optin', 'no' );
+		$content_guard_user_details = [
+			'first_name'     => isset( $user_details['first_name'] ) ? sanitize_text_field( $user_details['first_name'] ) : '',
+			'last_name'      => isset( $user_details['last_name'] ) ? sanitize_text_field( $user_details['last_name'] ) : '',
+			'email'          => isset( $user_details['email'] ) ? sanitize_email( $user_details['email'] ) : '',
+			'agree_to_terms' => isset( $user_details['agree_to_terms'] ) ? (bool) $user_details['agree_to_terms'] : ( 'yes' === $analytics_optin ),
+			'skip'           => isset( $user_details['skip'] ) ? sanitize_text_field( $user_details['skip'] ) : 'no',
+			'lead'           => ! empty( $user_details['lead'] ),
+		];
+
 		// Localize script to pass data to React.
 		wp_localize_script(
 			'suremails-react-script',
 			'suremails',
 			[
+				'currentUser'                  => [
+					'firstName' => sanitize_text_field( (string) ( $current_user->first_name ?? '' ) ),
+					'lastName'  => sanitize_text_field( (string) ( $current_user->last_name ?? '' ) ),
+					'email'     => sanitize_email( (string) ( $current_user->user_email ?? '' ) ),
+				],
 				'siteUrl'                      => esc_url( get_site_url( get_current_blog_id() ) ),
 				'attachmentUrl'                => $this->get_attachment_url(),
-				'userEmail'                    => wp_get_current_user()->user_email,
+				'userEmail'                    => sanitize_email( (string) ( $current_user->user_email ?? '' ) ),
 				'version'                      => SUREMAILS_VERSION,
 				'nonce'                        => current_user_can( 'manage_options' ) ? wp_create_nonce( 'wp_rest' ) : '',
 				'_ajax_nonce'                  => current_user_can( 'manage_options' ) ? wp_create_nonce( 'suremails_plugin' ) : '',
 				'contentGuardPopupStatus'      => Settings::instance()->show_content_guard_lead_popup(),
 				'contentGuardActiveStatus'     => get_option( 'suremails_content_guard_activated', 'no' ),
+				'contentGuardUserDetails'      => $content_guard_user_details,
 				'termsURL'                     => 'https://suremails.com/terms?utm_campaign=suremails&utm_medium=suremails-dashboard',
 				'privacyPolicyURL'             => 'https://suremails.com/privacy-policy?utm_campaign=suremails&utm_medium=suremails-dashboard',
 				'docsURL'                      => 'https://suremails.com/docs?utm_campaign=suremails&utm_medium=suremails-dashboard',
@@ -298,8 +320,8 @@ class Plugin {
 			'suremails-react-styles',
 			'
 			#adminmenu .toplevel_page_' . SUREMAILS . ' .wp-submenu li.wp-first-item,
-			#adminmenu .toplevel_page_' . SUREMAILS . ' .wp-submenu li.wp-first-item a { 
-				display: none !important; 
+			#adminmenu .toplevel_page_' . SUREMAILS . ' .wp-submenu li.wp-first-item a {
+				display: none !important;
 			}
 		'
 		);
@@ -317,8 +339,8 @@ class Plugin {
 	/**
 	 * Add a "Settings" and a "Setup Wizard" link on the Plugins page.
 	 *
-	 * @param array $links Existing plugin action links.
-	 * @return array Updated plugin action links.
+	 * @param array<int|string, string> $links Existing plugin action links.
+	 * @return array<int|string, string> Updated plugin action links.
 	 */
 	public function add_settings_link( array $links ) {
 
@@ -352,36 +374,6 @@ class Plugin {
 			</style>
 			<?php
 		}
-	}
-
-	/**
-	 * Show menu location notice to inform users about the menu location change.
-	 *
-	 * @return void
-	 */
-	public function show_menu_location_notice() {
-		if ( ! is_admin() ) {
-			return;
-		}
-
-		if ( ! current_user_can( 'manage_options' ) ) {
-			return;
-		}
-
-		if ( $this->is_menu_notice_disabled() ) {
-			return;
-		}
-
-		$current_page = isset( $_GET['page'] ) ? sanitize_text_field( wp_unslash( $_GET['page'] ) ) : ''; // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-
-		if ( $current_page === SUREMAILS ) {
-			return;
-		}
-
-		?>
-			<div id="suremails-menu-location-notice" class="notice notice-info is-dismissible">
-			</div>
-		<?php
 	}
 
 	/**

@@ -28,7 +28,7 @@ class PhpmailHandler implements ConnectionHandler {
 	/**
 	 * PHP mail connection data.
 	 *
-	 * @var array
+	 * @var array<string, string|int|bool>
 	 */
 	protected $connection_data;
 
@@ -37,7 +37,7 @@ class PhpmailHandler implements ConnectionHandler {
 	 *
 	 * Initializes connection data.
 	 *
-	 * @param array $connection_data The connection details.
+	 * @param array<string, string|int|bool> $connection_data The connection details.
 	 */
 	public function __construct( array $connection_data ) {
 		$this->connection_data = $connection_data;
@@ -49,11 +49,11 @@ class PhpmailHandler implements ConnectionHandler {
 	 * Since PHP Mail does not provide a direct authentication endpoint, this function
 	 * simply saves the connection data and returns a success message.
 	 *
-	 * @return array The result of the authentication attempt.
+	 * @return array{success: bool, message: string, error_code: int}
 	 */
 	public function authenticate() {
 
-		$from_email = sanitize_email( $this->connection_data['from_email'] );
+		$from_email = sanitize_email( (string) ( $this->connection_data['from_email'] ?? '' ) );
 
 		if ( empty( $this->connection_data['from_email'] ) ) {
 			return [
@@ -73,25 +73,31 @@ class PhpmailHandler implements ConnectionHandler {
 	/**
 	 * Send an email using PHP Mail.
 	 *
-	 * @param array $atts The email attributes.
-	 * @param int   $log_id The log ID.
-	 * @param array $connection The connection details.
-	 * @param array $processed_data The processed email data.
+	 * @param array<string, string|array<int, string>>                                                                                                                                                                                                                                                                                                                                                                                                                                                                             $atts The email attributes.
+	 * @param int                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  $log_id The log ID.
+	 * @param array<string, string|int|bool>                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       $connection The connection details.
+	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed email data.
 	 *
-	 * @return array The result of the sending attempt.
+	 * @return array{success: bool, message: string, send: bool}
 	 */
 	public function send( array $atts, $log_id, array $connection, $processed_data ) {
 		$phpmailer = ConnectionManager::instance()->get_phpmailer();
 
-		$from_email = sanitize_email( $connection['from_email'] );
-		$from_name  = sanitize_text_field( $connection['from_name'] );
+		$from_email = sanitize_email( (string) ( $connection['from_email'] ?? '' ) );
+		$from_name  = sanitize_text_field( (string) ( $connection['from_name'] ) );
 		$phpmailer->setFrom( $from_email, $from_name );
 		$phpmailer->isMail();
 
 		$content_type = $processed_data['headers']['content_type'];
+		/**
+		 * The email message body.
+		 *
+		 * @var string $message
+		 */
+		$message = $atts['message'] ?? '';
 		if ( ! empty( $content_type ) && ProviderHelper::is_html( $content_type ) ) {
-			$phpmailer->msgHTML( $atts['message'] );
-			$phpmailer->AltBody = wp_strip_all_tags( $atts['message'] );
+			$phpmailer->msgHTML( $message );
+			$phpmailer->AltBody = wp_strip_all_tags( $message );
 		}
 
 		try {
@@ -127,7 +133,7 @@ class PhpmailHandler implements ConnectionHandler {
 	/**
 	 * Get the PHP Mail connection options.
 	 *
-	 * @return array The PHP Mail connection options.
+	 * @return array{title: string, description: string, fields: array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>, icon: string, display_name: string, provider_type: string, field_sequence: array<int, string>, provider_sequence: int}
 	 */
 	public static function get_options() {
 		return [
@@ -145,7 +151,7 @@ class PhpmailHandler implements ConnectionHandler {
 	/**
 	 * Get the PHP Mail connection specific fields.
 	 *
-	 * @return array The PHP Mail connection specific fields.
+	 * @return array<string, array{required?: bool, datatype?: string, help_text?: string, label?: string, input_type?: string, placeholder?: string, encrypt?: bool, default?: bool|string|array{label: string, value: string}, depends_on?: array<int, string>, options?: array<string, string>|array<int, array{value: string, label: string}>, read_only?: bool, copy_button?: bool, class_name?: string, button_text?: string, alt_button_text?: string, on_click?: array{params: array<int|string, string>}, size?: string}>
 	 */
 	public static function get_specific_fields() {
 		return [];

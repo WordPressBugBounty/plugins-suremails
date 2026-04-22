@@ -334,6 +334,13 @@ const ConnectionProviders = () => {
 		await handleSaveChanges();
 	};
 
+	const handleSkip = async () => {
+		setState( {
+			hasSkippedStep: true,
+		} );
+		navigateToNextRoute();
+	};
+
 	return (
 		<form ref={ formRef } className="space-y-6">
 			<ConnectionProviderList />
@@ -350,6 +357,9 @@ const ConnectionProviders = () => {
 				continueProps={ {
 					onClick: handleContinue,
 					disabled: ! connection && ! connectionSaved,
+				} }
+				skipProps={ {
+					onClick: handleSkip,
 				} }
 			/>
 		</form>

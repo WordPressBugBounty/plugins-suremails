@@ -30,7 +30,7 @@ class WeeklySummary {
 	/**
 	 * Miscellaneous plugin settings.
 	 *
-	 * @var array|null
+	 * @var array<string, string>|null
 	 */
 	private $settings = null;
 
@@ -74,7 +74,7 @@ class WeeklySummary {
 	 */
 	private function send_summary_email(): void {
 		$email = $this->get_email_content();
-		if ( empty( $email ) || empty( $email['to'] ) || empty( $email['body'] ) ) {
+		if ( empty( $email['to'] ) || empty( $email['body'] ) ) {
 			return;
 		}
 		$this->send( $email['to'], $email['subject'], $email['body'], $this->get_html_headers(), [] );
@@ -83,7 +83,7 @@ class WeeklySummary {
 	/**
 	 * Builds the subject, body, and recipient for the summary email.
 	 *
-	 * @return array
+	 * @return array{to: string, subject: string, body: string}
 	 */
 	private function get_email_content(): array {
 		$stats = $this->get_statistics();
@@ -171,7 +171,7 @@ class WeeklySummary {
 	/**
 	 * Build email body with statistics.
 	 *
-	 * @param array $stats Email statistics.
+	 * @param array{sent: int, failed: int, blocked: int} $stats Email statistics.
 	 * @return string
 	 */
 	private function build_email_body( array $stats ): string {
@@ -217,7 +217,7 @@ class WeeklySummary {
 	/**
 	 * Build statistics table HTML.
 	 *
-	 * @param array $stats Email statistics.
+	 * @param array{sent: int, failed: int, blocked: int} $stats Email statistics.
 	 * @return string
 	 */
 	private function build_statistics_table( array $stats ): string {
@@ -262,7 +262,7 @@ class WeeklySummary {
 									</td>
 									<td
 										style="padding:12px;font-size:14px;color:#4B5563;text-align:right;width:146px;border-top:<?php echo esc_attr( $border_top ); ?>;<?php echo esc_attr( $border_radius_right ); ?>">
-										<?php echo esc_html( $stats[ $key ] ?? 0 ); ?>
+										<?php echo esc_html( (string) ( $stats[ $key ] ?? 0 ) ); // @phpstan-ignore nullCoalesce.offset ?>
 									</td>
 								</tr>
 								<?php
@@ -457,7 +457,7 @@ class WeeklySummary {
 	/**
 	 * Get email statistics for the past 7 days.
 	 *
-	 * @return array
+	 * @return array{sent: int, failed: int, blocked: int}
 	 */
 	private function get_statistics(): array {
 		$email_log  = EmailLog::instance();
@@ -483,6 +483,11 @@ class WeeklySummary {
 
 		if ( is_array( $results ) && ! empty( $results ) ) {
 			foreach ( $results as $row ) {
+				/**
+				 * The email status.
+				 *
+				 * @var string $status
+				 */
 				$status = $row['status'];
 				$count  = (int) $row['count'];
 				if ( isset( $counts[ $status ] ) ) {
