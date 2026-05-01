@@ -4374,6 +4374,12 @@ label:has(.sm-consent) {
   --tw-text-opacity: 1;
   color: rgb(220 38 38 / var(--tw-text-opacity, 1));
 }
+:is(#suremails-root-app, #suremails-admin-notice) :is(.\[\&\>\[role\=img\]\]\:h-full>[role=img]){
+  height: 100%;
+}
+:is(#suremails-root-app, #suremails-admin-notice) :is(.\[\&\>\[role\=img\]\]\:w-full>[role=img]){
+  width: 100%;
+}
 :is(#suremails-root-app, #suremails-admin-notice) :is(.\[\&\>a\]\:p-0\.5>a){
   padding: 0.125rem;
 }

@@ -334,7 +334,10 @@ export const Chart = ( {
 				>
 					{ dataToShow.length > 0 ? (
 						<div className="flex-1 w-full">
-							<div className="w-full h-full min-h-[248px] min-[1427px]:min-h-[228px]">
+							{ /* The `[&>[role=img]]` selectors restore the chart wrapper's
+							    dimensions: force-ui >=1.7.11's LineChart wraps the ResponsiveContainer
+							    in `<div role="img">` with no inline sizing, which collapses to 0×0. */ }
+							<div className="w-full h-full min-h-[248px] min-[1427px]:min-h-[228px] [&>[role=img]]:w-full [&>[role=img]]:h-full">
 								<LineChart
 									data={ dataToShow }
 									dataKeys={ [ 'sent', 'failed' ] }
@@ -347,7 +350,7 @@ export const Chart = ( {
 									showTooltip
 									showCartesianGrid={ true }
 									tooltipIndicator="dot"
-									tickFormatter={ formatXAxis }
+									xAxisTickFormatter={ formatXAxis }
 									xAxisDataKey="month"
 									chartWidth="100%"
 									chartHeight="100%"

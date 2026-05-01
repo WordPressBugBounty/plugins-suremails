@@ -26,23 +26,18 @@ msgstr "SureMail"
 msgid "https://suremails.com"
 msgstr "https://suremails.com"
 
-#. Description of the plugin
-#: suremails.php
-msgid "WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes—no more lost messages or frustrated customers."
-msgstr "Le email di WordPress spesso vanno perse o finiscono nello spam perché gli host web non sono costruiti per una consegna affidabile. SureMail risolve questo collegandosi a servizi SMTP affidabili, in modo che le tue email raggiungano le caselle di posta—niente più messaggi persi o clienti frustrati."
-
 #. Author URI of the plugin
 #: suremails.php
 msgid "https://suremails.com/"
 msgstr "https://suremails.com/"
 
-#: inc/admin/plugin.php:196
-#: inc/admin/plugin.php:209
+#: inc/admin/plugin.php:195
+#: inc/admin/plugin.php:208
 msgid "SureMail Settings"
 msgstr "Impostazioni di SureMail"
 
-#: inc/admin/plugin.php:349
-#: inc/admin/plugin.php:480
+#: inc/admin/plugin.php:348
+#: inc/admin/plugin.php:449
 #: build/main.js:2
 msgid "Settings"
 msgstr "Impostazioni"
@@ -216,13 +211,13 @@ msgstr "Reputation Shield"
 #: inc/controller/content-guard.php:388
 #: inc/controller/logger.php:563
 #: inc/controller/logger.php:565
-#: inc/emails/handler/mail-handler.php:420
+#: inc/emails/handler/mail-handler.php:423
 #, php-format
 msgid "Failed to update log ID %d."
 msgstr "Aggiornamento del log ID %d fallito."
 
 #: inc/emails/handler/mail-handler.php:158
-#: inc/emails/handler/mail-handler.php:532
+#: inc/emails/handler/mail-handler.php:535
 #: inc/emails/providers/aws/aws-handler.php:134
 #: inc/emails/providers/brevo/brevo-handler.php:164
 #: inc/emails/providers/emailit/emailit-handler.php:102
@@ -1728,7 +1723,7 @@ msgstr "Sei sicuro di voler eliminare il/i log selezionato/i? Questa azione non 
 msgid "Are you sure you want to resend the selected email(s)?"
 msgstr "Sei sicuro di voler reinviare il/i email selezionato/i?"
 
-#: inc/admin/plugin.php:488
+#: inc/admin/plugin.php:457
 #: build/main.js:2
 msgid "Email Logs"
 msgstr "Log email"
@@ -2092,7 +2087,7 @@ msgstr "Errore nel caricamento delle notifiche."
 msgid "There was an issue fetching notifications."
 msgstr "C'è stato un problema nel recupero delle notifiche."
 
-#: inc/admin/plugin.php:492
+#: inc/admin/plugin.php:461
 #: build/main.js:2
 msgid "Notifications"
 msgstr "Notifiche"
@@ -2496,7 +2491,7 @@ msgstr "Dati delle impostazioni da aggiornare."
 
 #. translators: %s is the error message.
 #: inc/controller/content-guard.php:354
-#: inc/emails/handler/mail-handler.php:360
+#: inc/emails/handler/mail-handler.php:363
 #, php-format
 msgid "Failed to log email: %s"
 msgstr "Impossibile registrare l'email: %s"
@@ -2686,12 +2681,12 @@ msgstr "Invio email fallito tramite SMTP: %s"
 msgid "Email sending failed via SMTP2GO. Error: %s"
 msgstr "Invio email fallito tramite SMTP2GO. Errore: %s"
 
-#: inc/admin/plugin.php:476
+#: inc/admin/plugin.php:445
 #: build/main.js:2
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: inc/admin/plugin.php:484
+#: inc/admin/plugin.php:453
 #: build/main.js:2
 msgid "Connections"
 msgstr "Connessioni"
@@ -2704,12 +2699,12 @@ msgstr "Notifica disabilitata per 15 giorni."
 msgid "Let's get started"
 msgstr "Iniziamo"
 
-#: inc/admin/plugin.php:197
-#: inc/admin/plugin.php:210
+#: inc/admin/plugin.php:196
+#: inc/admin/plugin.php:209
 msgid "SureMail SMTP"
 msgstr "SureMail SMTP"
 
-#: inc/admin/plugin.php:352
+#: inc/admin/plugin.php:351
 msgid "Setup Wizard"
 msgstr "Procedura guidata di configurazione"
 
@@ -3233,16 +3228,6 @@ msgstr "Attiva per mostrare SureMail nel menu principale o sotto Impostazioni �
 #: inc/api/notice.php:101
 msgid "Menu location notice dismissed."
 msgstr "Avviso sulla posizione del menu ignorato."
-
-#: admin-notice/index.js:40
-#: build/admin-notice.js:2
-msgid "Go to Settings"
-msgstr "Vai alle Impostazioni"
-
-#: admin-notice/index.js:36
-#: build/admin-notice.js:2
-msgid "SureMail is now under Settings → SureMail. You can change its menu position in settings."
-msgstr "SureMail ora si trova in Impostazioni → SureMail. Puoi cambiare la sua posizione nel menu nelle impostazioni."
 
 #: inc/emails/providers/emailit/emailit-handler.php:96
 msgid "Invalid or missing from email address."
@@ -3865,8 +3850,13 @@ msgstr "Contribuisci a SureMail"
 
 #: build/main.js:2
 msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
-msgstr "Raccogli informazioni non sensibili dal tuo sito web, come la versione PHP e le funzionalità utilizzate, per aiutarci a correggere i bug più velocemente, prendere decisioni più intelligenti e costruire funzionalità che contano davvero per te. "
+msgstr "Raccogli informazioni non sensibili dal tuo sito web, come la versione PHP e le funzionalità utilizzate, per aiutarci a correggere i bug più velocemente, prendere decisioni più intelligenti e costruire funzionalità che contano davvero per te."
 
 #: build/main.js:2
 msgid "Stay in the loop and help shape SureMail! Get feature updates, and help us build a better SureMail by sharing how you use the plugin. <a>Privacy Policy</a>"
 msgstr "Rimani aggiornato e aiuta a migliorare SureMail! Ricevi aggiornamenti sulle funzionalità e aiutaci a costruire un SureMail migliore condividendo come usi il plugin. <a>Informativa sulla privacy</a>"
+
+#. Description of the plugin
+#: suremails.php
+msgid "WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes - no more lost messages or frustrated customers."
+msgstr "Le email di WordPress spesso scompaiono o finiscono nello spam perché gli hosting web non sono progettati per una consegna affidabile. SureMail risolve questo collegandosi a servizi SMTP affidabili, così le tue email arrivano nelle caselle di posta - niente più messaggi persi o clienti frustrati."

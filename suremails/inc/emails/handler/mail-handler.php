@@ -210,7 +210,10 @@ class MailHandler {
 				$events->track(
 					'first_email_sent',
 					SUREMAILS_VERSION,
-					[ 'days_since_install' => (string) Analytics::get_days_since_install() ]
+					[
+						'days_since_install' => (string) Analytics::get_days_since_install(),
+						'provider_type'      => (string) ( $connection['type'] ?? 'Default' ),
+					]
 				);
 			}
 			do_action( 'wp_mail_succeeded', $mail_data );

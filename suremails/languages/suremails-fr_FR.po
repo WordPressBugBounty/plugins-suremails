@@ -26,23 +26,18 @@ msgstr "SureMail"
 msgid "https://suremails.com"
 msgstr "https://suremails.com"
 
-#. Description of the plugin
-#: suremails.php
-msgid "WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes—no more lost messages or frustrated customers."
-msgstr "Les e-mails WordPress disparaissent souvent ou atterrissent dans les spams car les hébergeurs web ne sont pas conçus pour une livraison fiable. SureMail résout ce problème en se connectant à des services SMTP de confiance, afin que vos e-mails atteignent les boîtes de réception—plus de messages perdus ou de clients frustrés."
-
 #. Author URI of the plugin
 #: suremails.php
 msgid "https://suremails.com/"
 msgstr "https://suremails.com/"
 
-#: inc/admin/plugin.php:196
-#: inc/admin/plugin.php:209
+#: inc/admin/plugin.php:195
+#: inc/admin/plugin.php:208
 msgid "SureMail Settings"
 msgstr "Paramètres de SureMail"
 
-#: inc/admin/plugin.php:349
-#: inc/admin/plugin.php:480
+#: inc/admin/plugin.php:348
+#: inc/admin/plugin.php:449
 #: build/main.js:2
 msgid "Settings"
 msgstr "Paramètres"
@@ -216,13 +211,13 @@ msgstr "Bouclier de réputation"
 #: inc/controller/content-guard.php:388
 #: inc/controller/logger.php:563
 #: inc/controller/logger.php:565
-#: inc/emails/handler/mail-handler.php:420
+#: inc/emails/handler/mail-handler.php:423
 #, php-format
 msgid "Failed to update log ID %d."
 msgstr "Échec de la mise à jour de l'ID de journal %d."
 
 #: inc/emails/handler/mail-handler.php:158
-#: inc/emails/handler/mail-handler.php:532
+#: inc/emails/handler/mail-handler.php:535
 #: inc/emails/providers/aws/aws-handler.php:134
 #: inc/emails/providers/brevo/brevo-handler.php:164
 #: inc/emails/providers/emailit/emailit-handler.php:102
@@ -1728,7 +1723,7 @@ msgstr "Êtes-vous sûr de vouloir supprimer le(s) journal(aux) sélectionné(s)
 msgid "Are you sure you want to resend the selected email(s)?"
 msgstr "Êtes-vous sûr de vouloir renvoyer le(s) email(s) sélectionné(s) ?"
 
-#: inc/admin/plugin.php:488
+#: inc/admin/plugin.php:457
 #: build/main.js:2
 msgid "Email Logs"
 msgstr "Journaux d'email"
@@ -2092,7 +2087,7 @@ msgstr "Erreur de chargement des notifications."
 msgid "There was an issue fetching notifications."
 msgstr "Il y a eu un problème lors de la récupération des notifications."
 
-#: inc/admin/plugin.php:492
+#: inc/admin/plugin.php:461
 #: build/main.js:2
 msgid "Notifications"
 msgstr "Notifications"
@@ -2496,7 +2491,7 @@ msgstr "Données de paramètres à mettre à jour."
 
 #. translators: %s is the error message.
 #: inc/controller/content-guard.php:354
-#: inc/emails/handler/mail-handler.php:360
+#: inc/emails/handler/mail-handler.php:363
 #, php-format
 msgid "Failed to log email: %s"
 msgstr "Échec de l'enregistrement de l'e-mail : %s"
@@ -2686,12 +2681,12 @@ msgstr "Échec de l'envoi de l'email via SMTP : %s"
 msgid "Email sending failed via SMTP2GO. Error: %s"
 msgstr "Échec de l'envoi de l'email via SMTP2GO. Erreur : %s"
 
-#: inc/admin/plugin.php:476
+#: inc/admin/plugin.php:445
 #: build/main.js:2
 msgid "Dashboard"
 msgstr "Tableau de bord"
 
-#: inc/admin/plugin.php:484
+#: inc/admin/plugin.php:453
 #: build/main.js:2
 msgid "Connections"
 msgstr "Connexions"
@@ -2704,12 +2699,12 @@ msgstr "Avis désactivé pendant 15 jours."
 msgid "Let's get started"
 msgstr "Commençons"
 
-#: inc/admin/plugin.php:197
-#: inc/admin/plugin.php:210
+#: inc/admin/plugin.php:196
+#: inc/admin/plugin.php:209
 msgid "SureMail SMTP"
 msgstr "SureMail SMTP"
 
-#: inc/admin/plugin.php:352
+#: inc/admin/plugin.php:351
 msgid "Setup Wizard"
 msgstr "Assistant de configuration"
 
@@ -3233,16 +3228,6 @@ msgstr "Basculer pour afficher SureMail dans le menu principal ou sous Paramètr
 #: inc/api/notice.php:101
 msgid "Menu location notice dismissed."
 msgstr "Avis de localisation du menu ignoré."
-
-#: admin-notice/index.js:40
-#: build/admin-notice.js:2
-msgid "Go to Settings"
-msgstr "Aller aux Paramètres"
-
-#: admin-notice/index.js:36
-#: build/admin-notice.js:2
-msgid "SureMail is now under Settings → SureMail. You can change its menu position in settings."
-msgstr "SureMail est maintenant sous Paramètres → SureMail. Vous pouvez changer sa position dans le menu dans les paramètres."
 
 #: inc/emails/providers/emailit/emailit-handler.php:96
 msgid "Invalid or missing from email address."
@@ -3865,8 +3850,13 @@ msgstr "Contribuer à SureMail"
 
 #: build/main.js:2
 msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
-msgstr "Collectez des informations non sensibles de votre site web, telles que la version PHP et les fonctionnalités utilisées, pour nous aider à corriger les bugs plus rapidement, prendre des décisions plus intelligentes et développer des fonctionnalités qui comptent vraiment pour vous. "
+msgstr "Collectez des informations non sensibles de votre site web, telles que la version PHP et les fonctionnalités utilisées, pour nous aider à corriger les bugs plus rapidement, prendre des décisions plus intelligentes et développer des fonctionnalités qui comptent vraiment pour vous."
 
 #: build/main.js:2
 msgid "Stay in the loop and help shape SureMail! Get feature updates, and help us build a better SureMail by sharing how you use the plugin. <a>Privacy Policy</a>"
 msgstr "Restez informé et contribuez à façonner SureMail ! Recevez les mises à jour des fonctionnalités et aidez-nous à construire un meilleur SureMail en partageant comment vous utilisez le plugin. <a>Politique de confidentialité</a>"
+
+#. Description of the plugin
+#: suremails.php
+msgid "WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes - no more lost messages or frustrated customers."
+msgstr "Les e-mails WordPress disparaissent souvent ou atterrissent dans les spams parce que les hébergeurs web ne sont pas conçus pour une livraison fiable. SureMail résout ce problème en se connectant à des services SMTP de confiance, afin que vos e-mails atteignent les boîtes de réception - plus de messages perdus ni de clients frustrés."

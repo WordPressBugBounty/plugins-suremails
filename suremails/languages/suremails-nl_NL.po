@@ -26,23 +26,18 @@ msgstr "SureMail"
 msgid "https://suremails.com"
 msgstr "https://suremails.com"
 
-#. Description of the plugin
-#: suremails.php
-msgid "WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes—no more lost messages or frustrated customers."
-msgstr "WordPress-e-mails gaan vaak verloren of belanden in de spam omdat webhosts niet zijn gebouwd voor betrouwbare levering. SureMail lost dit op door verbinding te maken met vertrouwde SMTP-services, zodat uw e-mails de inboxen bereiken - geen verloren berichten of gefrustreerde klanten meer."
-
 #. Author URI of the plugin
 #: suremails.php
 msgid "https://suremails.com/"
 msgstr "https://suremails.com/"
 
-#: inc/admin/plugin.php:196
-#: inc/admin/plugin.php:209
+#: inc/admin/plugin.php:195
+#: inc/admin/plugin.php:208
 msgid "SureMail Settings"
 msgstr "SureMail-instellingen"
 
-#: inc/admin/plugin.php:349
-#: inc/admin/plugin.php:480
+#: inc/admin/plugin.php:348
+#: inc/admin/plugin.php:449
 #: build/main.js:2
 msgid "Settings"
 msgstr "Instellingen"
@@ -216,13 +211,13 @@ msgstr "Reputatie Schild"
 #: inc/controller/content-guard.php:388
 #: inc/controller/logger.php:563
 #: inc/controller/logger.php:565
-#: inc/emails/handler/mail-handler.php:420
+#: inc/emails/handler/mail-handler.php:423
 #, php-format
 msgid "Failed to update log ID %d."
 msgstr "Bijwerken van log-ID %d mislukt."
 
 #: inc/emails/handler/mail-handler.php:158
-#: inc/emails/handler/mail-handler.php:532
+#: inc/emails/handler/mail-handler.php:535
 #: inc/emails/providers/aws/aws-handler.php:134
 #: inc/emails/providers/brevo/brevo-handler.php:164
 #: inc/emails/providers/emailit/emailit-handler.php:102
@@ -1728,7 +1723,7 @@ msgstr "Weet je zeker dat je de geselecteerde log(s) wilt verwijderen? Deze acti
 msgid "Are you sure you want to resend the selected email(s)?"
 msgstr "Weet je zeker dat je de geselecteerde e-mail(s) opnieuw wilt verzenden?"
 
-#: inc/admin/plugin.php:488
+#: inc/admin/plugin.php:457
 #: build/main.js:2
 msgid "Email Logs"
 msgstr "E-maillogs"
@@ -2092,7 +2087,7 @@ msgstr "Fout bij het laden van meldingen."
 msgid "There was an issue fetching notifications."
 msgstr "Er was een probleem met het ophalen van meldingen."
 
-#: inc/admin/plugin.php:492
+#: inc/admin/plugin.php:461
 #: build/main.js:2
 msgid "Notifications"
 msgstr "Meldingen"
@@ -2496,7 +2491,7 @@ msgstr "Instellingen gegevens om bij te werken."
 
 #. translators: %s is the error message.
 #: inc/controller/content-guard.php:354
-#: inc/emails/handler/mail-handler.php:360
+#: inc/emails/handler/mail-handler.php:363
 #, php-format
 msgid "Failed to log email: %s"
 msgstr "Kon e-mail niet loggen: %s"
@@ -2686,12 +2681,12 @@ msgstr "E-mail verzenden mislukt via SMTP: %s"
 msgid "Email sending failed via SMTP2GO. Error: %s"
 msgstr "E-mail verzenden mislukt via SMTP2GO. Fout: %s"
 
-#: inc/admin/plugin.php:476
+#: inc/admin/plugin.php:445
 #: build/main.js:2
 msgid "Dashboard"
 msgstr "Dashboard"
 
-#: inc/admin/plugin.php:484
+#: inc/admin/plugin.php:453
 #: build/main.js:2
 msgid "Connections"
 msgstr "Verbindingen"
@@ -2704,12 +2699,12 @@ msgstr "Kennisgeving is 15 dagen uitgeschakeld."
 msgid "Let's get started"
 msgstr "Laten we beginnen"
 
-#: inc/admin/plugin.php:197
-#: inc/admin/plugin.php:210
+#: inc/admin/plugin.php:196
+#: inc/admin/plugin.php:209
 msgid "SureMail SMTP"
 msgstr "SureMail SMTP"
 
-#: inc/admin/plugin.php:352
+#: inc/admin/plugin.php:351
 msgid "Setup Wizard"
 msgstr "Installatiewizard"
 
@@ -3233,16 +3228,6 @@ msgstr "Schakel in om SureMail weer te geven in het hoofdmenu of onder Instellin
 #: inc/api/notice.php:101
 msgid "Menu location notice dismissed."
 msgstr "Menu locatie melding genegeerd."
-
-#: admin-notice/index.js:40
-#: build/admin-notice.js:2
-msgid "Go to Settings"
-msgstr "Ga naar Instellingen"
-
-#: admin-notice/index.js:36
-#: build/admin-notice.js:2
-msgid "SureMail is now under Settings → SureMail. You can change its menu position in settings."
-msgstr "SureMail staat nu onder Instellingen → SureMail. Je kunt de positie in het menu aanpassen in de instellingen."
 
 #: inc/emails/providers/emailit/emailit-handler.php:96
 msgid "Invalid or missing from email address."
@@ -3865,8 +3850,13 @@ msgstr "Draag bij aan SureMail"
 
 #: build/main.js:2
 msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
-msgstr "Verzamel niet-gevoelige informatie van uw website, zoals de PHP-versie en gebruikte functies, om ons te helpen bugs sneller op te lossen, slimmere beslissingen te nemen en functies te bouwen die er echt toe doen voor u. "
+msgstr "Verzamel niet-gevoelige informatie van uw website, zoals de PHP-versie en gebruikte functies, om ons te helpen bugs sneller op te lossen, slimmere beslissingen te nemen en functies te bouwen die er echt toe doen voor u."
 
 #: build/main.js:2
 msgid "Stay in the loop and help shape SureMail! Get feature updates, and help us build a better SureMail by sharing how you use the plugin. <a>Privacy Policy</a>"
 msgstr "Blijf op de hoogte en help SureMail vorm te geven! Ontvang functie-updates en help ons een betere SureMail te bouwen door te delen hoe u de plugin gebruikt. <a>Privacybeleid</a>"
+
+#. Description of the plugin
+#: suremails.php
+msgid "WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes - no more lost messages or frustrated customers."
+msgstr "WordPress-e-mails verdwijnen vaak of belanden in de spam omdat webhosts niet zijn ontworpen voor betrouwbare aflevering. SureMail lost dit op door verbinding te maken met vertrouwde SMTP-diensten, zodat je e-mails de inbox bereiken - geen verloren berichten of gefrustreerde klanten meer."

@@ -26,23 +26,18 @@ msgstr "SureMail"
 msgid "https://suremails.com"
 msgstr "https://suremails.com"
 
-#. Description of the plugin
-#: suremails.php
-msgid "WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes—no more lost messages or frustrated customers."
-msgstr "Os e-mails do WordPress frequentemente desaparecem ou vão para o spam porque os provedores de hospedagem não são construídos para entrega confiável. O SureMail resolve isso conectando-se a serviços SMTP confiáveis, para que seus e-mails cheguem às caixas de entrada—sem mais mensagens perdidas ou clientes frustrados."
-
 #. Author URI of the plugin
 #: suremails.php
 msgid "https://suremails.com/"
 msgstr "https://suremails.com/"
 
-#: inc/admin/plugin.php:196
-#: inc/admin/plugin.php:209
+#: inc/admin/plugin.php:195
+#: inc/admin/plugin.php:208
 msgid "SureMail Settings"
 msgstr "Configurações do SureMail"
 
-#: inc/admin/plugin.php:349
-#: inc/admin/plugin.php:480
+#: inc/admin/plugin.php:348
+#: inc/admin/plugin.php:449
 #: build/main.js:2
 msgid "Settings"
 msgstr "Configurações"
@@ -216,13 +211,13 @@ msgstr "Escudo de Reputação"
 #: inc/controller/content-guard.php:388
 #: inc/controller/logger.php:563
 #: inc/controller/logger.php:565
-#: inc/emails/handler/mail-handler.php:420
+#: inc/emails/handler/mail-handler.php:423
 #, php-format
 msgid "Failed to update log ID %d."
 msgstr "Falha ao atualizar o ID do log %d."
 
 #: inc/emails/handler/mail-handler.php:158
-#: inc/emails/handler/mail-handler.php:532
+#: inc/emails/handler/mail-handler.php:535
 #: inc/emails/providers/aws/aws-handler.php:134
 #: inc/emails/providers/brevo/brevo-handler.php:164
 #: inc/emails/providers/emailit/emailit-handler.php:102
@@ -1728,7 +1723,7 @@ msgstr "Você tem certeza de que deseja excluir o(s) log(s) selecionado(s)? Esta
 msgid "Are you sure you want to resend the selected email(s)?"
 msgstr "Você tem certeza de que deseja reenviar o(s) e-mail(s) selecionado(s)?"
 
-#: inc/admin/plugin.php:488
+#: inc/admin/plugin.php:457
 #: build/main.js:2
 msgid "Email Logs"
 msgstr "Logs de E-mail"
@@ -2092,7 +2087,7 @@ msgstr "Erro ao carregar notificações."
 msgid "There was an issue fetching notifications."
 msgstr "Houve um problema ao buscar notificações."
 
-#: inc/admin/plugin.php:492
+#: inc/admin/plugin.php:461
 #: build/main.js:2
 msgid "Notifications"
 msgstr "Notificações"
@@ -2496,7 +2491,7 @@ msgstr "Dados de configurações a serem atualizados."
 
 #. translators: %s is the error message.
 #: inc/controller/content-guard.php:354
-#: inc/emails/handler/mail-handler.php:360
+#: inc/emails/handler/mail-handler.php:363
 #, php-format
 msgid "Failed to log email: %s"
 msgstr "Falha ao registrar email: %s"
@@ -2686,12 +2681,12 @@ msgstr "Falha ao enviar email via SMTP: %s"
 msgid "Email sending failed via SMTP2GO. Error: %s"
 msgstr "Falha ao enviar email via SMTP2GO. Erro: %s"
 
-#: inc/admin/plugin.php:476
+#: inc/admin/plugin.php:445
 #: build/main.js:2
 msgid "Dashboard"
 msgstr "Painel de Controle"
 
-#: inc/admin/plugin.php:484
+#: inc/admin/plugin.php:453
 #: build/main.js:2
 msgid "Connections"
 msgstr "Conexões"
@@ -2704,12 +2699,12 @@ msgstr "Aviso desativado por 15 dias."
 msgid "Let's get started"
 msgstr "Vamos começar"
 
-#: inc/admin/plugin.php:197
-#: inc/admin/plugin.php:210
+#: inc/admin/plugin.php:196
+#: inc/admin/plugin.php:209
 msgid "SureMail SMTP"
 msgstr "SureMail SMTP"
 
-#: inc/admin/plugin.php:352
+#: inc/admin/plugin.php:351
 msgid "Setup Wizard"
 msgstr "Assistente de Configuração"
 
@@ -3233,16 +3228,6 @@ msgstr "Alternar para mostrar o SureMail no menu principal ou em Configurações
 #: inc/api/notice.php:101
 msgid "Menu location notice dismissed."
 msgstr "Aviso de localização do menu descartado."
-
-#: admin-notice/index.js:40
-#: build/admin-notice.js:2
-msgid "Go to Settings"
-msgstr "Ir para Configurações"
-
-#: admin-notice/index.js:36
-#: build/admin-notice.js:2
-msgid "SureMail is now under Settings → SureMail. You can change its menu position in settings."
-msgstr "SureMail agora está em Configurações → SureMail. Você pode alterar sua posição no menu nas configurações."
 
 #: inc/emails/providers/emailit/emailit-handler.php:96
 msgid "Invalid or missing from email address."
@@ -3865,8 +3850,13 @@ msgstr "Contribua para o SureMail"
 
 #: build/main.js:2
 msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
-msgstr "Colete informações não sensíveis do seu site, como a versão do PHP e os recursos usados, para nos ajudar a corrigir bugs mais rapidamente, tomar decisões mais inteligentes e criar recursos que realmente importam para você. "
+msgstr "Colete informações não sensíveis do seu site, como a versão do PHP e os recursos usados, para nos ajudar a corrigir bugs mais rapidamente, tomar decisões mais inteligentes e criar recursos que realmente importam para você."
 
 #: build/main.js:2
 msgid "Stay in the loop and help shape SureMail! Get feature updates, and help us build a better SureMail by sharing how you use the plugin. <a>Privacy Policy</a>"
 msgstr "Fique por dentro e ajude a moldar o SureMail! Receba atualizações de recursos e nos ajude a construir um SureMail melhor compartilhando como você usa o plugin. <a>Política de Privacidade</a>"
+
+#. Description of the plugin
+#: suremails.php
+msgid "WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes - no more lost messages or frustrated customers."
+msgstr "Os e-mails do WordPress frequentemente desaparecem ou vão para o spam porque os provedores de hospedagem não são feitos para entrega confiável. O SureMail resolve isso conectando-se a serviços SMTP confiáveis, para que seus e-mails cheguem às caixas de entrada - nada mais de mensagens perdidas ou clientes frustrados."

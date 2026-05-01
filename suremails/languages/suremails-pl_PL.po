@@ -26,23 +26,18 @@ msgstr "SureMail"
 msgid "https://suremails.com"
 msgstr "https://suremails.com"
 
-#. Description of the plugin
-#: suremails.php
-msgid "WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes—no more lost messages or frustrated customers."
-msgstr "E-maile WordPressa często giną lub trafiają do spamu, ponieważ hosty internetowe nie są stworzone do niezawodnej dostawy. SureMail to naprawia, łącząc się z zaufanymi usługami SMTP, dzięki czemu Twoje e-maile docierają do skrzynek odbiorczych — koniec z zagubionymi wiadomościami i sfrustrowanymi klientami."
-
 #. Author URI of the plugin
 #: suremails.php
 msgid "https://suremails.com/"
 msgstr "https://suremails.com/"
 
-#: inc/admin/plugin.php:196
-#: inc/admin/plugin.php:209
+#: inc/admin/plugin.php:195
+#: inc/admin/plugin.php:208
 msgid "SureMail Settings"
 msgstr "Ustawienia SureMail"
 
-#: inc/admin/plugin.php:349
-#: inc/admin/plugin.php:480
+#: inc/admin/plugin.php:348
+#: inc/admin/plugin.php:449
 #: build/main.js:2
 msgid "Settings"
 msgstr "Ustawienia"
@@ -216,13 +211,13 @@ msgstr "Tarcza reputacji"
 #: inc/controller/content-guard.php:388
 #: inc/controller/logger.php:563
 #: inc/controller/logger.php:565
-#: inc/emails/handler/mail-handler.php:420
+#: inc/emails/handler/mail-handler.php:423
 #, php-format
 msgid "Failed to update log ID %d."
 msgstr "Nie udało się zaktualizować identyfikatora logu %d."
 
 #: inc/emails/handler/mail-handler.php:158
-#: inc/emails/handler/mail-handler.php:532
+#: inc/emails/handler/mail-handler.php:535
 #: inc/emails/providers/aws/aws-handler.php:134
 #: inc/emails/providers/brevo/brevo-handler.php:164
 #: inc/emails/providers/emailit/emailit-handler.php:102
@@ -1728,7 +1723,7 @@ msgstr "Czy na pewno chcesz usunąć wybrane dzienniki? Ta akcja nie może być 
 msgid "Are you sure you want to resend the selected email(s)?"
 msgstr "Czy na pewno chcesz ponownie wysłać wybrane e-maile?"
 
-#: inc/admin/plugin.php:488
+#: inc/admin/plugin.php:457
 #: build/main.js:2
 msgid "Email Logs"
 msgstr "Dzienniki e-maili"
@@ -2092,7 +2087,7 @@ msgstr "Błąd ładowania powiadomień."
 msgid "There was an issue fetching notifications."
 msgstr "Wystąpił problem z pobieraniem powiadomień."
 
-#: inc/admin/plugin.php:492
+#: inc/admin/plugin.php:461
 #: build/main.js:2
 msgid "Notifications"
 msgstr "Powiadomienia"
@@ -2496,7 +2491,7 @@ msgstr "Dane ustawień do zaktualizowania."
 
 #. translators: %s is the error message.
 #: inc/controller/content-guard.php:354
-#: inc/emails/handler/mail-handler.php:360
+#: inc/emails/handler/mail-handler.php:363
 #, php-format
 msgid "Failed to log email: %s"
 msgstr "Nie udało się zarejestrować e-maila: %s"
@@ -2686,12 +2681,12 @@ msgstr "Wysyłanie e-maila nie powiodło się przez SMTP: %s"
 msgid "Email sending failed via SMTP2GO. Error: %s"
 msgstr "Wysyłanie e-maila nie powiodło się przez SMTP2GO. Błąd: %s"
 
-#: inc/admin/plugin.php:476
+#: inc/admin/plugin.php:445
 #: build/main.js:2
 msgid "Dashboard"
 msgstr "Panel sterowania"
 
-#: inc/admin/plugin.php:484
+#: inc/admin/plugin.php:453
 #: build/main.js:2
 msgid "Connections"
 msgstr "Połączenia"
@@ -2704,12 +2699,12 @@ msgstr "Powiadomienie wyłączone na 15 dni."
 msgid "Let's get started"
 msgstr "Zaczynajmy"
 
-#: inc/admin/plugin.php:197
-#: inc/admin/plugin.php:210
+#: inc/admin/plugin.php:196
+#: inc/admin/plugin.php:209
 msgid "SureMail SMTP"
 msgstr "SureMail SMTP"
 
-#: inc/admin/plugin.php:352
+#: inc/admin/plugin.php:351
 msgid "Setup Wizard"
 msgstr "Kreator konfiguracji"
 
@@ -3233,16 +3228,6 @@ msgstr "Przełącz, aby wyświetlić SureMail w głównym menu lub w Ustawieniac
 #: inc/api/notice.php:101
 msgid "Menu location notice dismissed."
 msgstr "Powiadomienie o lokalizacji menu odrzucone."
-
-#: admin-notice/index.js:40
-#: build/admin-notice.js:2
-msgid "Go to Settings"
-msgstr "Przejdź do Ustawień"
-
-#: admin-notice/index.js:36
-#: build/admin-notice.js:2
-msgid "SureMail is now under Settings → SureMail. You can change its menu position in settings."
-msgstr "SureMail jest teraz dostępny w Ustawienia → SureMail. Możesz zmienić jego pozycję w menu w ustawieniach."
 
 #: inc/emails/providers/emailit/emailit-handler.php:96
 msgid "Invalid or missing from email address."
@@ -3865,8 +3850,13 @@ msgstr "Wspieraj SureMail"
 
 #: build/main.js:2
 msgid "Collect non-sensitive information from your website, such as the PHP version and features used, to help us fix bugs faster, make smarter decisions, and build features that actually matter to you. "
-msgstr "Zbieraj niepoufne informacje z Twojej strony internetowej, takie jak wersja PHP i używane funkcje, aby pomóc nam szybciej naprawiać błędy, podejmować mądrzejsze decyzje i tworzyć funkcje, które naprawdę mają dla Ciebie znaczenie. "
+msgstr "Zbieraj niepoufne informacje z Twojej strony internetowej, takie jak wersja PHP i używane funkcje, aby pomóc nam szybciej naprawiać błędy, podejmować mądrzejsze decyzje i tworzyć funkcje, które naprawdę mają dla Ciebie znaczenie."
 
 #: build/main.js:2
 msgid "Stay in the loop and help shape SureMail! Get feature updates, and help us build a better SureMail by sharing how you use the plugin. <a>Privacy Policy</a>"
 msgstr "Bądź na bieżąco i pomóż kształtować SureMail! Otrzymuj aktualizacje funkcji i pomagaj nam tworzyć lepszy SureMail, dzieląc się tym, jak używasz wtyczki. <a>Polityka prywatności</a>"
+
+#. Description of the plugin
+#: suremails.php
+msgid "WordPress emails often go missing or land in spam because web hosts aren’t built for reliable delivery. SureMail fixes this by connecting to trusted SMTP services, so your emails reach inboxes - no more lost messages or frustrated customers."
+msgstr "E-maile WordPressa często giną lub trafiają do spamu, ponieważ hostingi internetowe nie są przystosowane do niezawodnej dostawy. SureMail rozwiązuje ten problem, łącząc się z zaufanymi usługami SMTP, dzięki czemu Twoje e-maile trafiają do skrzynek odbiorczych - koniec z zagubionymi wiadomościami i sfrustrowanymi klientami."
