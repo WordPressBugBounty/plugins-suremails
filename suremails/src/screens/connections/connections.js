@@ -17,6 +17,7 @@ import { formatDate, sortData } from '@utils/utils';
 import Tooltip from '@components/tooltip/tooltip';
 import TruncatedTooltipText from '@components/truncated-tooltip-text';
 import Title from '@components/title/title';
+import SureContactCustomDomainBanner from '@components/surecontact-custom-domain-banner';
 import useProviders from './use-dynamic-providers';
 
 const Connections = () => {
@@ -40,6 +41,9 @@ const Connections = () => {
 		if ( location.state?.openDrawer ) {
 			setIsDrawerOpen( true );
 
+			// A banner/CTA can request a specific provider be pre-selected.
+			const presetProvider = location.state?.selectedProvider || null;
+
 			const storedFormState =
 				JSON.parse( localStorage.getItem( 'formStateValues' ) ) || {};
 
@@ -50,8 +54,15 @@ const Connections = () => {
 			if ( storedTime && storedTime < expirationTime ) {
 				localStorage.removeItem( 'formStateValues' );
 				localStorage.removeItem( 'formStateValuesTimestamp' );
+				if ( presetProvider ) {
+					setCurrentConnection( { type: presetProvider } );
+				}
 			} else {
-				setCurrentConnection( storedFormState );
+				setCurrentConnection(
+					presetProvider
+						? { ...storedFormState, type: presetProvider }
+						: storedFormState
+				);
 				localStorage.removeItem( 'formStateValues' );
 				localStorage.removeItem( 'formStateValuesTimestamp' );
 			}
@@ -94,6 +105,17 @@ const Connections = () => {
 		} );
 
 		return count;
+	}, [ settings?.connections ] );
+
+	// Paid SureContact accounts may add extra sender connections (each a new
+	// from_email sharing the account's api_key). is_paid is mirrored onto every
+	// SureContact row by the status sync, so any row reflects the account plan.
+	const isSureContactPaid = useCallback( () => {
+		return Object.values( settings?.connections ?? {} ).some(
+			( connectionItem ) =>
+				connectionItem?.type === 'SURECONTACT' &&
+				Boolean( connectionItem?.is_paid )
+		);
 	}, [ settings?.connections ] );
 
 	// Mutation for deleting connections
@@ -208,6 +230,21 @@ const Connections = () => {
 		setIsDrawerOpen( true );
 	};
 
+	// Adding a connection must start clean — clear any connection left in state
+	// from a previous edit, otherwise the drawer reopens on that stale
+	// connection instead of the new-connection form.
+	const handleAddConnection = () => {
+		setCurrentConnection( null );
+		setIsDrawerOpen( true );
+	};
+
+	// Paid SureContact nudge CTA: pre-select SureContact so the drawer opens
+	// straight into the "Add Sender" flow (custom domain picker).
+	const handleAddCustomDomainSender = () => {
+		setCurrentConnection( { type: 'SURECONTACT' } );
+		setIsDrawerOpen( true );
+	};
+
 	// Show loading state
 	if ( isLoading ) {
 		return <ConnectionsSkeleton />;
@@ -261,13 +298,18 @@ const Connections = () => {
 							size="sm"
 							icon={ <Plus /> }
 							iconPosition="left"
-							onClick={ () => setIsDrawerOpen( true ) }
+							onClick={ handleAddConnection }
 							className="font-medium"
 						>
 							{ __( 'Add Connection', 'suremails' ) }
 						</Button>
 					</div>
 				) }
+
+				{ /* Paid SureContact custom sending domain nudge */ }
+				<SureContactCustomDomainBanner
+					onAddSender={ handleAddCustomDomainSender }
+				/>
 
 				{ /* Content Area */ }
 				{ renderSortedConnections().length > 0 ? (
@@ -358,7 +400,6 @@ const Connections = () => {
 									</Table.Cell>
 									<Table.Cell>
 										<div className="inline-flex justify-end w-full gap-2">
-											{ /* Edit Button with Tooltip */ }
 											<Tooltip
 												content={ __(
 													'Edit',
@@ -413,7 +454,7 @@ const Connections = () => {
 					</Table>
 				) : (
 					<NoConnection
-						onClickAddConnection={ () => setIsDrawerOpen( true ) }
+						onClickAddConnection={ handleAddConnection }
 					/>
 				) }
 
@@ -427,6 +468,7 @@ const Connections = () => {
 					isProvidersLoading={ isProvidersLoading }
 					sequenceId={ getNewConnectionSequenceId() }
 					connectionCount={ getNewConnectionCount() }
+					surecontactPaid={ isSureContactPaid() }
 				/>
 
 				{ /* Test Email Drawer */ }

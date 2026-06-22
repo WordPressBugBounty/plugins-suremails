@@ -5,7 +5,7 @@ import { SureMailLogo } from '@assets/icons';
 import { XIcon } from 'lucide-react';
 import { __ } from '@wordpress/i18n';
 import { useOnboardingNavigation } from './hooks';
-import { getVisibleOnboardingRoutes } from './onboarding-routes-config';
+import { getProgressMeta } from './onboarding-routes-config';
 import {
 	OnboardingProvider,
 	ONBOARDING_SESSION_STORAGE_KEY,
@@ -16,9 +16,9 @@ import './styles.css';
 /* global sessionStorage */
 
 const NavBar = () => {
-	const { getCurrentStepNumber, navigateToStep } = useOnboardingNavigation();
-	const [ onboardingState ] = useOnboardingState();
-	const visibleRoutes = getVisibleOnboardingRoutes( onboardingState );
+	const location = useLocation();
+	const [ state ] = useOnboardingState();
+	const progress = getProgressMeta( state, location.pathname );
 
 	return (
 		<Topbar className="p-5 bg-background-secondary">
@@ -29,27 +29,22 @@ const NavBar = () => {
 			</Topbar.Left>
 			<Topbar.Middle align="center">
 				<Topbar.Item className="md:block hidden">
-					<ProgressSteps
-						completedVariant="number"
-						currentStep={ getCurrentStepNumber() }
-						size="md"
-						type="inline"
-						variant="number"
-					>
-						{ Array.from(
-							{ length: Math.max( visibleRoutes.length - 1, 0 ) },
-							( _, index ) => (
-								<ProgressSteps.Step
-									key={ index }
-									size="md"
-									onClick={ () =>
-										navigateToStep( index + 1 )
-									}
-									className="cursor-pointer hover:bg-background-secondary transition-colors duration-200"
-								/>
-							)
-						) }
-					</ProgressSteps>
+					{ progress.totalSteps > 0 && (
+						<ProgressSteps
+							key={ `progress-${ progress.totalSteps }` }
+							completedVariant="number"
+							currentStep={ progress.currentStep }
+							size="md"
+							type="inline"
+							variant="number"
+						>
+							{ Array.from( {
+								length: progress.totalSteps,
+							} ).map( ( _, index ) => (
+								<ProgressSteps.Step key={ index } size="md" />
+							) ) }
+						</ProgressSteps>
+					) }
 				</Topbar.Item>
 			</Topbar.Middle>
 			<Topbar.Right>
@@ -76,7 +71,6 @@ const NavigationGuard = () => {
 	const navigate = useNavigate();
 	const { checkRequiredStep } = useOnboardingNavigation();
 
-	// Check if the user is authorized to access this step
 	useLayoutEffect( () => {
 		const redirectUrl = checkRequiredStep();
 		if ( redirectUrl ) {
@@ -90,18 +84,8 @@ const NavigationGuard = () => {
 const OnboardingLayout = () => {
 	const location = useLocation();
 
-	const widthClassNames = {
-		1: 'max-w-[35rem]', // 560px converted to rem (assuming 1rem = 16px)
-		2: 'max-w-[46.875rem]', // 750px converted to rem (assuming 1rem = 16px)
-	};
+	const containerWidth = 'max-w-[46.875rem]'; // 750px — all onboarding screens
 
-	const widthClassKey =
-		location.pathname === '/onboarding/welcome' ||
-		location.pathname === '/onboarding/done'
-			? 1
-			: 2;
-
-	// Add body class for onboarding-specific styles
 	useEffect( () => {
 		document.body.classList.add( 'suremails-onboarding-page' );
 
@@ -110,14 +94,12 @@ const OnboardingLayout = () => {
 		};
 	}, [] );
 
-	// Clear when on the done page
 	useEffect( () => {
 		if ( location.pathname === '/onboarding/done' ) {
 			sessionStorage.removeItem( ONBOARDING_SESSION_STORAGE_KEY );
 		}
 	}, [ location.pathname ] );
 
-	// Clear session storage when the user navigates away from the onboarding page
 	useEffect( () => {
 		return () => {
 			sessionStorage.removeItem( ONBOARDING_SESSION_STORAGE_KEY );
@@ -126,18 +108,15 @@ const OnboardingLayout = () => {
 
 	return (
 		<OnboardingProvider>
-			{ /* Navigation guard to check required state for each step */ }
 			<NavigationGuard />
 
 			<div className="bg-background-secondary h-full space-y-7 pb-10">
-				{ /* Header */ }
 				<NavBar />
-				{ /* Content */ }
 				<div className="p-7 w-full h-full">
 					<div
 						className={ cn(
 							'w-full h-full border-0.5 border-solid border-border-subtle bg-background-primary shadow-sm rounded-xl mx-auto p-7',
-							widthClassNames[ widthClassKey ]
+							containerWidth
 						) }
 					>
 						<Outlet />

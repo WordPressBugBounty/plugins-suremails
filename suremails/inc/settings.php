@@ -294,6 +294,49 @@ class Settings {
 	}
 
 	/**
+	 * Apply shared account-level fields to every SureContact connection in a
+	 * workspace. All SureContact rows for a site are siblings of one account —
+	 * they share api_key, workspace_uuid, connection_uuid, email_verified and
+	 * is_paid — so verification/plan changes must fan out to all of them, not
+	 * just the row that happened to trigger the sync. Writes once.
+	 *
+	 * @param string                         $workspace_uuid The shared workspace UUID.
+	 * @param array<string, string|int|bool> $shared_fields  Field => value pairs to apply.
+	 * @since 1.6.0
+	 * @return void
+	 */
+	public function sync_surecontact_siblings( $workspace_uuid, array $shared_fields ) {
+		$workspace_uuid = (string) $workspace_uuid;
+		if ( $workspace_uuid === '' || empty( $shared_fields ) ) {
+			return;
+		}
+
+		$settings    = $this->get_settings();
+		$connections = is_array( $settings['connections'] ?? null ) ? $settings['connections'] : [];
+		$changed     = false;
+
+		foreach ( $connections as $id => $connection ) {
+			if (
+				! is_array( $connection )
+				|| ( $connection['type'] ?? '' ) !== 'SURECONTACT'
+				|| (string) ( $connection['workspace_uuid'] ?? '' ) !== $workspace_uuid
+			) {
+				continue;
+			}
+
+			foreach ( $shared_fields as $field => $value ) {
+				$settings['connections'][ $id ][ $field ] = $value;
+			}
+			$changed = true;
+		}
+
+		if ( $changed ) {
+			update_option( SUREMAILS_CONNECTIONS, $this->encrypt_all( $settings ) );
+			Settings::$connections = null;
+		}
+	}
+
+	/**
 	 * Get the simulation status. If the email simulation is enabled, return true.
 	 * Otherwise, return false.
 	 *

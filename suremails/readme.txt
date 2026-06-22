@@ -3,9 +3,9 @@ Contributors: brainstormforce
 Donate link: https://www.paypal.me/BrainstormForce
 Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
-Tested up to: 6.9
+Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 1.9.5
+Stable tag: 2.0.0
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -55,19 +55,20 @@ With SureMail, emails are sent using your chosen SMTP provider’s API, bypassin
 
 SureMail supports multiple SMTP providers:
 
-1. Amazon SES
-2. SendGrid
-3. Mailgun
-4. Mailjet
-5. Google Workspace / Gmail
-6. MailerSend
-7. Postmark
-8. SparkPost
-9. Elastic Email
-10. Brevo
-11. SMTP2GO
-12. Netcore
-13. Other SMTP
+1. SureContact
+2. Amazon SES
+3. SendGrid
+4. Mailgun
+5. Mailjet
+6. Google Workspace / Gmail
+7. MailerSend
+8. Postmark
+9. SparkPost
+10. Elastic Email
+11. Brevo
+12. SMTP2GO
+13. Netcore
+14. Other SMTP
 
 Plus, you can customize the "From Name" and "From Email" for each SMTP connection, ensuring consistent and professional branding across all your communications.
 
@@ -82,7 +83,7 @@ SureMail is the ultimate WordPress SMTP plugin designed to ensure fail-proof ema
 - **Email Failure Notifications:** Get notified about email delivery failures via SureTriggers integration, with support for a variety of channels beyond Telegram, Slack, and Discord.
 - **Detailed Email Analytics:** Gain insights into your email performance with comprehensive reporting on delivery rates and failures.
 - **Super Fast and Easy-to-Use Interface:** SureMail is built for simplicity, with a sleek, intuitive interface that makes managing emails easy.
-- **Support for Popular SMTP Providers:** Easily integrate with top email services like Amazon SES, SendGrid, Mailgun, Gmail, and more.
+- **Support for Popular SMTP Providers:** Easily integrate with top email services like SureContact, Amazon SES, SendGrid, Mailgun, Gmail, and more.
 
 Best of all, SureMail is completely free, ensuring high-quality, fail-proof email delivery for all WordPress users, with no hidden costs.
 
@@ -116,7 +117,7 @@ SureMail is built with simplicity and speed in mind. It's super-fast, user-frien
 
 ### Support for Popular SMTP Providers
 
-SureMail supports a wide range of popular SMTP providers, giving you the flexibility to choose the service that works best for you. Whether you’re using Amazon SES, SendGrid, Mailgun, or Gmail, SureMail ensures smooth integration with these services, providing you with a powerful, fail-proof email delivery system. Choose from the best providers to suit your needs and ensure reliable email sending every time.
+SureMail supports a wide range of popular SMTP providers, giving you the flexibility to choose the service that works best for you. Whether you’re using SureContact, Amazon SES, SendGrid, Mailgun, or Gmail, SureMail ensures smooth integration with these services, providing you with a powerful, fail-proof email delivery system. Choose from the best providers to suit your needs and ensure reliable email sending every time.
 
 ### Completely Free
 
@@ -244,6 +245,10 @@ You can report the issue through our [Bug Bounty Program](https://brainstormforc
 5. Email Logs – Monitor your email activity with detailed logs to track successful, failed, in progress, and blocked emails easily.
 
 == Changelog ==
+
+v2.0.0 - 22-June-2026
+- New: SureContact email service provider added with guided onboarding and multi-sender support.
+- Improvement: Internal libraries updated to patched releases for improved security and stability.
 
 v1.9.5 - 01-May-2026
 - Fix: Dashboard rendered blank on sites with a strict Content Security Policy after updating to v1.9.4.

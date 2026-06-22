@@ -99,7 +99,36 @@ class SaveTestConnection extends Api_Base {
 				);
 			}
 
-			$fields     = $options['fields'] ?? [];
+			$fields = $options['fields'] ?? [];
+
+			// SureContact's account identity is platform-owned. On UPDATE the
+			// React form deliberately omits these fields (only the editable
+			// allowlist is sent), so resolve the stored row up-front and
+			// merge the locked values into $settings — this both satisfies
+			// schema validation for required fields like from_email AND lets
+			// the post-prepare restore below treat the stored values as
+			// authoritative regardless of what was submitted.
+			$surecontact_locked_fields = [
+				'api_key',
+				'workspace_uuid',
+				'connection_uuid',
+				'email_verified',
+				'is_paid',
+				'from_email',
+				'force_from_email',
+			];
+			$existing_surecontact      = null;
+			if ( $provider === 'SURECONTACT' && ! empty( $settings['id'] ) ) {
+				$existing_surecontact = $this->get_all_connections()[ $settings['id'] ] ?? null;
+				if ( is_array( $existing_surecontact ) ) {
+					foreach ( $surecontact_locked_fields as $field ) {
+						if ( isset( $existing_surecontact[ $field ] ) ) {
+							$settings[ $field ] = $existing_surecontact[ $field ];
+						}
+					}
+				}
+			}
+
 			$validation = $this->validate_schema_fields( $fields, $settings );
 			if ( ! $validation['success'] ) {
 				return new WP_REST_Response(
@@ -116,6 +145,64 @@ class SaveTestConnection extends Api_Base {
 
 			$connection_data['type'] = strtoupper( $provider );
 
+			// Re-pin the locked fields from the stored row even after
+			// prepare_connection_data has run. A request can't swap the
+			// bearer (api_key/workspace) or aim sends at a different mailbox
+			// by changing from_email — the OAuth flow is the only path that
+			// mutates them.
+			if ( is_array( $existing_surecontact ) ) {
+				foreach ( $surecontact_locked_fields as $field ) {
+					if ( isset( $existing_surecontact[ $field ] ) ) {
+						$connection_data[ $field ] = $existing_surecontact[ $field ];
+					}
+				}
+			}
+
+			// SureContact connection policy:
+			// - Free accounts: one connection per site (the original cap).
+			// - Paid accounts: additional senders allowed. Each extra row is a
+			// new from_email that shares the account's single api_key, added
+			// in-place (no OAuth) — see the clone branch below.
+			// Block a new insert (empty id, no OAuth token) only when one already
+			// exists AND the account is not paid.
+			$is_surecontact_add_sender = false;
+			if ( $connection_data['type'] === 'SURECONTACT' && empty( $connection_data['id'] ) && $this->has_existing_surecontact() ) {
+				if ( ! $this->existing_surecontact_is_paid() ) {
+					return new WP_REST_Response(
+						[
+							'success' => false,
+							'message' => __( 'SureContact is already connected. Upgrade to a paid plan to send from additional addresses.', 'suremails' ),
+						],
+						400
+					);
+				}
+
+				// Paid: a no-OAuth insert is an "add sender" clone. Reuse the
+				// existing account's credentials and only vary the from_email.
+				if ( empty( $settings['oauth_token'] ) ) {
+					$primary = $this->primary_surecontact_connection();
+					foreach ( [ 'api_key', 'workspace_uuid', 'connection_uuid', 'email_verified', 'is_paid' ] as $shared_field ) {
+						if ( isset( $primary[ $shared_field ] ) ) {
+							$connection_data[ $shared_field ] = $primary[ $shared_field ];
+						}
+					}
+					$is_surecontact_add_sender = true;
+				}
+			}
+
+			// SureContact's OAuth-callback save and the "add sender" clone run
+			// from screens that don't know the next free sequence (the onboarding
+			// wizard, the drawer's auto-exchange path, the add-sender form). Pick
+			// a non-colliding priority server-side instead of bouncing the user
+			// with a duplicate-sequence error.
+			if (
+				$connection_data['type'] === 'SURECONTACT'
+				&& empty( $connection_data['id'] )
+				&& ( ! empty( $settings['oauth_token'] ) || $is_surecontact_add_sender )
+			) {
+				$connection_data['priority'] = $this->next_available_priority();
+			}
+
 			// Check for priority uniqueness.
 			if ( isset( $connection_data['priority'] ) && ! $this->is_priority_unique( intval( $connection_data['priority'] ), (string) ( $connection_data['id'] ?? '' ) ) ) {
 				return new WP_REST_Response(
@@ -131,18 +218,41 @@ class SaveTestConnection extends Api_Base {
 				);
 			}
 
-			// Authenticate the connection before testing or saving it.
-			$auth_result = $this->authenticate_connection( $connection_data );
+			// SureContact UPDATEs that don't change OAuth credentials are
+			// cosmetic — from_name, force_from_name, priority, title. The
+			// api_key was just auto-restored from the stored row above; it's
+			// already known-good. Re-calling authenticate() would re-hit
+			// SureContact's API on every save with no signal change, and
+			// fails the save when the SaaS is briefly unreachable. Require
+			// the id to resolve to an existing row so a forged id can't slip
+			// past authenticate() and write a junk SureContact connection.
+			// Skip the SureContact API round-trip when there's no new credential
+			// to validate: a cosmetic update of an existing row, or an
+			// "add sender" clone that reuses the already-validated api_key.
+			$skip_authentication = (
+				$connection_data['type'] === 'SURECONTACT'
+				&& empty( $settings['oauth_token'] )
+				&& (
+					( ! empty( $connection_data['id'] ) && is_array( $existing_surecontact ) )
+					|| $is_surecontact_add_sender
+				)
+			);
 
-			if ( $auth_result['success'] !== true ) {
-				$status_code = $auth_result['error_code'] ?? 401;
-				return new WP_REST_Response(
-					[
-						'success' => false,
-						'message' => $auth_result['message'] ?? __( 'Failed to authenticate.', 'suremails' ), // @phpstan-ignore nullCoalesce.offset
-					],
-					$status_code
-				);
+			if ( ! $skip_authentication ) {
+				$auth_result = $this->authenticate_connection( $connection_data );
+
+				if ( $auth_result['success'] !== true ) {
+					$status_code = $auth_result['error_code'] ?? 401;
+					return new WP_REST_Response(
+						[
+							'success' => false,
+							'message' => $auth_result['message'] ?? __( 'Failed to authenticate.', 'suremails' ), // @phpstan-ignore nullCoalesce.offset
+						],
+						$status_code
+					);
+				}
+			} else {
+				$auth_result = [ 'success' => true ];
 			}
 
 			// If the connection is authenticated, store the connection data.
@@ -268,6 +378,59 @@ class SaveTestConnection extends Api_Base {
 	}
 
 	/**
+	 * Whether at least one SureContact connection already exists.
+	 *
+	 * @return bool
+	 */
+	public function has_existing_surecontact() {
+		foreach ( $this->get_all_connections() as $existing_connection ) {
+			if ( ( $existing_connection['type'] ?? '' ) === 'SURECONTACT' ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * Whether any existing SureContact connection belongs to a paid account.
+	 * Paid status is account-level and mirrored onto every sibling row by the
+	 * status sync, so the first paid row is enough to allow extra senders.
+	 *
+	 * @return bool
+	 */
+	public function existing_surecontact_is_paid() {
+		foreach ( $this->get_all_connections() as $existing_connection ) {
+			if ( ( $existing_connection['type'] ?? '' ) === 'SURECONTACT' && ! empty( $existing_connection['is_paid'] ) ) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	/**
+	 * The primary SureContact row (lowest priority number) — the source of the
+	 * shared api_key/workspace/connection identifiers cloned onto additional
+	 * sender rows.
+	 *
+	 * @return array<string, string|int|bool>
+	 */
+	public function primary_surecontact_connection() {
+		$primary = [];
+		$lowest  = PHP_INT_MAX;
+		foreach ( $this->get_all_connections() as $existing_connection ) {
+			if ( ( $existing_connection['type'] ?? '' ) !== 'SURECONTACT' ) {
+				continue;
+			}
+			$priority = intval( $existing_connection['priority'] ?? 0 );
+			if ( $priority < $lowest ) {
+				$lowest  = $priority;
+				$primary = $existing_connection;
+			}
+		}
+		return $primary;
+	}
+
+	/**
 	 * Add extra fields to the connection data.
 	 *
 	 * @param array<string, string|int|bool> $connection_data The connection data.
@@ -279,6 +442,7 @@ class SaveTestConnection extends Api_Base {
 		$providers = [
 			'GMAIL',
 			'ZOHO',
+			'SURECONTACT',
 		];
 
 		if ( ! in_array( $connection_data['type'], $providers ) ) {
@@ -302,11 +466,37 @@ class SaveTestConnection extends Api_Base {
 			$connection_data['account_id'] = $new_fields['account_id']; // zoho.
 		}
 
-		if ( isset( $new_fields['from_email'] ) ) {
-			$connection_data['from_email'] = $new_fields['from_email']; // zoho.
+		if ( ! empty( $new_fields['from_email'] ) ) {
+			$connection_data['from_email'] = $new_fields['from_email']; // zoho, surecontact.
+		}
+		if ( ! empty( $new_fields['from_name'] ) ) {
+			$connection_data['from_name'] = $new_fields['from_name']; // surecontact.
+		}
+
+		// SureContact: persist the api_key + workspace identifiers returned by the OAuth exchange.
+		if ( isset( $new_fields['api_key'] ) ) {
+			$connection_data['api_key'] = $new_fields['api_key'];
+		}
+		if ( isset( $new_fields['workspace_uuid'] ) ) {
+			$connection_data['workspace_uuid'] = $new_fields['workspace_uuid'];
+		}
+		if ( isset( $new_fields['connection_uuid'] ) ) {
+			$connection_data['connection_uuid'] = $new_fields['connection_uuid'];
+		}
+		if ( isset( $new_fields['email_verified'] ) ) {
+			$connection_data['email_verified'] = (bool) $new_fields['email_verified'];
+		}
+
+		// Persist the account plan tier captured during the OAuth exchange so a
+		// paid account can add a second sender immediately, without waiting for a
+		// later status sync to mirror the flag onto the row.
+		if ( isset( $new_fields['is_paid'] ) ) {
+			$connection_data['is_paid'] = (bool) $new_fields['is_paid'];
 		}
 
 		unset( $connection_data['auth_code'] );
+		unset( $connection_data['oauth_token'] );
+		unset( $connection_data['oauth_state'] );
 
 		return $connection_data;
 	}
@@ -403,6 +593,23 @@ class SaveTestConnection extends Api_Base {
 		}
 
 		return true;
+	}
+
+	/**
+	 * Pick the next free priority — `max + 1` over existing connections.
+	 *
+	 * @return int
+	 */
+	private function next_available_priority() {
+		$max = 0;
+		foreach ( $this->get_all_connections() as $existing_connection ) {
+			$priority = intval( $existing_connection['priority'] ?? 0 );
+			if ( $priority > $max ) {
+				$max = $priority;
+			}
+		}
+
+		return $max + 1;
 	}
 
 	/**

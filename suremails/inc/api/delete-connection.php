@@ -9,6 +9,7 @@
 
 namespace SureMails\Inc\API;
 
+use SureMails\Inc\Emails\Providers\SURECONTACT\SurecontactHandler;
 use SureMails\Inc\Settings;
 use SureMails\Inc\Traits\Instance;
 use WP_REST_Request;
@@ -113,6 +114,18 @@ class DeleteConnection extends Api_Base {
 			);
 		}
 
+		// Best-effort cleanup on the SureContact side. Failures don't block the
+		// local delete. Multiple SureContact rows can be siblings sharing one
+		// api_key (paid multi-sender) — revoking the key kills every sibling, so
+		// only revoke when this is the LAST SureContact row for the workspace.
+		if ( $connection_type === 'SURECONTACT' ) {
+			$decrypted      = Settings::instance()->get_settings()['connections'][ $connection_id ] ?? [];
+			$workspace_uuid = (string) ( $decrypted['workspace_uuid'] ?? '' );
+			if ( $this->is_last_surecontact_sibling( $connection_id, $workspace_uuid ) ) {
+				$this->revoke_surecontact_key( (string) ( $decrypted['api_key'] ?? '' ) );
+			}
+		}
+
 		// Remove the connection.
 		unset( $options['connections'][ $connection_id ] );
 
@@ -195,6 +208,66 @@ class DeleteConnection extends Api_Base {
 			'id'               => '',
 			'connection_title' => '',
 		];
+	}
+
+	/**
+	 * Whether the row being deleted is the only remaining SureContact
+	 * connection for its workspace. Siblings share one api_key, so the SaaS-
+	 * side revoke must wait until the last sender is gone.
+	 *
+	 * @param string $connection_id  The row being deleted.
+	 * @param string $workspace_uuid The shared workspace UUID (may be empty on legacy rows).
+	 * @return bool
+	 */
+	private function is_last_surecontact_sibling( $connection_id, $workspace_uuid ) {
+		$connections = Settings::instance()->get_settings()['connections'] ?? [];
+		if ( ! is_array( $connections ) ) {
+			return true;
+		}
+
+		foreach ( $connections as $id => $connection ) {
+			if (
+				(string) $id === (string) $connection_id
+				|| ! is_array( $connection )
+				|| ( $connection['type'] ?? '' ) !== 'SURECONTACT'
+			) {
+				continue;
+			}
+			// A legacy row without a workspace_uuid can't be proven a sibling,
+			// so treat any other SureContact row as a sibling in that case.
+			if ( $workspace_uuid === '' || (string) ( $connection['workspace_uuid'] ?? '' ) === $workspace_uuid ) {
+				return false;
+			}
+		}
+
+		return true;
+	}
+
+	/**
+	 * Best-effort call to SureContact's /disconnect endpoint to revoke the
+	 * connection's API key server-side. Runs synchronously with a short timeout
+	 * so the request actually reaches Laravel — `blocking: false` was unreliable
+	 * on some PHP-FPM setups. Response is intentionally discarded; failures
+	 * never block the local delete.
+	 *
+	 * @param string $api_key The decrypted bearer token.
+	 * @return void
+	 */
+	private function revoke_surecontact_key( $api_key ) {
+		if ( $api_key === '' ) {
+			return;
+		}
+
+		wp_remote_post(
+			rtrim( SurecontactHandler::api_base(), '/' ) . '/suremails/disconnect',
+			[
+				'headers' => [
+					'Accept'        => 'application/json',
+					'Authorization' => 'Bearer ' . $api_key,
+				],
+				'timeout' => 5,
+			]
+		);
 	}
 }
 

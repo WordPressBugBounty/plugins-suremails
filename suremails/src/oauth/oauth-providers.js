@@ -17,6 +17,15 @@ const OAUTH_PROVIDERS = {
 		type: 'ZOHO',
 		displayName: 'Zoho',
 	},
+	surecontact: {
+		state: 'surecontact',
+		// SureContact's `state` on the wire is `surecontact_<32-hex>` (CSRF
+		// token, minimum 32 chars). The fixed prefix lets us identify the
+		// provider on the callback while keeping the random suffix unique.
+		statePrefix: 'surecontact_',
+		type: 'SURECONTACT',
+		displayName: 'SureContact SMTP',
+	},
 };
 
 /**
@@ -37,7 +46,16 @@ export const getOAuthProviderStates = () => {
  * @return {boolean} True if the state represents a valid OAuth provider
  */
 export const isValidOAuthProvider = ( state ) => {
-	return getOAuthProviderStates().includes( state );
+	if ( ! state ) {
+		return false;
+	}
+	if ( getOAuthProviderStates().includes( state ) ) {
+		return true;
+	}
+	return Object.values( OAUTH_PROVIDERS ).some(
+		( provider ) =>
+			provider.statePrefix && state.startsWith( provider.statePrefix )
+	);
 };
 
 /**
@@ -47,9 +65,15 @@ export const isValidOAuthProvider = ( state ) => {
  * @return {object|null} Provider configuration or null if not found
  */
 export const getProviderByState = ( state ) => {
+	if ( ! state ) {
+		return null;
+	}
 	return (
 		Object.values( OAUTH_PROVIDERS ).find(
-			( provider ) => provider.state === state
+			( provider ) =>
+				provider.state === state ||
+				( provider.statePrefix &&
+					state.startsWith( provider.statePrefix ) )
 		) || null
 	);
 };

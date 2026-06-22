@@ -5,6 +5,36 @@ import { getProviders } from '@api/connections';
 import { z } from 'zod';
 import * as Icons from '@assets/icons';
 import { __, sprintf } from '@wordpress/i18n';
+
+export const SURECONTACT_KEY = 'SURECONTACT';
+
+const SureContactIcon = () => (
+	<Icons.SureContactIcon className="shrink-0 size-6 rounded" />
+);
+
+const getSureContactProvider = () => ( {
+	value: SURECONTACT_KEY,
+	display_name: __( 'SureContact SMTP', 'suremails' ),
+	title: __( 'SureContact SMTP', 'suremails' ),
+	description: __(
+		'Start sending in one click — no API keys, no DNS.',
+		'suremails'
+	),
+	icon: <SureContactIcon />,
+	provider_type: 'free',
+	provider_sequence: -1,
+	isSureContact: true,
+	fields: [],
+	schema: z.object( {} ),
+	badgeItem: (
+		<Badge
+			label={ __( 'Recommended', 'suremails' ) }
+			size="xxs"
+			type="pill"
+			variant="blue"
+		/>
+	),
+} );
 const getFieldDefaultValue = ( fieldDataType, fieldKey, field ) => {
 	if ( field?.default !== undefined ) {
 		// If field type is select, return the value of the default option
@@ -244,10 +274,30 @@ const useProviders = () => {
 			return [];
 		}
 
-		const preparedProviders =
-			Object.entries( providers ).map( prepareProviderData );
+		// PHP discovery returns the SureContact provider too. The curated
+		// React-side card supplies the display props (icon, description,
+		// badge) for the provider list and provision flow; the PHP-discovered
+		// entry supplies real `fields` + `schema` so the edit drawer can
+		// render the generic form for an existing SureContact connection.
+		const preparedProviders = Object.entries( providers )
+			.filter( ( [ key ] ) => key !== SURECONTACT_KEY )
+			.map( prepareProviderData );
 
-		return sortProviders( preparedProviders );
+		const phpSureContact = providers[ SURECONTACT_KEY ];
+		const sureContactPhpPrepared = phpSureContact
+			? prepareProviderData( [ SURECONTACT_KEY, phpSureContact ] )
+			: null;
+
+		const sureContactEntry = sureContactPhpPrepared
+			? {
+					...sureContactPhpPrepared,
+					...getSureContactProvider(),
+					fields: sureContactPhpPrepared.fields,
+					schema: sureContactPhpPrepared.schema,
+			  }
+			: getSureContactProvider();
+
+		return [ sureContactEntry, ...sortProviders( preparedProviders ) ];
 	}, [ isLoading, providers, error ] );
 
 	return {

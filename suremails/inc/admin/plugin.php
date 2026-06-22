@@ -10,6 +10,7 @@
 namespace SureMails\Inc\Admin;
 
 use SureMails\Inc\API\RecommendedPlugin;
+use SureMails\Inc\Emails\Providers\SURECONTACT\SurecontactHandler;
 use SureMails\Inc\Onboarding;
 use SureMails\Inc\Settings;
 use SureMails\Inc\Traits\Instance;
@@ -285,30 +286,37 @@ class Plugin {
 			'suremails-react-script',
 			'suremails',
 			[
-				'currentUser'                  => [
+				'currentUser'                           => [
 					'firstName' => sanitize_text_field( (string) ( $current_user->first_name ?? '' ) ),
 					'lastName'  => sanitize_text_field( (string) ( $current_user->last_name ?? '' ) ),
 					'email'     => sanitize_email( (string) ( $current_user->user_email ?? '' ) ),
 				],
-				'siteUrl'                      => esc_url( get_site_url( get_current_blog_id() ) ),
-				'attachmentUrl'                => $this->get_attachment_url(),
-				'userEmail'                    => sanitize_email( (string) ( $current_user->user_email ?? '' ) ),
-				'version'                      => SUREMAILS_VERSION,
-				'nonce'                        => current_user_can( 'manage_options' ) ? wp_create_nonce( 'wp_rest' ) : '',
-				'_ajax_nonce'                  => current_user_can( 'manage_options' ) ? wp_create_nonce( 'suremails_plugin' ) : '',
-				'contentGuardPopupStatus'      => Settings::instance()->show_content_guard_lead_popup(),
-				'contentGuardActiveStatus'     => get_option( 'suremails_content_guard_activated', 'no' ),
-				'contentGuardUserDetails'      => $content_guard_user_details,
-				'termsURL'                     => 'https://suremails.com/terms?utm_campaign=suremails&utm_medium=suremails-dashboard',
-				'privacyPolicyURL'             => 'https://suremails.com/privacy-policy?utm_campaign=suremails&utm_medium=suremails-dashboard',
-				'docsURL'                      => 'https://suremails.com/docs?utm_campaign=suremails&utm_medium=suremails-dashboard',
-				'supportURL'                   => 'https://suremails.com/contact/?utm_campaign=suremails&utm_medium=suremails-dashboard',
-				'adminURL'                     => Utils::get_admin_url(),
-				'ottokit_connected'            => apply_filters( 'suretriggers_is_user_connected', '' ),
-				'ottokit_admin_url'            => admin_url( 'admin.php?page=suretriggers' ),
-				'pluginInstallationPermission' => current_user_can( 'install_plugins' ),
-				'onboardingCompleted'          => Onboarding::instance()->get_onboarding_status(),
-				'recommendedPluginsData'       => RecommendedPlugin::get_recommended_plugins_sequence(),
+				'siteUrl'                               => esc_url( get_site_url( get_current_blog_id() ) ),
+				'attachmentUrl'                         => $this->get_attachment_url(),
+				'userEmail'                             => sanitize_email( (string) ( $current_user->user_email ?? '' ) ),
+				'version'                               => SUREMAILS_VERSION,
+				'nonce'                                 => current_user_can( 'manage_options' ) ? wp_create_nonce( 'wp_rest' ) : '',
+				'_ajax_nonce'                           => current_user_can( 'manage_options' ) ? wp_create_nonce( 'suremails_plugin' ) : '',
+				'contentGuardPopupStatus'               => Settings::instance()->show_content_guard_lead_popup(),
+				'contentGuardActiveStatus'              => get_option( 'suremails_content_guard_activated', 'no' ),
+				'contentGuardUserDetails'               => $content_guard_user_details,
+				'termsURL'                              => 'https://suremails.com/terms?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'privacyPolicyURL'                      => 'https://suremails.com/privacy-policy?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'docsURL'                               => 'https://suremails.com/docs?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'supportURL'                            => 'https://suremails.com/contact/?utm_campaign=suremails&utm_medium=suremails-dashboard',
+				'adminURL'                              => Utils::get_admin_url(),
+				'ottokit_connected'                     => apply_filters( 'suretriggers_is_user_connected', '' ),
+				'ottokit_admin_url'                     => admin_url( 'admin.php?page=suretriggers' ),
+				'pluginInstallationPermission'          => current_user_can( 'install_plugins' ),
+				'onboardingCompleted'                   => Onboarding::instance()->get_onboarding_status(),
+				'recommendedPluginsData'                => RecommendedPlugin::get_recommended_plugins_sequence(),
+				'surecontactBillingUrl'                 => SurecontactHandler::billing_url(),
+				'surecontactSendingDomainsUrl'          => SurecontactHandler::sending_domains_url(),
+				'surecontactPluginUrl'                  => apply_filters( 'suremails_surecontact_plugin_url', 'https://wordpress.org/plugins/surecontact' ),
+				'surecontactPromoDismissed'             => $this->is_surecontact_promo_dismissed(),
+				'surecontactSmtpPromoDismissed'         => $this->is_surecontact_smtp_promo_dismissed(),
+				'surecontactCustomDomainPromoDismissed' => $this->is_surecontact_custom_domain_promo_dismissed(),
+				'paymentLogosUrl'                       => SUREMAILS_PLUGIN_URL . 'assets/images/payment-logos.png',
 			]
 		);
 
@@ -552,6 +560,72 @@ class Plugin {
 	 */
 	private function is_menu_notice_disabled() {
 		return (bool) get_option( 'suremails_menu_notice_dismissed', false );
+	}
+
+	/**
+	 * Check if the SureContact cross-sell promo is currently dismissed.
+	 *
+	 * Mirrors is_notice_disabled(): the dismissal lasts 15 days and is cleared
+	 * once expired so the promo can resurface.
+	 *
+	 * @return bool True if the promo is dismissed (within the 15-day window).
+	 */
+	private function is_surecontact_promo_dismissed() {
+		$expiry = get_option( 'suremails_surecontact_promo_dismissal_time', 0 );
+		if ( ! $expiry ) {
+			return false;
+		}
+
+		if ( time() >= $expiry ) {
+			delete_option( 'suremails_surecontact_promo_dismissal_time' );
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if the SureContact SMTP launch promo is currently dismissed.
+	 *
+	 * Mirrors is_surecontact_promo_dismissed(): the dismissal lasts 15 days and
+	 * is cleared once expired so the promo can resurface.
+	 *
+	 * @return bool True if the promo is dismissed (within the 15-day window).
+	 */
+	private function is_surecontact_smtp_promo_dismissed() {
+		$expiry = get_option( 'suremails_surecontact_smtp_promo_dismissal_time', 0 );
+		if ( ! $expiry ) {
+			return false;
+		}
+
+		if ( time() >= $expiry ) {
+			delete_option( 'suremails_surecontact_smtp_promo_dismissal_time' );
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Check if the SureContact custom sending domain nudge is currently dismissed.
+	 *
+	 * Mirrors is_surecontact_smtp_promo_dismissed(): the dismissal lasts 15 days
+	 * and is cleared once expired so the nudge can resurface.
+	 *
+	 * @return bool True if the nudge is dismissed (within the 15-day window).
+	 */
+	private function is_surecontact_custom_domain_promo_dismissed() {
+		$expiry = get_option( 'suremails_surecontact_custom_domain_promo_dismissal_time', 0 );
+		if ( ! $expiry ) {
+			return false;
+		}
+
+		if ( time() >= $expiry ) {
+			delete_option( 'suremails_surecontact_custom_domain_promo_dismissal_time' );
+			return false;
+		}
+
+		return true;
 	}
 }
 

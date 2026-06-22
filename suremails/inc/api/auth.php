@@ -10,6 +10,7 @@
 namespace SureMails\Inc\API;
 
 use SureMails\Inc\Emails\Providers\GMAIL\GmailHandler;
+use SureMails\Inc\Emails\Providers\SURECONTACT\SurecontactHandler;
 use SureMails\Inc\Emails\Providers\ZOHO\ZohoHandler;
 use SureMails\Inc\Traits\Instance;
 use WP_REST_Response;
@@ -91,8 +92,9 @@ class Auth extends Api_Base {
 	 */
 	private function get_supported_providers() {
 		return [
-			'gmail' => GmailHandler::class,
-			'zoho'  => ZohoHandler::class,
+			'gmail'       => GmailHandler::class,
+			'zoho'        => ZohoHandler::class,
+			'surecontact' => SurecontactHandler::class,
 		];
 	}
 

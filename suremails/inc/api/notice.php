@@ -64,6 +64,45 @@ class Notice extends Api_Base {
 				],
 			]
 		);
+
+		// SureContact cross-sell promo dismissal (15 days).
+		register_rest_route(
+			$this->get_api_namespace(),
+			'/disable-surecontact-promo',
+			[
+				[
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => [ $this, 'handle_surecontact_promo' ],
+					'permission_callback' => [ $this, 'validate_permission' ],
+				],
+			]
+		);
+
+		// SureContact SMTP launch promo dismissal (15 days).
+		register_rest_route(
+			$this->get_api_namespace(),
+			'/disable-surecontact-smtp-promo',
+			[
+				[
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => [ $this, 'handle_surecontact_smtp_promo' ],
+					'permission_callback' => [ $this, 'validate_permission' ],
+				],
+			]
+		);
+
+		// SureContact custom sending domain nudge dismissal (15 days).
+		register_rest_route(
+			$this->get_api_namespace(),
+			'/disable-surecontact-custom-domain-promo',
+			[
+				[
+					'methods'             => WP_REST_Server::EDITABLE,
+					'callback'            => [ $this, 'handle_surecontact_custom_domain_promo' ],
+					'permission_callback' => [ $this, 'validate_permission' ],
+				],
+			]
+		);
 	}
 
 	/**
@@ -99,6 +138,63 @@ class Notice extends Api_Base {
 			[
 				'success' => true,
 				'message' => __( 'Menu location notice dismissed.', 'suremails' ),
+			]
+		);
+	}
+
+	/**
+	 * Dismiss the SureContact cross-sell promo for 15 days.
+	 *
+	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
+	 * @return WP_REST_Response
+	 */
+	public function handle_surecontact_promo( $request ) {
+		// Calculate "now + 15 days".
+		$expiry_time = time() + ( 1296000 );
+		update_option( 'suremails_surecontact_promo_dismissal_time', $expiry_time );
+
+		return rest_ensure_response(
+			[
+				'success' => true,
+				'message' => __( 'SureContact promo dismissed for 15 days.', 'suremails' ),
+			]
+		);
+	}
+
+	/**
+	 * Dismiss the SureContact SMTP launch promo for 15 days.
+	 *
+	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
+	 * @return WP_REST_Response
+	 */
+	public function handle_surecontact_smtp_promo( $request ) {
+		// Calculate "now + 15 days".
+		$expiry_time = time() + ( 1296000 );
+		update_option( 'suremails_surecontact_smtp_promo_dismissal_time', $expiry_time );
+
+		return rest_ensure_response(
+			[
+				'success' => true,
+				'message' => __( 'SureContact SMTP promo dismissed for 15 days.', 'suremails' ),
+			]
+		);
+	}
+
+	/**
+	 * Dismiss the SureContact custom sending domain nudge for 15 days.
+	 *
+	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
+	 * @return WP_REST_Response
+	 */
+	public function handle_surecontact_custom_domain_promo( $request ) {
+		// Calculate "now + 15 days".
+		$expiry_time = time() + ( 1296000 );
+		update_option( 'suremails_surecontact_custom_domain_promo_dismissal_time', $expiry_time );
+
+		return rest_ensure_response(
+			[
+				'success' => true,
+				'message' => __( 'SureContact custom domain nudge dismissed for 15 days.', 'suremails' ),
 			]
 		);
 	}

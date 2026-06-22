@@ -8,6 +8,7 @@ import apiFetch from '@wordpress/api-fetch';
 import { useQuery } from '@tanstack/react-query';
 import { useCallback } from '@wordpress/element';
 import AuthCodeDisplay from '@components/auth-code-display/auth-code-display';
+import SureContactMeter from '@components/surecontact-meter';
 import Welcome from './welcome';
 const Dashboard = () => {
 	const restApiNonce = window.suremails?.nonce;
@@ -49,6 +50,9 @@ const Dashboard = () => {
 						</div>
 					) : (
 						<>
+							{ /* SureContact Trial Meter — renders only when a SureContact connection exists */ }
+							<SureContactMeter />
+
 							{ /* Chart Card */ }
 							<div className="w-full h-auto border-0.5 border-solid shadow-sm rounded-xl bg-background-primary border-border-subtle">
 								<Chart

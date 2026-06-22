@@ -40,7 +40,12 @@ const reducer = ( state, action ) => {
 
 export const OnboardingProvider = ( { children } ) => {
 	const location = useLocation();
-	const { connection = '', auth_code = '' } = location.state ?? {};
+	const {
+		connection = '',
+		auth_code = '',
+		oauth_token = '',
+		oauth_state = '',
+	} = location.state ?? {};
 
 	const getSavedState = useCallback( () => {
 		try {
@@ -59,18 +64,35 @@ export const OnboardingProvider = ( { children } ) => {
 	const initialState = savedState
 		? {
 				...savedState,
+				...( connection ? { connection } : {} ),
 				connectionFormData: {
 					...( savedState.connectionFormData ?? {} ),
 					...( connection && auth_code
 						? { connection, auth_code }
 						: {} ),
+					...( connection && oauth_token
+						? { connection, oauth_token, oauth_state }
+						: {} ),
 				},
 		  }
 		: {
 				hasSkippedStep: false,
+				connection: 'SURECONTACT',
+				otherProvidersOpen: false,
 				safeGuard: {
 					activation: suremails?.contentGuardActiveStatus === 'yes',
 					showLeadForm: Boolean( suremails?.contentGuardPopupStatus ),
+				},
+				sureContact: {
+					name:
+						[
+							suremails?.currentUser?.firstName,
+							suremails?.currentUser?.lastName,
+						]
+							.filter( Boolean )
+							.join( ' ' ) || '',
+					email: suremails?.currentUser?.email || '',
+					website: suremails?.siteUrl || '',
 				},
 		  };
 

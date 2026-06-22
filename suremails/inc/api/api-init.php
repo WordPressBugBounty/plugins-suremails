@@ -57,6 +57,13 @@ class Api_Init {
 			'SureMails\Inc\API\OttoKit',
 			'SureMails\Inc\API\Onboarding',
 			'SureMails\Inc\API\Notice',
+			'SureMails\Inc\API\SureContactVerify',
+			'SureMails\Inc\API\SureContactProvision',
+			'SureMails\Inc\API\SureContactResendVerification',
+			'SureMails\Inc\API\SureContactStatus',
+			'SureMails\Inc\API\SureContactSaasDisconnect',
+			'SureMails\Inc\API\SureContactSendingDomains',
+			'SureMails\Inc\API\SureContactPlans',
 		];
 
 		foreach ( $controllers as $controller_class ) {

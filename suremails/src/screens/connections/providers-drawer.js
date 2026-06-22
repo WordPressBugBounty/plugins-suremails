@@ -11,7 +11,21 @@ import { testAndSaveEmailConnection as apiTestAndSaveEmailConnection } from '@ap
 import { useMemo } from 'react';
 import ProvidersSkeleton from './providers-skeleton';
 import ExtendedDynamicForm from './extended-dynamic-form';
+import SureContactDrawerForm from './surecontact-drawer-form';
+import SureContactAddSenderForm from './surecontact-add-sender-form';
 import { isOAuthProvider } from '@oauth/oauth-providers';
+import { SURECONTACT_KEY } from './use-dynamic-providers';
+
+// Editable subset for an existing SureContact connection. Account email and
+// OAuth identity are platform-owned (the bearer is bound to from_email), so
+// only the cosmetic + routing fields are exposed; from_email / force_from_email
+// stay in formData so the save payload still carries them.
+const SURECONTACT_EDIT_FIELDS = [
+	'connection_title',
+	'from_name',
+	'force_from_name',
+	'priority',
+];
 
 const ProvidersDrawer = ( {
 	isOpen,
@@ -22,12 +36,28 @@ const ProvidersDrawer = ( {
 	isProvidersLoading = false,
 	sequenceId = 1,
 	connectionCount = {},
+	surecontactPaid = false,
 } ) => {
+	// Free accounts get one SureContact connection per site; paid accounts can
+	// add more (each a new from_email sharing the account's api_key). The drawer
+	// always opens on the provider list — a specific provider is only
+	// pre-selected when the caller passes one via currentConnection.type (e.g.
+	// the SureContact SMTP banner's "Set Up Now").
+	const surecontactExists = ( connectionCount[ SURECONTACT_KEY ] || 0 ) > 0;
+	const surecontactLocked = surecontactExists && ! surecontactPaid;
+	const defaultProvider = null;
 	const [ selectedProvider, setSelectedProvider ] = useState(
-		currentConnection ? currentConnection.type : ''
+		currentConnection?.type || defaultProvider
 	);
 	const [ formData, setFormData ] = useState( currentConnection );
 	const [ errors, setErrors ] = useState( {} );
+	// Edit mode is only entered by opening an existing connection. Picking a
+	// provider from the list (or hitting Back and re-selecting) is always a new
+	// connection — tracked here so a stale currentConnection.id can't keep the
+	// drawer in edit mode after the user navigates back to create one.
+	const [ isEditing, setIsEditing ] = useState(
+		Boolean( currentConnection?.id )
+	);
 
 	const [ isLoading, setIsLoading ] = useState( false );
 	// Add form refs
@@ -41,26 +71,52 @@ const ProvidersDrawer = ( {
 		return providersList.find(
 			( provider ) => provider.value === selectedProvider
 		);
-	}, [ selectedProvider, providersList, currentConnection ] );
+	}, [ selectedProvider, providersList ] );
 	const fields = selectedProviderData?.fields;
+
+	// SureContact splits provision (OAuth flow via SureContactDrawerForm) from
+	// edit (the generic form, with a narrowed field set). Edit mode is only
+	// reachable when an existing connection is loaded into currentConnection.
+	const isSureContactEdit = selectedProvider === SURECONTACT_KEY && isEditing;
+
+	// Paid account adding another sender: a SureContact connection already
+	// exists and we're creating a new row. Shows the domain/local-part picker
+	// instead of the account-provision flow.
+	const isSureContactAddSender =
+		selectedProvider === SURECONTACT_KEY &&
+		! isSureContactEdit &&
+		surecontactExists &&
+		surecontactPaid;
+
+	const visibleFields = useMemo( () => {
+		if ( ! fields || ! isSureContactEdit ) {
+			return fields;
+		}
+		return fields.filter( ( field ) =>
+			SURECONTACT_EDIT_FIELDS.includes( field.name )
+		);
+	}, [ fields, isSureContactEdit ] );
 
 	const defaultValues = useMemo( () => {
 		return selectedProviderData?.fields.reduce( ( acc, field ) => {
 			acc[ field.name ] = field.default;
 			return acc;
 		}, {} );
-	}, [ selectedProviderData, currentConnection ] );
+	}, [ selectedProviderData ] );
 
 	useEffect( () => {
 		if ( currentConnection?.type ) {
 			setSelectedProvider( currentConnection.type );
+			setIsEditing( Boolean( currentConnection?.id ) );
 
 			setFormData( ( prevData ) => ( {
 				...prevData,
 				...currentConnection,
 			} ) );
 		} else {
-			setSelectedProvider( null );
+			// New connection with no explicit provider — open on the list.
+			setSelectedProvider( defaultProvider );
+			setIsEditing( false );
 			setFormData( null );
 		}
 	}, [ currentConnection ] );
@@ -87,6 +143,8 @@ const ProvidersDrawer = ( {
 
 	const handleProviderSelect = ( provider ) => {
 		setSelectedProvider( provider );
+		// Picking from the provider list always starts a fresh connection.
+		setIsEditing( false );
 		const config = selectedProviderData;
 		if ( ! config ) {
 			return;
@@ -138,7 +196,7 @@ const ProvidersDrawer = ( {
 	const handleSetOpenDrawer = ( value ) => {
 		setIsOpen( value );
 		if ( ! value ) {
-			setSelectedProvider( '' );
+			setSelectedProvider( currentConnection?.type || defaultProvider );
 			setErrors( {} );
 			setFormData( {} );
 		}
@@ -178,6 +236,7 @@ const ProvidersDrawer = ( {
 		setSelectedProvider( null );
 		setFormData( null );
 		setErrors( {} );
+		setIsEditing( false );
 	};
 
 	const hasChanges =
@@ -193,8 +252,21 @@ const ProvidersDrawer = ( {
 			return;
 		}
 
+		// SureContact edits ship only the editable allowlist + id, so a
+		// tampered client can't smuggle from_email / api_key / etc. into the
+		// payload. The server enforces the same restriction on its side; this
+		// is defense-in-depth.
+		const settingsPayload = isSureContactEdit
+			? [ ...SURECONTACT_EDIT_FIELDS, 'id' ].reduce( ( acc, key ) => {
+					if ( formData?.[ key ] !== undefined ) {
+						acc[ key ] = formData[ key ];
+					}
+					return acc;
+			  }, {} )
+			: formData;
+
 		const payload = {
-			settings: formData,
+			settings: settingsPayload,
 			provider: selectedProvider.toUpperCase(),
 		};
 		setIsLoading( true );
@@ -270,23 +342,46 @@ const ProvidersDrawer = ( {
 		}
 	};
 
-	// Define drawer title and description based on selected provider
-	const title = selectedProvider
-		? __( 'Connection Details', 'suremails' )
-		: __( 'New Connection', 'suremails' );
-	const description = selectedProvider
-		? selectedProviderData?.description ??
-		  __(
+	// Define drawer title and description based on selected provider. The
+	// SureContact provision flow gets the onboarding-style header so the
+	// drawer and onboarding screens read identically.
+	const isSureContactProvision =
+		selectedProvider === SURECONTACT_KEY &&
+		! isSureContactEdit &&
+		! isSureContactAddSender;
+
+	let title;
+	let description;
+	if ( isSureContactAddSender ) {
+		title = __( 'Add a sender', 'suremails' );
+		description = __(
+			'Send from another address on one of your verified sending domains.',
+			'suremails'
+		);
+	} else if ( isSureContactProvision ) {
+		title = __( 'Create your SureContact account', 'suremails' );
+		description = __(
+			"Takes 30 seconds. No credit card needed. We'll auto-configure everything.",
+			'suremails'
+		);
+	} else if ( selectedProvider ) {
+		title = __( 'Connection Details', 'suremails' );
+		description =
+			selectedProviderData?.description ??
+			__(
 				'Enter the details below to connect with your {providerName} account.',
 				'suremails'
-		  ).replace(
+			).replace(
 				'{providerName}',
 				selectedProviderData?.display_name || selectedProvider
-		  )
-		: __(
-				'Pick an email provider to ensure your WordPress emails are delivered securely and reliably.',
-				'suremails'
-		  );
+			);
+	} else {
+		title = __( 'New Connection', 'suremails' );
+		description = __(
+			'Pick an email provider to ensure your WordPress emails are delivered securely and reliably.',
+			'suremails'
+		);
+	}
 
 	return (
 		<Drawer
@@ -318,70 +413,124 @@ const ProvidersDrawer = ( {
 						</Drawer.Description>
 					</Drawer.Header>
 					<Drawer.Body className="overflow-x-hidden">
-						{ /* Form when a provider is selected */ }
-						{ ! isProvidersLoading && selectedProvider && (
-							<div>
-								<ExtendedDynamicForm
-									fields={ fields }
-									onChange={ handleFormSubmit }
-									connectionData={ formData }
-									errors={ errors }
-									inlineValidator={ handleOnBlurValidation }
-									onClickAuthenticate={
-										handleClickAuthenticate
+						{ /* Paid "add another sender" — domain/local-part picker, clones the shared api_key. */ }
+						{ ! isProvidersLoading && isSureContactAddSender && (
+							<SureContactAddSenderForm
+								sequenceId={ sequenceId }
+								onBack={ () => {
+									setSelectedProvider( null );
+									setFormData( null );
+								} }
+								onSuccess={ ( connection ) => {
+									setIsOpen( false );
+									if ( onSave ) {
+										onSave( connection );
 									}
-									providerOptions={ selectedProviderData }
-								/>
-							</div>
+									resetProviderState();
+								} }
+							/>
 						) }
+
+						{ /* SureContact provision/connect — only when adding the first connection. */ }
+						{ ! isProvidersLoading &&
+							selectedProvider === SURECONTACT_KEY &&
+							! isSureContactEdit &&
+							! isSureContactAddSender && (
+								<SureContactDrawerForm
+									pendingOAuthToken={
+										currentConnection?.oauth_token || ''
+									}
+									pendingOAuthState={
+										currentConnection?.oauth_state || ''
+									}
+									sequenceId={ sequenceId }
+									onBack={ () => {
+										setSelectedProvider( null );
+										setFormData( null );
+									} }
+									onSuccess={ ( connection ) => {
+										setIsOpen( false );
+										if ( onSave ) {
+											onSave( connection );
+										}
+										resetProviderState();
+									} }
+								/>
+							) }
+
+						{ /* Generic form: any non-SureContact provider, or SureContact in edit mode (with a narrowed field set). */ }
+						{ ! isProvidersLoading &&
+							selectedProvider &&
+							( selectedProvider !== SURECONTACT_KEY ||
+								isSureContactEdit ) && (
+								<div>
+									<ExtendedDynamicForm
+										fields={ visibleFields }
+										onChange={ handleFormSubmit }
+										connectionData={ formData }
+										errors={ errors }
+										inlineValidator={
+											handleOnBlurValidation
+										}
+										onClickAuthenticate={
+											handleClickAuthenticate
+										}
+										providerOptions={ selectedProviderData }
+									/>
+								</div>
+							) }
 
 						{ /* Provider List when no provider is selected */ }
 						{ ! isProvidersLoading && ! selectedProvider && (
 							<ProviderList
 								onSelectProvider={ handleProviderSelect }
 								providers={ providersList }
+								surecontactDisabled={ surecontactLocked }
 							/>
 						) }
 
 						{ /* Skeleton for loading state */ }
 						{ isProvidersLoading && <ProvidersSkeleton /> }
 					</Drawer.Body>
-					{ selectedProvider && (
-						<Drawer.Footer>
-							<Button
-								onClick={ () => {
-									setSelectedProvider( null );
-									setFormData( null );
-									setErrors( {} );
-								} }
-								variant="outline"
-								icon={ <ChevronLeftIcon /> }
-								size="sm"
-								iconPosition="left"
-								className="font-medium"
-								type="button"
-							>
-								{ __( 'Back', 'suremails' ) }
-							</Button>
-							<Button
-								variant="primary"
-								loading={ isLoading }
-								icon={
-									isLoading ? (
-										<LoaderIcon className="animate-spin" />
-									) : null
-								}
-								onClick={ handleSaveChanges }
-								className="font-medium"
-								size="sm"
-								type="button"
-							>
-								{ isLoading
-									? __( 'Testing…', 'suremails' )
-									: __( 'Save Changes', 'suremails' ) }
-							</Button>
-						</Drawer.Footer>
-					) }
+					{ selectedProvider &&
+						( selectedProvider !== SURECONTACT_KEY ||
+							isSureContactEdit ) && (
+							<Drawer.Footer>
+								<Button
+									onClick={ () => {
+										setSelectedProvider( null );
+										setFormData( null );
+										setErrors( {} );
+										setIsEditing( false );
+									} }
+									variant="outline"
+									icon={ <ChevronLeftIcon /> }
+									size="sm"
+									iconPosition="left"
+									className="font-medium"
+									type="button"
+								>
+									{ __( 'Back', 'suremails' ) }
+								</Button>
+								<Button
+									variant="primary"
+									loading={ isLoading }
+									icon={
+										isLoading ? (
+											<LoaderIcon className="animate-spin" />
+										) : null
+									}
+									onClick={ handleSaveChanges }
+									className="font-medium"
+									size="sm"
+									type="button"
+								>
+									{ isLoading
+										? __( 'Testing…', 'suremails' )
+										: __( 'Save Changes', 'suremails' ) }
+								</Button>
+							</Drawer.Footer>
+						) }
 				</Drawer.Panel>
 			</form>
 		</Drawer>

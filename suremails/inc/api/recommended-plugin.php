@@ -155,6 +155,7 @@ class RecommendedPlugin extends Api_Base {
 	 */
 	public static function get_recommended_plugins_sequence() {
 		$sequence = [
+			'surecontact',
 			'sureforms',
 			'surecart',
 			'surerank',

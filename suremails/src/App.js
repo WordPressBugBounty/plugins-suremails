@@ -2,6 +2,9 @@ import { HashRouter as Router, useLocation } from 'react-router-dom'; // Using H
 import ContentArea from '@routes/routes.js'; // Ensure this path is correct and points to your route definitions
 import './styles.css'; // Ensure Tailwind CSS is imported properly
 import NavMenu from '@components/nav-nenu.js'; // Import NavMenu for the top navigation
+import SureContactVerifyBanner from '@components/surecontact-verify-banner';
+import SureContactPromoBanner from '@components/surecontact-promo-banner';
+import SureContactSmtpBanner from '@components/surecontact-smtp-banner';
 import { Toaster } from '@bsf/force-ui'; // Import Toaster for notifications
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { cn } from '@utils/utils';
@@ -30,6 +33,9 @@ const AppLayout = () => {
 			<div className="w-full h-full">
 				{ /* Only render NavMenu if not on the onboarding screen */ }
 				{ ! isOnboarding && <NavMenu /> }
+				{ ! isOnboarding && <SureContactVerifyBanner /> }
+				{ ! isOnboarding && <SureContactPromoBanner /> }
+				{ ! isOnboarding && <SureContactSmtpBanner /> }
 				<div
 					className={ cn(
 						'w-full bg-background-secondary',

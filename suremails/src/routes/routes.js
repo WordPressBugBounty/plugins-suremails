@@ -6,6 +6,8 @@ import { Notifications } from '@screens/notifications';
 import { Settings } from '@screens/settings/index.js';
 import {
 	ConnectionProviders,
+	ConnectSureContact,
+	TestEmail,
 	OnboardingLayout,
 	SafeGuard,
 	Welcome,
@@ -39,6 +41,8 @@ const ContentArea = () => {
 						path="connection"
 						element={ <ConnectionProviders /> }
 					/>
+					<Route path="connect" element={ <ConnectSureContact /> } />
+					<Route path="test" element={ <TestEmail /> } />
 					<Route path="reputation-shield" element={ <SafeGuard /> } />
 					<Route path="done" element={ <Done /> } />
 				</Route>

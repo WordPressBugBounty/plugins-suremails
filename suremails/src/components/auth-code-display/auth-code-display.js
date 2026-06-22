@@ -71,9 +71,11 @@ const AuthCodeDisplay = () => {
 			return;
 		}
 
+		// SureContact's connect flow returns ?oauth_token= instead of ?code=.
 		const code = urlParams.get( 'code' );
+		const oauthToken = urlParams.get( 'oauth_token' );
 
-		if ( code ) {
+		if ( code || oauthToken ) {
 			const storedFormState =
 				JSON.parse( localStorage.getItem( 'formStateValues' ) ) || {};
 
@@ -83,11 +85,20 @@ const AuthCodeDisplay = () => {
 
 			const updatedFormState = {
 				...storedFormState,
-				auth_code: code,
 				type: providerType,
 				refresh_token: '',
 				force_save: true,
 			};
+
+			if ( code ) {
+				updatedFormState.auth_code = code;
+			}
+			if ( oauthToken ) {
+				updatedFormState.oauth_token = oauthToken;
+				// Stash the state too — SureContact's exchange endpoint
+				// verifies it matches the one issued during initiate.
+				updatedFormState.oauth_state = state;
+			}
 
 			localStorage.setItem(
 				'formStateValues',
@@ -136,12 +147,13 @@ const AuthCodeDisplay = () => {
 			return;
 		}
 
-		// Get the code and state from the URL
+		// Get the code/token and state from the URL.
 		const urlParams = new URLSearchParams( window.location.search );
 		const code = urlParams.get( 'code' );
+		const oauthToken = urlParams.get( 'oauth_token' );
 		const state = urlParams.get( 'state' );
 
-		if ( ! code || ! isValidOAuthProvider( state ) ) {
+		if ( ( ! code && ! oauthToken ) || ! isValidOAuthProvider( state ) ) {
 			return;
 		}
 
@@ -149,10 +161,22 @@ const AuthCodeDisplay = () => {
 
 		const connectionType = getProviderTypeByState( state );
 
-		navigate( '/onboarding/connection', {
+		// SureContact has its own connect screen with an auto-exchange effect
+		// that fires when oauth_token is present. Land there directly so the
+		// callback completes without an extra "Continue" click on the picker.
+		// Other providers continue to use the picker step.
+		const target =
+			connectionType === 'SURECONTACT'
+				? '/onboarding/connect'
+				: '/onboarding/connection';
+
+		navigate( target, {
 			state: {
 				connection: connectionType,
-				auth_code: code,
+				...( code ? { auth_code: code } : {} ),
+				...( oauthToken
+					? { oauth_token: oauthToken, oauth_state: state }
+					: {} ),
 			},
 		} );
 	}, [ navigate ] );

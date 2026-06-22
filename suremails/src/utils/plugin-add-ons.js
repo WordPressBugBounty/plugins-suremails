@@ -21,14 +21,15 @@ import {
 	AbandonedCartsLogo,
 	SureRankLogo,
 	UAE,
+	SureContactIcon,
 } from 'assets/icons';
 
 export const recommendedPluginsData = {
 	sequence: window.suremails?.recommendedPluginsData || [
+		'surecontact',
 		'sureforms',
-		'ultimate-addons-for-gutenberg',
 		'surecart',
-		'suretriggers',
+		'surerank',
 	],
 	description: 'short_description',
 };
@@ -300,5 +301,23 @@ export const pluginAddons = [
 		slug: 'surerank',
 		type: 'plugin',
 		init: 'surerank/surerank.php',
+	},
+	{
+		id: '15',
+		badgeText: __( 'Free', 'suremails' ),
+		svg: <SureContactIcon />,
+		title: __( 'SureContact', 'suremails' ),
+		long_description: __(
+			'Run email marketing, forms, landing pages, automations, and contact lists with SureContact.',
+			'suremails'
+		),
+		short_description: __(
+			'Email marketing, forms, and automations with SureContact.',
+			'suremails'
+		),
+		slug: 'surecontact',
+		name: __( 'SureContact', 'suremails' ),
+		type: 'plugin',
+		init: 'surecontact/surecontact.php',
 	},
 ];
