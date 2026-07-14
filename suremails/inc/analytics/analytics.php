@@ -86,6 +86,14 @@ class Analytics {
 	public function add_analytics_data( $stats_data ) {
 		$events = self::events();
 
+		// One-time events flushed from the pending queue, plus the daily
+		// per-provider email breakdown. The breakdown is appended directly
+		// (not via BSF_Analytics_Events::track()) so each record can carry the
+		// stat-day `date` and skip the one-time dedup — it is a recurring,
+		// idempotent daily metric, not a milestone.
+		$events_record = $events ? $events->flush_pending() : [];
+		$events_record = array_merge( $events_record, $this->get_provider_stats_events() );
+
 		$stats_data['plugin_data']['suremails'] = [
 			'version'       => SUREMAILS_VERSION,
 			'site_language' => get_locale(),
@@ -93,8 +101,8 @@ class Analytics {
 			// Daily KPIs (last 2 days).
 			'kpi_records'   => $this->get_kpi_tracking_data(),
 
-			// One-time events (flushed from pending queue).
-			'events_record' => $events ? $events->flush_pending() : [],
+			// One-time events + daily per-provider email breakdown.
+			'events_record' => $events_record,
 		];
 
 		return $stats_data;
@@ -248,5 +256,103 @@ class Analytics {
 				$date
 			)
 		);
+	}
+
+	/**
+	 * Build the daily per-provider email breakdown events (last 2 days, excluding today).
+	 *
+	 * Each closed day with activity becomes a single `email_provider_stats` event whose
+	 * `properties` map holds the per-provider counts — keeping one row per site per day
+	 * instead of one KPI row per provider. The `date` is set to the stat day so the
+	 * warehouse keys (and de-duplicates) the row by day, making re-sends idempotent.
+	 * Days with no emails are skipped to avoid empty rows.
+	 *
+	 * @since 1.9.4
+	 * @return array<int, array<string, mixed>> Event records to append to `events_record`.
+	 */
+	private function get_provider_stats_events(): array {
+		$provider_events = [];
+
+		for ( $i = 1; $i <= 2; $i++ ) {
+			$date = wp_date( 'Y-m-d', strtotime( "-{$i} days" ) );
+
+			if ( ! $date ) {
+				continue;
+			}
+
+			$breakdown = $this->get_provider_breakdown( $date );
+
+			if ( empty( $breakdown ) ) {
+				continue;
+			}
+
+			$properties = [];
+			foreach ( $breakdown as $provider => $count ) {
+				$properties[ $provider ] = (string) $count;
+			}
+
+			$provider_events[] = [
+				'event_name'  => 'email_provider_stats',
+				'event_value' => (string) array_sum( $breakdown ),
+				'properties'  => $properties,
+				'date'        => $date . ' 00:00:00',
+			];
+		}
+
+		return $provider_events;
+	}
+
+	/**
+	 * Get the per-provider email count for a specific date.
+	 *
+	 * Mirrors get_emails_log_count() (same table, date column and all-status scope) but
+	 * grouped by the `connection` column, so the per-provider counts always sum back to
+	 * `emails_processed` for that date. Provider keys are normalized; empty/Default
+	 * connections are bucketed as `default`.
+	 *
+	 * @param string $date Date in Y-m-d format.
+	 * @since 1.9.4
+	 * @return array<string, int> Map of normalized provider key => count.
+	 */
+	private function get_provider_breakdown( string $date ): array {
+		global $wpdb;
+
+		$table_name = EmailLog::instance()->get_table_name();
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$table_exists = $wpdb->get_var(
+			$wpdb->prepare( 'SHOW TABLES LIKE %s', $table_name )
+		);
+
+		if ( $table_exists !== $table_name ) {
+			return [];
+		}
+
+		// phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery, WordPress.DB.DirectDatabaseQuery.NoCaching
+		$rows = $wpdb->get_results(
+			$wpdb->prepare(
+				"SELECT `connection` AS provider, COUNT(*) AS cnt FROM `{$table_name}` WHERE DATE(`created_at`) = %s GROUP BY `connection`", // phpcs:ignore WordPress.DB.PreparedSQL.InterpolatedNotPrepared
+				$date
+			),
+			ARRAY_A
+		);
+
+		if ( ! is_array( $rows ) ) {
+			return [];
+		}
+
+		$breakdown = [];
+		foreach ( $rows as $row ) {
+			$provider = sanitize_key( (string) ( $row['provider'] ?? '' ) );
+
+			if ( '' === $provider ) {
+				$provider = 'default';
+			}
+
+			// Distinct raw connection values can normalize to the same key — sum them.
+			$breakdown[ $provider ] = ( $breakdown[ $provider ] ?? 0 ) + (int) $row['cnt'];
+		}
+
+		return $breakdown;
 	}
 }

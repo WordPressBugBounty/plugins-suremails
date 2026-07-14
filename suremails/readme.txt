@@ -5,7 +5,7 @@ Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
 Tested up to: 7.0
 Requires PHP: 7.4
-Stable tag: 2.0.0
+Stable tag: 2.0.1
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -245,6 +245,11 @@ You can report the issue through our [Bug Bounty Program](https://brainstormforc
 5. Email Logs – Monitor your email activity with detailed logs to track successful, failed, in progress, and blocked emails easily.
 
 == Changelog ==
+
+v2.0.1 - 14-July-2026
+- Improvement: SureContact - Added a quick "Add Sender" option in the connections header.
+- Improvement: Internal enhancements to SureContact integration and email analytics.
+- Fix: SureContact - Fixed the user name not being sent during connection provisioning.
 
 v2.0.0 - 22-June-2026
 - New: SureContact email service provider added with guided onboarding and multi-sender support.

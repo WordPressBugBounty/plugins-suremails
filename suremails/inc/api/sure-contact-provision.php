@@ -101,10 +101,12 @@ class SureContactProvision extends Api_Base {
 
 		$payload = [
 			'email'          => $email,
+			'name'           => $name,
 			'site_url'       => $website,
 			'site_name'      => get_bloginfo( 'name' ),
 			'wp_version'     => get_bloginfo( 'version' ),
 			'plugin_version' => defined( 'SUREMAILS_VERSION' ) ? SUREMAILS_VERSION : '',
+			'utm_source'     => 'suremails',
 		];
 
 		$response = $this->call_provision( $payload );

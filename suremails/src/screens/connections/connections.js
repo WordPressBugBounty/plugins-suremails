@@ -17,7 +17,6 @@ import { formatDate, sortData } from '@utils/utils';
 import Tooltip from '@components/tooltip/tooltip';
 import TruncatedTooltipText from '@components/truncated-tooltip-text';
 import Title from '@components/title/title';
-import SureContactCustomDomainBanner from '@components/surecontact-custom-domain-banner';
 import useProviders from './use-dynamic-providers';
 
 const Connections = () => {
@@ -238,12 +237,27 @@ const Connections = () => {
 		setIsDrawerOpen( true );
 	};
 
-	// Paid SureContact nudge CTA: pre-select SureContact so the drawer opens
-	// straight into the "Add Sender" flow (custom domain picker).
-	const handleAddCustomDomainSender = () => {
+	// "Add Sender" CTA. Paid accounts open the add-sender drawer straight into
+	// the custom-domain picker; free accounts are sent to the SureContact SMTP
+	// upgrade page, since custom-domain senders are a paid capability.
+	const handleAddSender = () => {
+		if ( ! isSureContactPaid() ) {
+			window.open(
+				'https://surecontact.com/smtp/',
+				'_blank',
+				'noopener,noreferrer'
+			);
+			return;
+		}
 		setCurrentConnection( { type: 'SURECONTACT' } );
 		setIsDrawerOpen( true );
 	};
+
+	// Show the "Add Sender" action whenever a SureContact connection exists.
+	const hasSureContactConnection = Object.values(
+		settings?.connections ?? {}
+	).some( ( connectionItem ) => connectionItem?.type === 'SURECONTACT' );
+	const sureContactIsPaid = isSureContactPaid();
 
 	// Show loading state
 	if ( isLoading ) {
@@ -293,23 +307,48 @@ const Connections = () => {
 							title={ __( 'Email Connections', 'suremails' ) }
 							tag="h1"
 						/>
-						<Button
-							variant="primary"
-							size="sm"
-							icon={ <Plus /> }
-							iconPosition="left"
-							onClick={ handleAddConnection }
-							className="font-medium"
-						>
-							{ __( 'Add Connection', 'suremails' ) }
-						</Button>
+						<div className="flex items-center gap-2">
+							{ hasSureContactConnection && (
+								<Tooltip
+									content={
+										sureContactIsPaid
+											? __(
+													'Your SureContact plan lets you send from a verified custom domain — add another sender in seconds.',
+													'suremails'
+											  )
+											: __(
+													'Upgrade your SureContact plan to send from your own verified domain.',
+													'suremails'
+											  )
+									}
+									position="top"
+									arrow
+								>
+									<Button
+										variant="outline"
+										size="sm"
+										icon={ <Plus /> }
+										iconPosition="left"
+										onClick={ handleAddSender }
+										className="font-medium"
+									>
+										{ __( 'Add Sender', 'suremails' ) }
+									</Button>
+								</Tooltip>
+							) }
+							<Button
+								variant="primary"
+								size="sm"
+								icon={ <Plus /> }
+								iconPosition="left"
+								onClick={ handleAddConnection }
+								className="font-medium"
+							>
+								{ __( 'Add Connection', 'suremails' ) }
+							</Button>
+						</div>
 					</div>
 				) }
-
-				{ /* Paid SureContact custom sending domain nudge */ }
-				<SureContactCustomDomainBanner
-					onAddSender={ handleAddCustomDomainSender }
-				/>
 
 				{ /* Content Area */ }
 				{ renderSortedConnections().length > 0 ? (

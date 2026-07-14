@@ -90,19 +90,6 @@ class Notice extends Api_Base {
 				],
 			]
 		);
-
-		// SureContact custom sending domain nudge dismissal (15 days).
-		register_rest_route(
-			$this->get_api_namespace(),
-			'/disable-surecontact-custom-domain-promo',
-			[
-				[
-					'methods'             => WP_REST_Server::EDITABLE,
-					'callback'            => [ $this, 'handle_surecontact_custom_domain_promo' ],
-					'permission_callback' => [ $this, 'validate_permission' ],
-				],
-			]
-		);
 	}
 
 	/**
@@ -176,25 +163,6 @@ class Notice extends Api_Base {
 			[
 				'success' => true,
 				'message' => __( 'SureContact SMTP promo dismissed for 15 days.', 'suremails' ),
-			]
-		);
-	}
-
-	/**
-	 * Dismiss the SureContact custom sending domain nudge for 15 days.
-	 *
-	 * @param WP_REST_Request<array<string, mixed>> $request The request object.
-	 * @return WP_REST_Response
-	 */
-	public function handle_surecontact_custom_domain_promo( $request ) {
-		// Calculate "now + 15 days".
-		$expiry_time = time() + ( 1296000 );
-		update_option( 'suremails_surecontact_custom_domain_promo_dismissal_time', $expiry_time );
-
-		return rest_ensure_response(
-			[
-				'success' => true,
-				'message' => __( 'SureContact custom domain nudge dismissed for 15 days.', 'suremails' ),
 			]
 		);
 	}

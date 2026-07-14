@@ -315,7 +315,6 @@ class Plugin {
 				'surecontactPluginUrl'                  => apply_filters( 'suremails_surecontact_plugin_url', 'https://wordpress.org/plugins/surecontact' ),
 				'surecontactPromoDismissed'             => $this->is_surecontact_promo_dismissed(),
 				'surecontactSmtpPromoDismissed'         => $this->is_surecontact_smtp_promo_dismissed(),
-				'surecontactCustomDomainPromoDismissed' => $this->is_surecontact_custom_domain_promo_dismissed(),
 				'paymentLogosUrl'                       => SUREMAILS_PLUGIN_URL . 'assets/images/payment-logos.png',
 			]
 		);
@@ -600,28 +599,6 @@ class Plugin {
 
 		if ( time() >= $expiry ) {
 			delete_option( 'suremails_surecontact_smtp_promo_dismissal_time' );
-			return false;
-		}
-
-		return true;
-	}
-
-	/**
-	 * Check if the SureContact custom sending domain nudge is currently dismissed.
-	 *
-	 * Mirrors is_surecontact_smtp_promo_dismissed(): the dismissal lasts 15 days
-	 * and is cleared once expired so the nudge can resurface.
-	 *
-	 * @return bool True if the nudge is dismissed (within the 15-day window).
-	 */
-	private function is_surecontact_custom_domain_promo_dismissed() {
-		$expiry = get_option( 'suremails_surecontact_custom_domain_promo_dismissal_time', 0 );
-		if ( ! $expiry ) {
-			return false;
-		}
-
-		if ( time() >= $expiry ) {
-			delete_option( 'suremails_surecontact_custom_domain_promo_dismissal_time' );
 			return false;
 		}
 

@@ -295,6 +295,7 @@ class SurecontactHandler implements ConnectionHandler {
 				'oauth_url'        => $callback_url,
 				'state'            => $state,
 				'integration_name' => 'SureMails',
+				'utm_source'       => 'suremails',
 			]
 		);
 

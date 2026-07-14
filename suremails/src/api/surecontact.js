@@ -205,20 +205,3 @@ export const dismissSureContactSmtpPromo = async () => {
 		},
 	} ).catch( () => {} );
 };
-
-/**
- * Dismiss the SureContact custom sending domain nudge for 15 days.
- * Fire-and-forget: the banner hides locally regardless of the request outcome.
- *
- * @return {Promise<Object>} { success, message }
- */
-export const dismissSureContactCustomDomainPromo = async () => {
-	return apiFetch( {
-		path: '/suremails/v1/disable-surecontact-custom-domain-promo',
-		method: 'POST',
-		headers: {
-			'Content-Type': 'application/json',
-			'X-WP-Nonce': suremails.nonce,
-		},
-	} ).catch( () => {} );
-};
