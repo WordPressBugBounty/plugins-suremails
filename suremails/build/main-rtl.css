@@ -2887,32 +2887,37 @@ body.suremails-onboarding-page #wpadminbar {
 :is(#suremails-root-app, #suremails-admin-notice) .ease-linear{
   transition-timing-function: linear;
 }
-:is(#suremails-root-app, #suremails-admin-notice)  h1,:is( :is(#suremails-root-app, #suremails-admin-notice) h2),:is( :is(#suremails-root-app, #suremails-admin-notice) h3),:is( :is(#suremails-root-app, #suremails-admin-notice) h4),:is( :is(#suremails-root-app, #suremails-admin-notice) h5),:is( :is(#suremails-root-app, #suremails-admin-notice) h6),:is( :is(#suremails-root-app, #suremails-admin-notice) p),:is( :is(#suremails-root-app, #suremails-admin-notice) pre){
+  :is(#suremails-root-app, #suremails-admin-notice)  h1,:is( :is(#suremails-root-app, #suremails-admin-notice) h2),:is( :is(#suremails-root-app, #suremails-admin-notice) h3),:is( :is(#suremails-root-app, #suremails-admin-notice) h4),:is( :is(#suremails-root-app, #suremails-admin-notice) h5),:is( :is(#suremails-root-app, #suremails-admin-notice) h6),:is( :is(#suremails-root-app, #suremails-admin-notice) p),:is( :is(#suremails-root-app, #suremails-admin-notice) pre){
   margin: 0px;
   --tw-text-opacity: 1;
   color: rgb(17 24 39 / var(--tw-text-opacity, 1));
 }
-:is(#suremails-root-app, #suremails-admin-notice)  h1{
+
+
+  :is(#suremails-root-app, #suremails-admin-notice)  h1{
   font-size: 1.25rem !important;
   font-weight: 600 !important;
   line-height: 1.875rem !important;
 }
-:is(#suremails-root-app, #suremails-admin-notice)  h2{
+  :is(#suremails-root-app, #suremails-admin-notice)  h2{
   font-size: 1.125rem;
   font-weight: 600;
   line-height: 1.75rem;
 }
-:is(#suremails-root-app, #suremails-admin-notice)  h3{
+
+  :is(#suremails-root-app, #suremails-admin-notice)  h3{
   font-size: 1rem;
   font-weight: 600;
   line-height: 1.5rem;
 }
-:is(#suremails-root-app, #suremails-admin-notice)  h4{
+
+  :is(#suremails-root-app, #suremails-admin-notice)  h4{
   font-size: 0.875rem !important;
   font-weight: 600 !important;
   line-height: 1.25rem !important;
 }
-:is(#suremails-root-app, #suremails-admin-notice)  p{
+
+  :is(#suremails-root-app, #suremails-admin-notice)  p{
   font-size: 0.875rem;
   font-weight: 400;
   line-height: 1.25rem;
