@@ -97,7 +97,6 @@ class Auth extends Api_Base {
 			'surecontact' => SurecontactHandler::class,
 		];
 	}
-
 }
 
 // Instantiate the Auth class to register the routes.

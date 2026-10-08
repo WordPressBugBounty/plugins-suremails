@@ -34,5 +34,4 @@ class LogError {
 			error_log( '[SureMails EmailLog Error] ' . $message ); // phpcs:ignore WordPress.PHP.DevelopmentFunctions.error_log_error_log
 		}
 	}
-
 }

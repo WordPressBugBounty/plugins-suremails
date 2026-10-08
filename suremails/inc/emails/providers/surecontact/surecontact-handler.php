@@ -57,6 +57,18 @@ class SurecontactHandler implements ConnectionHandler {
 	private const SENDING_DOMAINS_URL = 'https://app.surecontact.com/organization/sending-domains';
 
 	/**
+	 * Acquisition channels SureContact accepts as `utm_source`. Anything else
+	 * is reported as 'suremails'.
+	 */
+	private const ATTRIBUTION_SOURCES = [ 'suremails', 'sureforms' ];
+
+	/**
+	 * Transient prefix that carries `utm_source` from get_auth_url() to the
+	 * exchange, keyed by the state minted for that flow.
+	 */
+	private const SOURCE_TRANSIENT_PREFIX = 'suremails_sc_source_';
+
+	/**
 	 * Connection data passed in from the factory.
 	 *
 	 * @var array<string, string|int|bool>
@@ -106,6 +118,18 @@ class SurecontactHandler implements ConnectionHandler {
 	 */
 	public static function sending_domains_url() {
 		return self::SENDING_DOMAINS_URL;
+	}
+
+	/**
+	 * Resolve the acquisition channel reported to SureContact, so accounts and
+	 * connections started from another plugin (e.g. SureForms) are attributed
+	 * to it.
+	 *
+	 * @param mixed $source Caller-supplied source.
+	 * @return string An allowlisted source, 'suremails' by default.
+	 */
+	public static function resolve_source( $source ) {
+		return is_string( $source ) && in_array( $source, self::ATTRIBUTION_SOURCES, true ) ? $source : 'suremails';
 	}
 
 	/**
@@ -275,17 +299,25 @@ class SurecontactHandler implements ConnectionHandler {
 	 * The callback URL is server-built from `admin_url()` (no request-controlled
 	 * input) so the `oauth_token` can never be delivered to a foreign host.
 	 *
-	 * @param array<string, mixed> $params Unused — kept for the auth-url controller's contract.
+	 * An optional `utm_source` (see resolve_source()) is passed on in the
+	 * redirect, and kept for the exchange keyed by this flow's state.
+	 *
+	 * @param array<string, mixed> $params Auth-url request params; only `utm_source` is read.
 	 * @return array{auth_url?: string, state?: string, error?: string}
 	 */
 	public static function get_auth_url( $params ) {
-		unset( $params );
+		$source = self::resolve_source( $params['utm_source'] ?? '' );
 
 		$state = self::mint_state();
 		if ( $state === '' ) {
 			return [
 				'error' => __( 'You must be logged in to start authorization.', 'suremails' ),
 			];
+		}
+
+		if ( 'suremails' !== $source ) {
+			// Lives as long as the state itself (see validate_state()).
+			set_transient( self::SOURCE_TRANSIENT_PREFIX . md5( $state ), $source, 10 * MINUTE_IN_SECONDS );
 		}
 
 		$callback_url = admin_url( 'admin.php?page=suremail' );
@@ -295,7 +327,7 @@ class SurecontactHandler implements ConnectionHandler {
 				'oauth_url'        => $callback_url,
 				'state'            => $state,
 				'integration_name' => 'SureMails',
-				'utm_source'       => 'suremails',
+				'utm_source'       => $source,
 			]
 		);
 
@@ -456,6 +488,10 @@ class SurecontactHandler implements ConnectionHandler {
 			];
 		}
 
+		$source_key = self::SOURCE_TRANSIENT_PREFIX . md5( $oauth_state );
+		$source     = self::resolve_source( get_transient( $source_key ) );
+		delete_transient( $source_key );
+
 		$body = [
 			'oauth_token'    => $oauth_token,
 			'site_url'       => esc_url_raw( rest_url( 'suremails/v1/' ) ),
@@ -463,6 +499,7 @@ class SurecontactHandler implements ConnectionHandler {
 			'site_name'      => get_bloginfo( 'name' ),
 			'wp_version'     => get_bloginfo( 'version' ),
 			'plugin_version' => defined( 'SUREMAILS_VERSION' ) ? SUREMAILS_VERSION : '',
+			'utm_source'     => $source,
 		];
 
 		$response = $this->api_request( 'POST', '/connections/exchange', $body, '' );

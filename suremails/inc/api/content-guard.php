@@ -258,7 +258,6 @@ class ContentGuard extends Api_Base {
 			Settings::instance()->set_user_details( [ 'lead' => false ] );
 		}
 	}
-
 }
 
 // Initialize the ContentGuard singleton.

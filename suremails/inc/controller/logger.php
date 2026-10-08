@@ -27,6 +27,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Logger {
 
 	use Instance;
+
 	/**
 	 * Status constant for failed emails.
 	 */

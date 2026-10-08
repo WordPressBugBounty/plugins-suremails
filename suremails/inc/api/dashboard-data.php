@@ -156,7 +156,6 @@ class DashboardData extends Api_Base {
 			]
 		);
 	}
-
 }
 
 // Initialize the DashboardData singleton.

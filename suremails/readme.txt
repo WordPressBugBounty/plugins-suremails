@@ -5,7 +5,7 @@ Tags: smtp, email, gmail smtp, outlook, email logs
 Requires at least: 6.7
 Tested up to: 7.1
 Requires PHP: 7.4
-Stable tag: 2.0.2
+Stable tag: 2.0.3
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
 
@@ -245,6 +245,10 @@ You can report the issue through our [Bug Bounty Program](https://brainstormforc
 5. Email Logs – Monitor your email activity with detailed logs to track successful, failed, in progress, and blocked emails easily.
 
 == Changelog ==
+
+v2.0.3 - 08-October-2026
+- Improvement: SureContact - Improved connection source tracking during onboarding and OAuth connect.
+- Improvement: Internal libraries updated to patched releases for improved security and stability.
 
 v2.0.2 - 20-August-2026
 - Improvement: Added compatibility with WordPress 7.1.

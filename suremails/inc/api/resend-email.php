@@ -160,7 +160,7 @@ class ResendEmail extends Api_Base {
 		}
 		$connection_manager->set_is_resend( false );
 
-		$overall_success = array_reduce( $results, static fn( $carry, $item) => $carry || $item['success'], false );
+		$overall_success = array_reduce( $results, static fn( $carry, $item ) => $carry || $item['success'], false );
 
 		return new WP_REST_Response(
 			[
@@ -170,7 +170,6 @@ class ResendEmail extends Api_Base {
 			$overall_success ? 200 : 500
 		);
 	}
-
 }
 
 // Initialize the ResendEmail singleton.

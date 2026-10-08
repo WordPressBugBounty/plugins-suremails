@@ -344,5 +344,4 @@ class BrevoHandler implements ConnectionHandler {
 			$recipients
 		);
 	}
-
 }

@@ -79,7 +79,6 @@ class GetSettings extends Api_Base {
 			]
 		);
 	}
-
 }
 
 /**

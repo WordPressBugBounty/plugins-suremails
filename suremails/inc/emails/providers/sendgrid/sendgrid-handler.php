@@ -278,5 +278,4 @@ class SendgridHandler implements ConnectionHandler {
 			],
 		];
 	}
-
 }

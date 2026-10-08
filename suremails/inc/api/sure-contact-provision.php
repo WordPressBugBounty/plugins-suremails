@@ -67,6 +67,9 @@ class SureContactProvision extends Api_Base {
 		$params = $request->get_json_params();
 		$name   = sanitize_text_field( (string) ( $params['name'] ?? '' ) );
 		$email  = sanitize_email( (string) ( $params['email'] ?? '' ) );
+		// Lets SureForms (or another plugin) provisioning through SureMail be
+		// credited as the channel; unknown values report as 'suremails'.
+		$source = SurecontactHandler::resolve_source( $params['utm_source'] ?? '' );
 
 		// The site identifier is this install's REST namespace root, built
 		// server-side from rest_url() so it already honours the permalink
@@ -106,7 +109,7 @@ class SureContactProvision extends Api_Base {
 			'site_name'      => get_bloginfo( 'name' ),
 			'wp_version'     => get_bloginfo( 'version' ),
 			'plugin_version' => defined( 'SUREMAILS_VERSION' ) ? SUREMAILS_VERSION : '',
-			'utm_source'     => 'suremails',
+			'utm_source'     => $source,
 		];
 
 		$response = $this->call_provision( $payload );

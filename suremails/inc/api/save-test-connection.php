@@ -641,7 +641,6 @@ class SaveTestConnection extends Api_Base {
 		}
 		return false;
 	}
-
 }
 
 // Initialize the SaveTestConnection singleton.

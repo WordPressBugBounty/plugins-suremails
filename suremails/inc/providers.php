@@ -23,6 +23,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 class Providers {
 
 	use Instance;
+
 	/**
 	 * Get the options configuration for a specific provider or all providers.
 	 *

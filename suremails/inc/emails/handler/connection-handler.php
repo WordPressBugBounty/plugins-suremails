@@ -33,7 +33,7 @@ interface ConnectionHandler {
 	 * @param array{to: array<int, array{name: string, email: string}>, headers: array{from: array{name: string, email: string}, cc: array<int, array{name: string, email: string}>, bcc: array<int, array{name: string, email: string}>, reply_to: array<int, array{name: string, email: string}>, content_type: string, charset: string, boundary: string, x_mailer: string, extra_headers: array<string, string>}, message: string, attachments: array<int, string>, subject: string, uploaded_attachments: array<int, string>} $processed_data The processed data.
 	 * @return array{success: bool, message: string, send?: bool, error_code?: int, email_simulated?: bool} The result of the email send operation.
 	 */
-	public function send( array $atts, $log_id, array $connection, array $processed_data);
+	public function send( array $atts, $log_id, array $connection, array $processed_data );
 
 	/**
 	 * Return the option configuration for this provider.

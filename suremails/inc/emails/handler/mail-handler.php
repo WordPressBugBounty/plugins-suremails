@@ -558,5 +558,4 @@ class MailHandler {
 
 		return $connection;
 	}
-
 }

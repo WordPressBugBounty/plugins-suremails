@@ -156,5 +156,4 @@ class PhpmailHandler implements ConnectionHandler {
 	public static function get_specific_fields() {
 		return [];
 	}
-
 }

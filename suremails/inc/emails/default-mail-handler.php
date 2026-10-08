@@ -431,5 +431,4 @@ class DefaultMailHandler {
 			return false;
 		}
 	}
-
 }

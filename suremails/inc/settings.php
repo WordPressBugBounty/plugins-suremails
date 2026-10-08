@@ -187,7 +187,7 @@ class Settings {
 		return array_keys(
 			array_filter(
 				$fields,
-				static function( $field ) {
+				static function ( $field ) {
 					return isset( $field['encrypt'] ) && $field['encrypt'] === true;
 				}
 			)

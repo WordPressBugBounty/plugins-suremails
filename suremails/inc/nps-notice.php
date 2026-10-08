@@ -120,7 +120,6 @@ if ( ! class_exists( 'Nps_Notice' ) ) {
 
 			return false;
 		}
-
 	}
 
 }

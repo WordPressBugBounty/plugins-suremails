@@ -203,5 +203,4 @@ class Db_Helper {
 			'values' => $values_limit,
 		];
 	}
-
 }

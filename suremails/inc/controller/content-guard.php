@@ -390,5 +390,4 @@ class ContentGuard {
 		}
 		return $log_id;
 	}
-
 }

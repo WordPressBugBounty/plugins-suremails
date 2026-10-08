@@ -506,5 +506,4 @@ class EmailLog {
 			return false;
 		}
 	}
-
 }
