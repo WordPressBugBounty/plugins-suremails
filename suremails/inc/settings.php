@@ -63,6 +63,21 @@ class Settings {
 	use Instance;
 
 	/**
+	 * Allowed log retention values mapped to their strtotime() offset.
+	 * A null offset means logs are kept indefinitely.
+	 */
+	public const LOG_RETENTION_PERIODS = [
+		'1_day'    => '-1 day',
+		'7_days'   => '-7 days',
+		'30_days'  => '-30 days',
+		'60_days'  => '-60 days',
+		'90_days'  => '-90 days',
+		'365_days' => '-1 year',
+		'730_days' => '-2 years',
+		'none'     => null,
+	];
+
+	/**
 	 * The connections array.
 	 *
 	 * @var array{connections: array<string, array<string, string|int|bool>>, default_connection: array{type: string, email: string, id: string, connection_title: string}, log_emails: string, delete_email_logs_after: string, email_simulation: string}|null

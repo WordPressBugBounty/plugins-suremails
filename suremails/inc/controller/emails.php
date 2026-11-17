@@ -131,18 +131,9 @@ class Emails {
 
 		$date_threshold = null;
 
-		$retention_map = [
-			'1_day'    => '-1 day',
-			'7_days'   => '-7 days',
-			'30_days'  => '-30 days',
-			'365_days' => '-1 year',
-			'730_days' => '-2 years',
-		];
-
-		if ( array_key_exists( $retention_period, $retention_map ) ) {
-			$date_threshold = gmdate( 'Y-m-d H:i:s', strtotime( $retention_map[ $retention_period ] ) );
-		} elseif ( $retention_period === 'none' ) {
-			$date_threshold = null;
+		if ( array_key_exists( $retention_period, Settings::LOG_RETENTION_PERIODS ) ) {
+			$offset         = Settings::LOG_RETENTION_PERIODS[ $retention_period ];
+			$date_threshold = $offset ? gmdate( 'Y-m-d H:i:s', strtotime( $offset ) ) : null;
 		} else {
 			$date_threshold = gmdate( 'Y-m-d H:i:s', strtotime( '-30 days' ) );
 		}

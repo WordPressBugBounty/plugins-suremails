@@ -953,7 +953,7 @@ class Ability {
 
 			// Update delete_email_logs_after.
 			$retention = $this->input_get( 'delete_email_logs_after', '' );
-			if ( ! empty( $retention ) ) {
+			if ( ! empty( $retention ) && array_key_exists( $retention, Settings::LOG_RETENTION_PERIODS ) ) {
 				$options['delete_email_logs_after'] = sanitize_text_field( $retention );
 				$is_updated                         = true;
 			}

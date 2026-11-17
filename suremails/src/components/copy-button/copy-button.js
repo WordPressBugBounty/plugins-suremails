@@ -47,6 +47,11 @@ const CopyButton = ( {
 				className={ cn( 'w-fit', className ) }
 				variant={ variant ?? 'outline' }
 				onClick={ handleCopy }
+				aria-label={
+					isCopied
+						? __( 'Copied to clipboard', 'suremails' )
+						: __( 'Copy to clipboard', 'suremails' )
+				}
 				icon={
 					isCopied ? (
 						<ClipboardCheckIcon className="w-4 h-4" />

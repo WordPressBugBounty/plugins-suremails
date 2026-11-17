@@ -1,10 +1,16 @@
 // @components/surecontact-upgrade-modal.js
-import { Dialog, Button, Badge, Text, Loader } from '@bsf/force-ui';
+import { useState } from '@wordpress/element';
+import { Dialog, Button, Badge, Text, Loader, toast } from '@bsf/force-ui';
 import PropTypes from 'prop-types';
-import { __ } from '@wordpress/i18n';
+import { __, sprintf } from '@wordpress/i18n';
 import { useQuery } from '@tanstack/react-query';
-import { ExternalLink } from 'lucide-react';
-import { getSureContactPlans } from '@api/surecontact';
+import { useNavigate } from 'react-router-dom';
+import { ExternalLink, Mail, Loader2 as LoaderIcon } from 'lucide-react';
+import {
+	getSureContactPlans,
+	getSureContactStatus,
+	resendVerification,
+} from '@api/surecontact';
 
 /**
  * Resolve the destination for a purchasable item's CTA. Prefer the item's own
@@ -77,11 +83,12 @@ PriceBlock.propTypes = {
  * A single SMTP plan card. Padding, type scale and button height match the
  * reference PricingCard (p-6, text-xl name, text-4xl price, h-12 CTA).
  *
- * @param {Object} props
- * @param {Object} props.plan       Plan data.
- * @param {string} props.billingUrl Fallback billing URL.
+ * @param {Object}  props
+ * @param {Object}  props.plan       Plan data.
+ * @param {string}  props.billingUrl Fallback billing URL.
+ * @param {boolean} props.isPaid     Account already has a paid plan, so the CTA adds a plan on top.
  */
-const PlanCard = ( { plan, billingUrl } ) => {
+const PlanCard = ( { plan, billingUrl, isPaid } ) => {
 	const url = resolveCheckoutUrl( plan, billingUrl );
 
 	return (
@@ -150,7 +157,13 @@ const PlanCard = ( { plan, billingUrl } ) => {
 							: 'bg-background-secondary hover:bg-[#F3F4F6] text-text-primary border border-solid border-[#E5E7EB]'
 					}` }
 				>
-					{ plan.cta_label || __( 'Buy Credits', 'suremails' ) }
+					{ isPaid && plan.name
+						? sprintf(
+								/* translators: %s: SMTP plan name */
+								__( 'Add %s', 'suremails' ),
+								plan.name
+						  )
+						: plan.cta_label || __( 'Buy Credits', 'suremails' ) }
 				</Button>
 			</div>
 		</div>
@@ -160,6 +173,83 @@ const PlanCard = ( { plan, billingUrl } ) => {
 PlanCard.propTypes = {
 	plan: PropTypes.object.isRequired,
 	billingUrl: PropTypes.string,
+	isPaid: PropTypes.bool,
+};
+
+/**
+ * Note shown above the plans while the SureContact email is unverified.
+ * Unverified accounts are held to a small daily cap on every plan, so the user
+ * hears that before paying, with a way to resend the verification email.
+ *
+ * @param {Object} props
+ * @param {string} props.connectionId Active SureContact connection.
+ */
+const VerifyNote = ( { connectionId } ) => {
+	const [ isResending, setIsResending ] = useState( false );
+
+	const handleResend = async () => {
+		setIsResending( true );
+		try {
+			const response = await resendVerification( connectionId );
+			if ( response?.success ) {
+				toast.success(
+					response.email_verified
+						? __( 'Email already verified.', 'suremails' )
+						: __(
+								'Verification email sent — check your inbox.',
+								'suremails'
+						  )
+				);
+			} else {
+				toast.error(
+					__( 'Could not send verification email.', 'suremails' ),
+					{ description: response?.message }
+				);
+			}
+		} catch ( error ) {
+			toast.error(
+				__( 'Could not send verification email.', 'suremails' ),
+				{ description: error?.message }
+			);
+		} finally {
+			setIsResending( false );
+		}
+	};
+
+	return (
+		<div className="flex items-start justify-between gap-4 flex-wrap p-4 border border-solid rounded-lg bg-alert-background-warning border-alert-border-warning">
+			<div className="flex items-start gap-3 min-w-0 flex-1">
+				<Mail
+					className="size-4 text-icon-warning shrink-0 mt-0.5"
+					strokeWidth={ 1.75 }
+				/>
+				<Text as="p" size={ 14 } color="primary">
+					{ __(
+						'Verify your SureContact email first. Until then, sending is limited to a few emails a day on any plan.',
+						'suremails'
+					) }
+				</Text>
+			</div>
+			<Button
+				size="sm"
+				variant="outline"
+				type="button"
+				icon={
+					isResending ? <LoaderIcon className="animate-spin" /> : null
+				}
+				disabled={ isResending }
+				onClick={ handleResend }
+			>
+				{ isResending
+					? __( 'Sending…', 'suremails' )
+					: __( 'Resend verification', 'suremails' ) }
+			</Button>
+		</div>
+	);
+};
+
+VerifyNote.propTypes = {
+	connectionId: PropTypes.oneOfType( [ PropTypes.string, PropTypes.number ] ),
 };
 
 /**
@@ -249,7 +339,11 @@ CreditCard.propTypes = {
  * dialog (max-w-7xl, max-h-90vh, 24px padding, scrollable body) but rendered
  * with force-ui components. Presents the SMTP subscription plans and, below an
  * "OR" divider, the one-time email-credit packs. Triggered from the dashboard
- * meter (Upgrade button + critical-state link).
+ * meter (Upgrade button + critical-state link) and the Add-ons menu item.
+ *
+ * The view follows the cached SureContact status: a verify note for unverified
+ * accounts, "Add {plan}" copy for paid accounts (SMTP plans stack), a manage
+ * link for unlimited plans, and a reconnect prompt when the key is revoked.
  *
  * @param {Object}   props
  * @param {boolean}  props.open           Whether the modal is visible.
@@ -260,19 +354,85 @@ const SureContactUpgradeModal = ( { open, setOpen, connectionId } ) => {
 	const billingUrl = window?.suremails?.surecontactBillingUrl || '';
 	const paymentLogosUrl = window?.suremails?.paymentLogosUrl || '';
 
-	const { data, isLoading, isError } = useQuery( {
+	const navigate = useNavigate();
+
+	const {
+		data: status,
+		error: statusError,
+		isLoading: isStatusLoading,
+	} = useQuery( {
+		queryKey: [ 'surecontact-cap', connectionId ],
+		queryFn: () => getSureContactStatus( connectionId ),
+		enabled: open && Boolean( connectionId ),
+		refetchOnWindowFocus: false,
+		retry: ( count, error ) => error?.status !== 401 && count < 2,
+	} );
+
+	const isUnauthorized = statusError?.status === 401;
+	const isUnlimited = status?.cap?.limit === -1;
+	const isUnverified = status?.success && ! status.email_verified;
+	const isPaid = Boolean( status?.success && status.is_paid );
+
+	const {
+		data,
+		isLoading: isPlansLoading,
+		isError,
+	} = useQuery( {
 		queryKey: [ 'surecontact-plans', connectionId ],
 		queryFn: () => getSureContactPlans( connectionId ),
-		enabled: open,
+		enabled: open && ! isUnauthorized && ! isUnlimited,
 		staleTime: Infinity,
 		refetchOnWindowFocus: false,
 	} );
+
+	const isLoading =
+		isStatusLoading ||
+		( isPlansLoading && ! isUnauthorized && ! isUnlimited );
 
 	const header = data?.header || {};
 	const plans = data?.plans || [];
 	const credits = data?.credits || null;
 
 	const closeModal = () => setOpen( false );
+
+	const goToConnections = () => {
+		setOpen( false );
+		navigate( '/connections' );
+	};
+
+	let title =
+		header.title ||
+		__(
+			'Email Delivery Built for You and Pay for What You Send.',
+			'suremails'
+		);
+	let subtitle =
+		header.subtitle ||
+		__(
+			'No IP warming, no separate billing. Pick a monthly SMTP plan or buy non-expiring credits and start sending emails today.',
+			'suremails'
+		);
+	if ( isUnauthorized ) {
+		title = __( 'Reconnect SureContact', 'suremails' );
+		subtitle = __(
+			'SureContact no longer accepts this connection. Reconnect it from Connections to see plans.',
+			'suremails'
+		);
+	} else if ( isUnlimited ) {
+		title = __( 'Your plan has no monthly limit', 'suremails' );
+		subtitle = __(
+			'You can send as many emails as you need. Manage your plan in SureContact.',
+			'suremails'
+		);
+	} else if ( isPaid ) {
+		title = __( 'Need more emails?', 'suremails' );
+		subtitle = __(
+			'Any plan you add stacks on top of your current one. Your quota covers every site connected to this SureContact account.',
+			'suremails'
+		);
+	}
+
+	const showPlans = ! isLoading && ! isUnauthorized && ! isUnlimited;
 
 	return (
 		<Dialog
@@ -287,24 +447,14 @@ const SureContactUpgradeModal = ( { open, setOpen, connectionId } ) => {
 				<Dialog.Header className="shrink-0 px-6 pt-6 pb-4">
 					<div className="flex items-start justify-between gap-4">
 						<Dialog.Title className="text-2xl font-bold">
-							{ ! isLoading
-								? header.title ||
-								  __(
-										'Email Delivery Built for You and Pay for What You Send.',
-										'suremails'
-								  )
-								: null }
+							{ ! isLoading ? title : null }
 						</Dialog.Title>
 						<Dialog.CloseButton onClick={ closeModal } />
 					</div>
 					{ ! isLoading ? (
 						<Dialog.Description className="text-base mt-1">
-							{ header.subtitle ||
-								__(
-									'No IP warming, no separate billing. Pick a monthly SMTP plan or buy non-expiring credits and start sending emails today.',
-									'suremails'
-								) }{ ' ' }
-							{ header.features_url ? (
+							{ subtitle }{ ' ' }
+							{ showPlans && header.features_url ? (
 								<a
 									href={ header.features_url }
 									target="_blank"
@@ -326,7 +476,32 @@ const SureContactUpgradeModal = ( { open, setOpen, connectionId } ) => {
 						</div>
 					) : null }
 
-					{ ! isLoading && isError ? (
+					{ ! isLoading && isUnauthorized ? (
+						<div className="flex items-center justify-center py-10">
+							<Button type="button" onClick={ goToConnections }>
+								{ __( 'Go to Connections', 'suremails' ) }
+							</Button>
+						</div>
+					) : null }
+
+					{ ! isLoading && ! isUnauthorized && isUnlimited ? (
+						<div className="flex items-center justify-center py-10">
+							<Button
+								tag="a"
+								href={ billingUrl || undefined }
+								target="_blank"
+								rel="noopener noreferrer"
+								disabled={ ! billingUrl }
+								icon={ <ExternalLink className="size-4" /> }
+								iconPosition="right"
+								className="no-underline"
+							>
+								{ __( 'Manage plan', 'suremails' ) }
+							</Button>
+						</div>
+					) : null }
+
+					{ showPlans && isError ? (
 						<div className="flex items-center justify-center py-16">
 							<Text as="p" size={ 14 } color="tertiary">
 								{ __(
@@ -337,14 +512,18 @@ const SureContactUpgradeModal = ( { open, setOpen, connectionId } ) => {
 						</div>
 					) : null }
 
-					{ ! isLoading && ! isError ? (
+					{ showPlans && ! isError ? (
 						<div className="space-y-6">
+							{ isUnverified ? (
+								<VerifyNote connectionId={ connectionId } />
+							) : null }
 							<div className="grid grid-cols-1 md:grid-cols-3 gap-4">
 								{ plans.map( ( plan ) => (
 									<PlanCard
 										key={ plan.id }
 										plan={ plan }
 										billingUrl={ billingUrl }
+										isPaid={ isPaid }
 									/>
 								) ) }
 							</div>

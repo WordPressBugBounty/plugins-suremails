@@ -9,6 +9,7 @@ import useWhatsNewRSS from '../../lib/useWhatsNewRSS';
 import { __ } from '@wordpress/i18n';
 import { useQuery } from '@tanstack/react-query';
 import { fetchSettings } from '@api/settings';
+import SureContactUpgradeModal from '@components/surecontact-upgrade-modal';
 
 const NavMenu = () => {
 	const location = useLocation();
@@ -31,6 +32,55 @@ const NavMenu = () => {
 	 * @type {boolean}
 	 */
 	const emailSimulation = settingsData?.email_simulation === 'yes';
+
+	const sureContactConnection = settingsData?.connections
+		? Object.values( settingsData.connections ).find(
+				( connection ) => connection?.type === 'SURECONTACT'
+		  )
+		: undefined;
+
+	const [ isPlansOpen, setIsPlansOpen ] = useState( false );
+	// Set when the setup drawer has just provisioned a connection that the
+	// cached settings don't include yet.
+	const [ plansConnectionId, setPlansConnectionId ] = useState( null );
+
+	useEffect( () => {
+		const openPlans = ( event ) => {
+			setPlansConnectionId( event?.detail?.connectionId ?? null );
+			setIsPlansOpen( true );
+		};
+		window.addEventListener( 'suremails:open-plans', openPlans );
+		return () =>
+			window.removeEventListener( 'suremails:open-plans', openPlans );
+	}, [] );
+
+	// Add-ons: connected sites see the SureContact SMTP plans, others get the
+	// existing SureContact setup drawer on Connections.
+	const handleAddonsClick = () => {
+		if ( sureContactConnection?.id ) {
+			setPlansConnectionId( null );
+			setIsPlansOpen( true );
+			return;
+		}
+		navigate( '/connections', {
+			state: {
+				openDrawer: true,
+				selectedProvider: 'SURECONTACT',
+				from: 'addons',
+			},
+		} );
+	};
+
+	const addonsLabel = __( 'Add-ons', 'suremails' );
+	const newBadge = (
+		<Badge
+			label={ __( 'New', 'suremails' ) }
+			size="xxs"
+			type="pill"
+			variant="blue"
+			disableHover
+		/>
+	);
 
 	// Define navigation items
 	const navItems = [
@@ -106,9 +156,11 @@ const NavMenu = () => {
 		selector: '#suremails_whats_new',
 		flyout: {
 			title: __( "What's New?", 'suremails' ),
+			closeBtnLabel: __( 'Close', 'suremails' ),
 			className: 'suremails-whats-new-flyout',
 		},
 		triggerButton: {
+			label: __( "What's New", 'suremails' ),
 			icon: renderToString(
 				<Megaphone
 					className="size-4 m-1 text-icon-primary"
@@ -136,6 +188,15 @@ const NavMenu = () => {
 									{ option.name }
 								</HamburgerMenu.Option>
 							) ) }
+							<HamburgerMenu.Option
+								tag="button"
+								type="button"
+								onClick={ handleAddonsClick }
+								className="bg-transparent border-0 cursor-pointer text-left"
+							>
+								{ addonsLabel }
+								{ newBadge }
+							</HamburgerMenu.Option>
 						</HamburgerMenu.Options>
 					</HamburgerMenu>
 					<Topbar.Item>
@@ -170,6 +231,14 @@ const NavMenu = () => {
 									{ item.name }
 								</Link>
 							) ) }
+							<button
+								type="button"
+								onClick={ handleAddonsClick }
+								className="inline-flex items-center gap-1.5 relative h-full px-1 text-sm text-text-secondary font-medium bg-transparent border-0 cursor-pointer shadow-none hover:text-text-primary focus:outline-none focus-visible:ring-2 focus-visible:ring-focus transition-colors duration-300"
+							>
+								{ addonsLabel }
+								{ newBadge }
+							</button>
 						</nav>
 					</Topbar.Item>
 				</Topbar.Middle>
@@ -202,6 +271,7 @@ const NavMenu = () => {
 							variant="ghost"
 							size="xs"
 							icon={ <CircleHelp /> }
+							aria-label={ __( 'Documentation', 'suremails' ) }
 							onClick={ () =>
 								window.open( suremails?.docsURL, '_blank' )
 							}
@@ -215,6 +285,11 @@ const NavMenu = () => {
 					</Topbar.Item>
 				</Topbar.Right>
 			</Topbar>
+			<SureContactUpgradeModal
+				open={ isPlansOpen }
+				setOpen={ setIsPlansOpen }
+				connectionId={ plansConnectionId || sureContactConnection?.id }
+			/>
 		</>
 	);
 };

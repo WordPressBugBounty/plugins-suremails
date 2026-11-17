@@ -115,8 +115,11 @@ export const getSureContactStatus = async ( connectionId ) => {
 		throw new Error( __( 'Missing connection identifier.', 'suremails' ) );
 	}
 
+	// parse: false keeps the HTTP status on failures, so callers can tell a
+	// revoked key (401) apart from SureContact being unreachable.
+	let response;
 	try {
-		return await apiFetch( {
+		response = await apiFetch( {
 			path: `/suremails/v1/surecontact/status?connection_id=${ encodeURIComponent(
 				connectionId
 			) }`,
@@ -124,16 +127,31 @@ export const getSureContactStatus = async ( connectionId ) => {
 			headers: {
 				'X-WP-Nonce': suremails.nonce,
 			},
+			parse: false,
 		} );
 	} catch ( error ) {
-		throw new Error(
-			error.message ||
-				__(
-					'There was an issue fetching the SureContact status.',
-					'suremails'
-				)
-		);
+		response = error;
 	}
+
+	const body =
+		typeof response?.json === 'function'
+			? await response.json().catch( () => ( {} ) )
+			: {};
+
+	if ( response?.ok ) {
+		return body;
+	}
+
+	const wrapped = new Error(
+		body?.message ||
+			response?.message ||
+			__(
+				'There was an issue fetching the SureContact status.',
+				'suremails'
+			)
+	);
+	wrapped.status = response?.status;
+	throw wrapped;
 };
 
 /**

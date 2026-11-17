@@ -168,6 +168,15 @@ class SetSettings extends Api_Base {
 		// Update delete_email_logs_after if provided.
 		if ( isset( $settings['delete_email_logs_after'] ) ) {
 			$sanitized_retention = sanitize_text_field( $settings['delete_email_logs_after'] );
+			if ( ! array_key_exists( $sanitized_retention, Settings::LOG_RETENTION_PERIODS ) ) {
+				return new WP_REST_Response(
+					[
+						'success' => false,
+						'message' => __( 'Invalid log retention period.', 'suremails' ),
+					],
+					400
+				);
+			}
 			if ( $options['delete_email_logs_after'] !== $sanitized_retention ) {
 				$options['delete_email_logs_after'] = $sanitized_retention;
 				$is_updated                         = true;

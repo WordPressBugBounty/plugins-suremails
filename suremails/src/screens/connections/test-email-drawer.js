@@ -97,14 +97,14 @@ const TestEmailDrawer = ( {
 			return true;
 		} catch ( error ) {
 			const formattedErrors = {};
-			error.errors.forEach( ( err ) => {
+			error.issues.forEach( ( err ) => {
 				const path = err.path.join( '.' );
 				formattedErrors[ path ] = err.message;
 			} );
 			setErrors( formattedErrors );
 
 			// Focus the first field with error.
-			if ( error.errors[ 0 ]?.path[ 0 ] === 'send_to_email' ) {
+			if ( error.issues[ 0 ]?.path[ 0 ] === 'send_to_email' ) {
 				emailToRef.current?.focus();
 			}
 
@@ -129,7 +129,7 @@ const TestEmailDrawer = ( {
 		} catch ( error ) {
 			setErrors( ( prev ) => ( {
 				...prev,
-				[ field ]: error.errors[ 0 ].message,
+				[ field ]: error.issues[ 0 ].message,
 			} ) );
 		}
 	};

@@ -3641,6 +3641,11 @@
     --tw-ring-color: rgb(107 114 128 / var(--tw-ring-opacity, 1))
 }
 
+:is(#suremails-root-app, #suremails-admin-notice) .focus-visible\:ring-focus:focus-visible{
+    --tw-ring-opacity: 1;
+    --tw-ring-color: rgb(13 126 232 / var(--tw-ring-opacity, 1))
+}
+
 :is(#suremails-root-app, #suremails-admin-notice) .focus-visible\:ring-support-error:focus-visible{
     --tw-ring-opacity: 1;
     --tw-ring-color: rgb(220 38 38 / var(--tw-ring-opacity, 1))

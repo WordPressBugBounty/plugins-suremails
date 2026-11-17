@@ -152,12 +152,7 @@ const generateValidationSchema = ( fields ) => {
 					accSchema[ field.name ] = field?.required
 						? z
 								.number( {
-									required_error: getErrorMessage(
-										field.label
-									),
-									invalid_type_error: getErrorMessage(
-										field.label
-									),
+									error: getErrorMessage( field.label ),
 								} )
 								.min( 1, getErrorMessage( field.label ) )
 						: z.number().optional();

@@ -2,8 +2,13 @@
 
 // Import createRoot from @wordpress/element for WordPress compatibility
 import { createRoot } from 'react-dom/client';
+import { z } from 'zod';
 import App from './App';
 import './styles.css'; // Ensure your styles are imported
+
+// Skip zod's eval probe and JIT compiler so strict CSP sites never see a
+// `new Function` attempt (see src/shims/zod-no-eval-loader.js).
+z.config( { jitless: true } );
 
 // Find the root element in the WordPress page where the app will be rendered
 const rootElement = document.getElementById( 'suremails-root-app' );

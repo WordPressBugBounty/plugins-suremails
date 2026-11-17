@@ -31,6 +31,7 @@ const SURECONTACT_KEY = 'SURECONTACT';
  * @param {number}   root0.sequenceId        Next free connection priority/sequence.
  * @param {Function} root0.onBack            Called when the user clicks Back — returns to the provider list.
  * @param {Function} root0.onSuccess         Called with the saved connection.
+ * @param {string}   root0.source            Where the drawer was opened from ('addons' opens the plans popup after connecting).
  */
 const SureContactDrawerForm = ( {
 	pendingOAuthToken,
@@ -38,7 +39,10 @@ const SureContactDrawerForm = ( {
 	sequenceId = 1,
 	onBack,
 	onSuccess,
+	source = '',
 } ) => {
+	const fromAddons = source === 'addons';
+
 	const [ formData, setFormData ] = useState( {
 		name:
 			[
@@ -164,6 +168,13 @@ const SureContactDrawerForm = ( {
 				toast.success( __( 'Connected to SureContact.', 'suremails' ) );
 				if ( onSuccess ) {
 					onSuccess( response.connection );
+				}
+				if ( fromAddons && response.connection?.id ) {
+					window.dispatchEvent(
+						new CustomEvent( 'suremails:open-plans', {
+							detail: { connectionId: response.connection.id },
+						} )
+					);
 				}
 			} else {
 				toast.error(
@@ -335,10 +346,15 @@ const SureContactDrawerForm = ( {
 					strokeWidth={ 1.75 }
 				/>
 				<Text as="p" size={ 13 } color="primary">
-					{ __(
-						"You'll get 100 free emails on the Free plan. Upgrade anytime to keep sending.",
-						'suremails'
-					) }
+					{ fromAddons
+						? __(
+								'Start free with 100 emails. Plans open right after you connect.',
+								'suremails'
+						  )
+						: __(
+								"You'll get 100 free emails on the Free plan. Upgrade anytime to keep sending.",
+								'suremails'
+						  ) }
 				</Text>
 			</div>
 

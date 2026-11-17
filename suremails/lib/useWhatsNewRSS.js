@@ -7,6 +7,12 @@
  */
 
 import { useEffect, useRef } from 'react';
+const escapeAttr = function ( value ) {
+	return String( value )
+		.replace( /&/g, '&amp;' )
+		.replace( /"/g, '&quot;' )
+		.replace( /</g, '&lt;' );
+};
 var __assign =
 	( this && this.__assign ) ||
 	function () {
@@ -192,6 +198,7 @@ const WhatsNewRSSDefaultArgs = {
 	},
 	triggerButton: {
 		icon: '<svg width="20" height="20" viewBox="0 0 20 20" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M8.61703 13.1998C8.04294 13.1503 7.46192 13.125 6.875 13.125H6.25C4.17893 13.125 2.5 11.4461 2.5 9.375C2.5 7.30393 4.17893 5.625 6.25 5.625H6.875C7.46192 5.625 8.04294 5.59972 8.61703 5.55018M8.61703 13.1998C8.82774 14.0012 9.1031 14.7764 9.43719 15.5195C9.64341 15.9782 9.48685 16.5273 9.05134 16.7787L8.50441 17.0945C8.04492 17.3598 7.45466 17.1921 7.23201 16.7106C6.70983 15.5811 6.30451 14.3866 6.03155 13.1425M8.61703 13.1998C8.29598 11.9787 8.125 10.6968 8.125 9.375C8.125 8.05316 8.29598 6.77125 8.61703 5.55018M8.61703 13.1998C11.25 13.427 13.737 14.1643 15.9789 15.3124M8.61703 5.55018C11.25 5.323 13.737 4.58569 15.9789 3.43757M15.9789 3.43757C15.8808 3.12162 15.7751 2.80903 15.662 2.5M15.9789 3.43757C16.4247 4.87356 16.7131 6.37885 16.8238 7.93326M15.9789 15.3124C15.8808 15.6284 15.7751 15.941 15.662 16.25M15.9789 15.3124C16.4247 13.8764 16.7131 12.3711 16.8238 10.8167M16.8238 7.93326C17.237 8.2772 17.5 8.79539 17.5 9.375C17.5 9.95461 17.237 10.4728 16.8238 10.8167M16.8238 7.93326C16.8578 8.40942 16.875 8.8902 16.875 9.375C16.875 9.8598 16.8578 10.3406 16.8238 10.8167" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+		label: "What's New",
 		beforeBtn: '',
 		afterBtn: '',
 		className: '',
@@ -218,6 +225,7 @@ const WhatsNewRSSDefaultArgs = {
 		className: '',
 		closeOnEsc: true,
 		closeOnOverlayClick: true,
+		closeBtnLabel: 'Close',
 		closeBtnIcon:
 			'<svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M6 18L18 6M6 6L18 18" stroke="#94A3B8" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>',
 		formatDate: null,
@@ -734,6 +742,12 @@ const WhatsNewRSS = /** @class */ ( function () {
 		 * Open flyout on trigger button click.
 		 * Flyout has three states: `closed | open | ready`
 		 */
+		triggerButton.addEventListener( 'keydown', function ( e ) {
+			if ( e.key === 'Enter' || e.key === ' ' ) {
+				e.preventDefault();
+				triggerButton.click();
+			}
+		} );
 		triggerButton.addEventListener( 'click', function ( e ) {
 			e.preventDefault();
 			_this.getArgs().triggerButton.onClick( _this );
@@ -1173,7 +1187,11 @@ var WhatsNewRSSView = /** @class */ ( function () {
 		const button = '\n\t\t'
 			.concat(
 				this.RSS.getArgs().triggerButton.beforeBtn,
-				'\n\t\t<a class="whats-new-rss-trigger-button" id="'
+				'\n\t\t<a class="whats-new-rss-trigger-button" role="button" tabindex="0" aria-label="'
+			)
+			.concat(
+				escapeAttr( this.RSS.getArgs().triggerButton.label ),
+				'" id="'
 			)
 			.concat( this.getTriggerButtonID(), '">\n\t\t\t' )
 			.concat(
@@ -1222,7 +1240,11 @@ var WhatsNewRSSView = /** @class */ ( function () {
 					this.RSS.getArgs().loaderIcon,
 					'\n\t\t\t\t\t</span>\n\t\t\t\t</div>\n\n\t\t\t\t<button type="button" id="'
 				)
-				.concat( this.getFlyoutCloseBtnID(), '">' )
+				.concat( this.getFlyoutCloseBtnID(), '" aria-label="' )
+				.concat(
+					escapeAttr( this.RSS.getArgs().flyout.closeBtnLabel ),
+					'">'
+				)
 				.concat(
 					this.RSS.getArgs().flyout.closeBtnIcon,
 					'</button>\n\t\t\t</div>\n\n\t\t\t'

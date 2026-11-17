@@ -95,13 +95,17 @@ const Settings = () => {
 
 	useLayoutEffect( () => {
 		if ( settingsData ) {
+			const retention = deleteLogsOptions.some(
+				( option ) =>
+					option.value === settingsData.delete_email_logs_after
+			)
+				? settingsData.delete_email_logs_after
+				: '30_days';
 			// Update form state with fetched data
 			setFormState( {
 				logEmails: settingsData.log_emails === 'yes',
 				deleteEmailLogsAfter:
-					settingsData.log_emails === 'yes'
-						? settingsData.delete_email_logs_after || '30_days'
-						: 'none',
+					settingsData.log_emails === 'yes' ? retention : 'none',
 				defaultConnection: {
 					type: settingsData?.default_connection?.type || '',
 					email: settingsData?.default_connection?.email || '',
@@ -126,6 +130,8 @@ const Settings = () => {
 		{ label: __( 'Delete after 30 days', 'suremails' ), value: '30_days' },
 		{ label: __( 'Delete after 60 days', 'suremails' ), value: '60_days' },
 		{ label: __( 'Delete after 90 days', 'suremails' ), value: '90_days' },
+		{ label: __( 'Delete after 1 year', 'suremails' ), value: '365_days' },
+		{ label: __( 'Delete after 2 years', 'suremails' ), value: '730_days' },
 		{ label: __( 'Never', 'suremails' ), value: 'none' },
 	];
 

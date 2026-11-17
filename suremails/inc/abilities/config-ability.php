@@ -14,6 +14,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+use SureMails\Inc\Settings;
+
 /**
  * Class ConfigAbility
  *
@@ -953,7 +955,7 @@ class ConfigAbility {
 						],
 						'delete_email_logs_after' => [
 							'type'        => 'string',
-							'description' => __( 'Automatic log retention period (e.g. "none", "7_days", "30_days").', 'suremails' ),
+							'description' => __( 'Automatic log retention period (e.g. "none", "7_days", "30_days", "90_days", "365_days").', 'suremails' ),
 						],
 						'email_summary_active'    => [
 							'type'        => 'string',
@@ -990,7 +992,7 @@ class ConfigAbility {
 
 			SUREMAILS_ABILITY_API_NAMESPACE . 'update-settings' => [
 				'label'               => __( 'Update plugin settings', 'suremails' ),
-				'description'         => __( 'Changes one or more SureMails plugin settings. Only the settings you provide will be updated — omitted settings remain unchanged. Available settings: log_emails ("yes"/"no" — controls whether outgoing emails are recorded in the log), email_simulation ("yes"/"no" — when enabled, emails are logged but NOT delivered to recipients), delete_email_logs_after (auto-delete old logs: "none", "1_day", "7_days", "30_days", "365_days", "730_days"), email_summary_active ("yes"/"no" — weekly delivery report), email_summary_day (day of the week for the summary). Changes take effect immediately and affect all future emails sent from the site.', 'suremails' ),
+				'description'         => __( 'Changes one or more SureMails plugin settings. Only the settings you provide will be updated — omitted settings remain unchanged. Available settings: log_emails ("yes"/"no" — controls whether outgoing emails are recorded in the log), email_simulation ("yes"/"no" — when enabled, emails are logged but NOT delivered to recipients), delete_email_logs_after (auto-delete old logs: "none", "1_day", "7_days", "30_days", "60_days", "90_days", "365_days", "730_days"), email_summary_active ("yes"/"no" — weekly delivery report), email_summary_day (day of the week for the summary). Changes take effect immediately and affect all future emails sent from the site.', 'suremails' ),
 				'category'            => 'suremails',
 				'permission_callback' => static function () use ( $ability ) {
 					return get_option( 'suremails_abilities_api_edit', false ) &&
@@ -1011,7 +1013,7 @@ class ConfigAbility {
 						],
 						'delete_email_logs_after' => [
 							'type'        => 'string',
-							'enum'        => [ 'none', '1_day', '7_days', '30_days', '365_days', '730_days' ],
+							'enum'        => array_keys( Settings::LOG_RETENTION_PERIODS ),
 							'description' => __( 'Automatically delete email logs older than this period. "none" keeps logs indefinitely.', 'suremails' ),
 						],
 						'email_summary_active'    => [

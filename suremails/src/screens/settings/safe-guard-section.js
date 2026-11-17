@@ -305,7 +305,7 @@ const SafeGuardSection = () => {
 			} catch ( error ) {
 				setErrors( ( prev ) => ( {
 					...prev,
-					[ name ]: error.errors[ 0 ].message,
+					[ name ]: error.issues[ 0 ].message,
 				} ) );
 				return false;
 			}
@@ -317,12 +317,12 @@ const SafeGuardSection = () => {
 			return true;
 		} catch ( error ) {
 			const formattedErrors = {};
-			error.errors.forEach( ( err ) => {
+			error.issues.forEach( ( err ) => {
 				formattedErrors[ err.path[ 0 ] ] = err.message;
 			} );
 			setErrors( formattedErrors );
 			// Focus the first input field that has an error
-			const firstInputWithError = error.errors[ 0 ]?.path[ 0 ];
+			const firstInputWithError = error.issues[ 0 ]?.path[ 0 ];
 			const firstErrorInput = formRef.current?.querySelector(
 				`input[name="${ firstInputWithError }"]`
 			);

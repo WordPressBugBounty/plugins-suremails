@@ -195,7 +195,7 @@ export const useFormValidation = ( form, formData, schema, onError ) => {
 				} );
 				onError( { [ field ]: undefined } );
 			} catch ( error ) {
-				onError( { [ field ]: error.errors[ 0 ].message } );
+				onError( { [ field ]: error.issues[ 0 ].message } );
 			}
 		},
 		[ formData, onError, schema ]
@@ -211,7 +211,7 @@ export const useFormValidation = ( form, formData, schema, onError ) => {
 			return true;
 		} catch ( error ) {
 			const formattedErrors = {};
-			error.errors.forEach( ( err ) => {
+			error.issues.forEach( ( err ) => {
 				formattedErrors[ err.path[ 0 ] ] = err.message;
 			} );
 
@@ -219,7 +219,7 @@ export const useFormValidation = ( form, formData, schema, onError ) => {
 			onError( formattedErrors );
 
 			// Focus the first input with error
-			const firstErrorField = error.errors[ 0 ]?.path[ 0 ];
+			const firstErrorField = error.issues[ 0 ]?.path[ 0 ];
 			const firstErrorInput = formRef.current?.querySelector(
 				`input[name="${ firstErrorField }"]`
 			);

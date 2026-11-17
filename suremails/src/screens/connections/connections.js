@@ -21,6 +21,15 @@ import useProviders from './use-dynamic-providers';
 
 const Connections = () => {
 	const [ isDrawerOpen, setIsDrawerOpen ] = useState( false );
+	// Which CTA opened the drawer (e.g. 'addons'), so the SureContact form can
+	// tailor its copy. Cleared on close so later opens start neutral.
+	const [ drawerSource, setDrawerSource ] = useState( '' );
+
+	useEffect( () => {
+		if ( ! isDrawerOpen ) {
+			setDrawerSource( '' );
+		}
+	}, [ isDrawerOpen ] );
 	const [ isTestEmailDrawerOpen, setIsTestEmailDrawerOpen ] =
 		useState( false );
 	const [ currentConnection, setCurrentConnection ] = useState( null );
@@ -39,6 +48,7 @@ const Connections = () => {
 	useEffect( () => {
 		if ( location.state?.openDrawer ) {
 			setIsDrawerOpen( true );
+			setDrawerSource( location.state?.from || '' );
 
 			// A banner/CTA can request a specific provider be pre-selected.
 			const presetProvider = location.state?.selectedProvider || null;
@@ -452,6 +462,10 @@ const Connections = () => {
 													size="xs"
 													icon={ <PenLine /> }
 													iconPosition="left"
+													aria-label={ __(
+														'Edit',
+														'suremails'
+													) }
 													onClick={ () =>
 														handleEditConnection(
 															row
@@ -478,6 +492,10 @@ const Connections = () => {
 													size="xs"
 													icon={ <Trash /> }
 													iconPosition="left"
+													aria-label={ __(
+														'Delete',
+														'suremails'
+													) }
 													onClick={ () =>
 														handleDeleteConnection(
 															row
@@ -508,6 +526,7 @@ const Connections = () => {
 					sequenceId={ getNewConnectionSequenceId() }
 					connectionCount={ getNewConnectionCount() }
 					surecontactPaid={ isSureContactPaid() }
+					source={ drawerSource }
 				/>
 
 				{ /* Test Email Drawer */ }

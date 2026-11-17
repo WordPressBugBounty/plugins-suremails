@@ -37,6 +37,7 @@ const ProvidersDrawer = ( {
 	sequenceId = 1,
 	connectionCount = {},
 	surecontactPaid = false,
+	source = '',
 } ) => {
 	// Free accounts get one SureContact connection per site; paid accounts can
 	// add more (each a new from_email sharing the account's api_key). The drawer
@@ -188,7 +189,7 @@ const ProvidersDrawer = ( {
 		} catch ( error ) {
 			setErrors( ( prev ) => ( {
 				...prev,
-				[ field ]: error.errors[ 0 ].message,
+				[ field ]: error.issues[ 0 ].message,
 			} ) );
 		}
 	};
@@ -216,13 +217,13 @@ const ProvidersDrawer = ( {
 			return true;
 		} catch ( error ) {
 			const formattedErrors = {};
-			error.errors.forEach( ( err ) => {
+			error.issues.forEach( ( err ) => {
 				formattedErrors[ err.path[ 0 ] ] = err.message;
 			} );
 			setErrors( formattedErrors );
 
 			// Focus the first input with error
-			const firstErrorField = error.errors[ 0 ]?.path[ 0 ];
+			const firstErrorField = error.issues[ 0 ]?.path[ 0 ];
 			const firstErrorInput = formRef.current?.querySelector(
 				`input[name="${ firstErrorField }"]`
 			);
@@ -444,6 +445,7 @@ const ProvidersDrawer = ( {
 										currentConnection?.oauth_state || ''
 									}
 									sequenceId={ sequenceId }
+									source={ source }
 									onBack={ () => {
 										setSelectedProvider( null );
 										setFormData( null );
